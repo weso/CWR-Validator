@@ -47,8 +47,12 @@ class GRPValidationTest(unittest.TestCase):
         self.assertFalse(self._validator.validate_group_trailer(
             'GRT000030000017900000719  1111111111'))
 
-    '''def test_agreements_groups(self):
-        with open('files/valid_agreements_group') as agreements_file:
-            file_content = agreements_file.readlines()
+    def test_file(self):
+        with open('files/CW1328EMI_059.V21') as cwr_file:
+            file_content = cwr_file.readlines()
 
-        self.assertTrue(self._validator.validate_group(file_content.pop(0), file_content))'''
+        for line in file_content:
+            if line[0:0+3] == 'GRT':
+                self.assertTrue(self._validator.validate_group_trailer(line))
+            elif line[0:0+3] == 'GRH':
+                self.assertTrue(self._validator.validate_group_header(line))
