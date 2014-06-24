@@ -4,6 +4,7 @@ import re
 from domain.agreement_record import AgreementRecord
 from domain.group_header import GroupHeader
 from domain.group_trailer import GroupTrailer
+from domain.territory_record import TerritoryRecord
 from domain.transmission_header import TransmissionHeader
 from domain.transmission_trailer import TransmissionTrailer
 
@@ -79,6 +80,17 @@ class Validator(object):
             return False
         try:
             AgreementRecord(record.upper())
+            return True
+        except ValueError as detail:
+            print detail
+            return False
+
+    @staticmethod
+    def validate_territory_record(record):
+        if record is None:
+            return False
+        try:
+            TerritoryRecord(record.upper())
             return True
         except ValueError as detail:
             print detail
