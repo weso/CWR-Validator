@@ -1,0 +1,8 @@
+*.pyc
+*.pyo
+
+.idea/
+
+out/
+
+.idea_modules/

@@ -47,11 +47,13 @@ class AgreementRecord(object):
             raise ValueError('Given agreement type: %s not in the required ones' % self._type)
 
         self._start_date = datetime.datetime.strptime(record[49:49 + 8], '%Y%m%d').date()
-        self._end_date = datetime.datetime.strptime(record[57:57 + 8], '%Y%m%d').date() if record[57:57 + 8].replace(
-            ' ', '') else None
+        if record[57:57 + 8].strip():
+            self._end_date = datetime.datetime.strptime(record[57:57 + 8], '%Y%m%d').date()
+        else:
+            self._end_date = None
 
         # Not in a single line for reading purposes
-        if record[65:65 + 8].replace(' ', ''):
+        if record[65:65 + 8].strip():
             self._retention_end_date = datetime.datetime.strptime(record[65:65 + 8], '%Y%m%d').date()
         else:
             self._retention_end_date = None
@@ -59,17 +61,17 @@ class AgreementRecord(object):
         self._prior_royalty_status = record[73:73 + 1]
         if self._prior_royalty_status == 'D':
             self._prior_royalty_date = datetime.datetime.strptime(record[74:74 + 8], '%Y%m%d').date()
-        elif record[74:74 + 8].replace(' ', ''):
+        elif record[74:74 + 8].strip():
             raise ValueError('Not expecting royalty date for royalty status %s' % self._prior_royalty_status)
 
         self._post_term_collection_stat = record[82:82 + 1]
         if self._post_term_collection_stat == 'D':
             self._post_term_collection_date = datetime.datetime.strptime(record[83:83 + 8], '%Y%m%d').date()
-        elif record[83:83 + 8].replace(' ', ''):
+        elif record[83:83 + 8].strip():
             raise ValueError('Not expecting post-term collection date for status %s' % self._post_term_collection_stat)
 
         # Not in a single line for reading purposes
-        if record[91:91 + 8].replace(' ', ''):
+        if record[91:91 + 8].strip():
             self._signature_date = datetime.datetime.strptime(record[91:91 + 8], '%Y%m%d').date()
         else:
             self._signature_date = None
@@ -77,7 +79,7 @@ class AgreementRecord(object):
         self._works_number = int(record[99:99 + 5])
 
         # Sales clause is only mandatory for OS and PS agreements
-        if record[104:104 + 1].replace(' ', ''):
+        if record[104:104 + 1].strip():
             self._sales_clause = record[104:104 + 1]
         elif self._type == 'OS' or self._type == 'PS':
             raise ValueError('Sales clause not specified for an agreement type of %s' % self._type)
@@ -85,7 +87,7 @@ class AgreementRecord(object):
         self._shares_change = record[105:105 + 1] == 'T'
         self._advance_given = record[106:106 + 1] == 'T'
 
-        self._society_assigned_number = record[107:107 + 14] if record[107:107 + 14].replace(' ', '') else None
+        self._society_assigned_number = record[107:107 + 14] if record[107:107 + 14].strip() else None
 
     '''@staticmethod
     def check_optional(value):
