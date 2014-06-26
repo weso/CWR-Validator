@@ -21,7 +21,7 @@ class InterestedPartyRecord(object):
     SR_AFFILIATION_SOCIETY = '[ -~]{3}'
     SR_SHARE = '\d{5}'
 
-    IPA_RECORD_REGEX = "^{0}{1}{2}{3}{4}{5}{6}{7}{8}{9}{10}{11}{12}{13}{14}{15}$".format(
+    IPA_RECORD_REGEX = "^{0}{1}{2}{3}{4}{5}{6}{7}{8}{9}{10}{11}{12}{13}{14}$".format(
         RECORD_TYPE, AGREEMENT_ID, RECORD_NUMBER, ROLE_CODE, CAE_IPI_NAME, IPI_BASE_NUMBER, IPA_NUMBER,
         IPA_LAST_NAME, IPA_FIRST_NAME, PR_AFFILIATION_SOCIETY, PR_SHARE, MR_AFFILIATION_SOCIETY, MR_SHARE,
         SR_AFFILIATION_SOCIETY, SR_SHARE)
@@ -32,7 +32,7 @@ class InterestedPartyRecord(object):
             self._build_ipa_record(record)
         else:
             raise ValueError(
-                'Given record: %s does not match required format %s' % (record, self.TERRITORY_RECORD_REGEX))
+                'Given record: %s does not match required format %s' % (record, self.IPA_RECORD_REGEX))
 
     def _build_ipa_record(self, record):
         self._agreement_id = int(record[3:3 + 8])
@@ -51,29 +51,28 @@ class InterestedPartyRecord(object):
         self._number = record[45:45 + 9]
         self._last_name = record[54:54 + 45]
         self._writer_first_name = record[99:99 + 30]
-        if self._writer_first_name.replace(' ', ''):
+        if self._writer_first_name.strip():
             if self._role != 'AS':  # or related agreement  type not OS or OG
                 raise ValueError('Not expected writer first name for role %s and agreement type %s'
                                  % (self._role, 'AGREEMENT_TYPE'))
 
         self._pr_share = float(record[132:132 + 3] + '.' + record[132 + 3:132 + 3 + 2])
-        self._pr_society = int(record[129:129 + 3])
+        self._pr_society = int(record[129:129 + 3]) if record[129:129 + 3].strip() else None
         if self._pr_share > 0:
-            pass  # Check pr_society within the table
+            if self._pr_society is None:  # Check pr_society within the table
+                raise ValueError('PR Society should be specified as pr share is greater than 0')
 
         self._mr_share = float(record[140:140 + 3] + '.' + record[140 + 3:140 + 3 + 2])
-        self._mr_society = int(record[137:137 + 3])
+        self._mr_society = int(record[137:137 + 3]) if record[137:137 + 3].strip() else None
         if self._mr_share > 0:
-            pass  # Check pr_society within the table
+            if self._mr_society is None:  # Check pr_society within the table
+                raise ValueError('MR Society should be specified as mr share is greater than 0')
 
         self._sr_share = float(record[148:148 + 3] + '.' + record[148 + 3:148 + 3 + 2])
-        self._sr_society = int(record[145:145 + 3])
+        self._sr_society = int(record[145:145 + 3]) if record[145:145 + 3].strip() else None
         if self._sr_share > 0:
-            pass  # Check pr_society within the table
-
-        total_share = self._pr_share + self._mr_share + self._sr_share
-        if not 0 < total_share <= 100:
-            raise ValueError('Total share should be greater than 0 and 100 max, received: %f' % total_share)
+            if self._sr_society is None:  # Check pr_society within the table
+                raise ValueError('SR Society should be specified as mr share is greater than 0')
 
     def __str__(self):
         return 'Not implemented yet'
