@@ -1,49 +1,46 @@
 __author__ = 'Borja'
 import datetime
-import re
+
+from validator.cwr_regex import regex
+from validator.cwr_regex.value_tables import AGREEMENT_TYPE_VALUES
+from validator.domain.record import Record
 
 
-class AgreementRecord(object):
-    AGREEMENT_TYPE_VALUES = {'OG', 'OS', 'PG', 'PS'}
+class AgreementRecord(Record):
+    RECORD_TYPE = regex.get_defined_values_regex(3, False, 'AGR')
+    AGREEMENT_NUMBER = regex.get_numeric_regex(16)
+    SUBMITTER_NUMBER = regex.get_alphanumeric_regex(14)
+    INTERNATIONAL_CODE = regex.get_alphanumeric_regex(14, True)
+    AGREEMENT_TYPE = regex.get_alpha_regex(2)
+    START_DATE = regex.get_date_regex()
+    END_DATE = regex.get_date_regex(True)
+    RETENTION_END_DATE = regex.get_date_regex(True)
+    PRIOR_ROYALTY_STATUS = regex.get_defined_values_regex(1, False, 'A', 'D', 'N')
+    PRIOR_ROYALTY_START_DATE = regex.get_date_regex(True)
+    POST_TERM_COLLECTION_STATUS = regex.get_defined_values_regex(1, False, 'D', 'N', 'O')
+    POST_TERM_COLLECTION_END_DATE = regex.get_date_regex(True)
+    SIGNATURE_DATE = regex.get_date_regex(True)
+    WORKS_NUMBER = regex.get_numeric_regex(5)
+    SALES_CLAUSE = regex.get_defined_values_regex(1, True, 'N', 'S')
+    SHARES_CHANGE = regex.get_flag_regex(True)
+    ADVANCE_GIVEN = regex.get_flag_regex(True)
+    SOCIETY_ASSIGNED_NUMBER = regex.get_alphanumeric_regex(14, True)
 
-    RECORD_TYPE = 'AGR'
-    AGREEMENT_NUMBER = '\d{8}\d{8}'  # Not really clear in the document
-    SUBMITTER_NUMBER = '[ -~]{14}'
-    INTERNATIONAL_CODE = '[ -~]{14}'
-    AGREEMENT_TYPE = '[A-Z]{2}'
-    START_DATE = '\d{8}'
-    END_DATE = '[ \d]{8}'  # Optional values are filled with whitespaces
-    RETENTION_END_DATE = '[ \d]{8}'
-    PRIOR_ROYALTY_STATUS = '[AND]'  # Matching available values [A, N, D]
-    PRIOR_ROYALTY_START_DATE = '[ \d]{8}'  # Required is status is D
-    POST_TERM_COLLECTION_STATUS = '[NOD]'
-    POST_TERM_COLLECTION_END_DATE = '[ \d]{8}'
-    SIGNATURE_DATE = '[ \d]{8}'
-    WORKS_NUMBER = '\d{5}'
-    SALES_CLAUSE = '[SM ]'
-    SHARES_CHANGE = '[YN ]'
-    ADVANCE_GIVEN = '[YN ]'
-    SOCIETY_ASSIGNED_NUMBER = '[ -~]{14}'
-
-    AGREEMENT_RECORD_REGEX = "^{0}{1}{2}{3}{4}{5}{6}{7}{8}{9}{10}{11}{12}{13}{14}{15}{16}{17}$".format(
+    REGEX = "^{0}{1}{2}{3}{4}{5}{6}{7}{8}{9}{10}{11}{12}{13}{14}{15}{16}{17}$".format(
         RECORD_TYPE, AGREEMENT_NUMBER, SUBMITTER_NUMBER, INTERNATIONAL_CODE, AGREEMENT_TYPE, START_DATE, END_DATE,
         RETENTION_END_DATE, PRIOR_ROYALTY_STATUS, PRIOR_ROYALTY_START_DATE, POST_TERM_COLLECTION_STATUS,
         POST_TERM_COLLECTION_END_DATE, SIGNATURE_DATE, WORKS_NUMBER, SALES_CLAUSE, SHARES_CHANGE, ADVANCE_GIVEN,
         SOCIETY_ASSIGNED_NUMBER)
 
     def __init__(self, record):
-        matcher = re.compile(self.AGREEMENT_RECORD_REGEX)
-        if matcher.match(record):
-            self._build_agreement_record(record)
-        else:
-            raise ValueError('Given record: %s does not match required format' % record)
+        super(AgreementRecord, self).__init__(record, self.REGEX)
 
-    def _build_agreement_record(self, record):
+    def _build_record(self, record):
         self._number = int(record[3:3 + 8])
         self._submitter = record[19:19 + 14]
         self._international_code = record[33:33 + 14] if record[33:33 + 14] else None
         self._type = record[47:47 + 2]
-        if self._type not in self.AGREEMENT_TYPE_VALUES:
+        if self._type not in AGREEMENT_TYPE_VALUES:
             raise ValueError('Given agreement type: %s not in the required ones' % self._type)
 
         self._start_date = datetime.datetime.strptime(record[49:49 + 8], '%Y%m%d').date()
@@ -88,12 +85,6 @@ class AgreementRecord(object):
         self._advance_given = record[106:106 + 1] == 'T'
 
         self._society_assigned_number = record[107:107 + 14] if record[107:107 + 14].strip() else None
-
-    '''@staticmethod
-    def check_optional(value):
-        if not value:
-            return None
-        return value'''
 
     def __str__(self):
         return 'Not implemented yet'
