@@ -18,23 +18,23 @@ class GRPValidationTest(unittest.TestCase):
 
     def test_headers(self):
         self.assertTrue(self._validator.validate_group_header(
-            'GRHAGR0000102.100130400001'))
+            'GRHAGR0000102.100130400001  '))
         self.assertTrue(self._validator.validate_group_header(
-            'GRHNWR0000202.100130500002'))
+            'GRHNWR0000202.100130500002  '))
         self.assertTrue(self._validator.validate_group_header(
-            'GRHREV0000202.100130500002'))
+            'GRHREV0000202.100130500002  '))
 
         # Same transaction group can't be validated twice
         self.assertFalse(self._validator.validate_group_header(
-            'GRHAGR0000102.100130400001'))
+            'GRHAGR0000102.100130400001  '))
         self.assertFalse(self._validator.validate_group_header(
-            'REV0000202.100130500002'))
+            'REV0000202.100130500002  '))
 
     def test_trailers(self):
         self.assertTrue(self._validator.validate_group_trailer(
             'GRT000010000017900000719   0000000000'))
         self.assertTrue(self._validator.validate_group_trailer(
-            'grt000020000017900000719'))
+            'grt000020000017900000719EUR0000000001'))
 
         # Same group id mustn't appear multiple times
         self.assertFalse(self._validator.validate_group_trailer(
@@ -53,6 +53,6 @@ class GRPValidationTest(unittest.TestCase):
 
         for line in file_content:
             if line[0:0+3] == 'GRT':
-                self.assertTrue(self._validator.validate_group_trailer(line))
+                self.assertTrue(self._validator.validate_group_trailer(line.rstrip()))
             elif line[0:0+3] == 'GRH':
                 self.assertTrue(self._validator.validate_group_header(line))

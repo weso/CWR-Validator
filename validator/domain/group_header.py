@@ -1,34 +1,30 @@
 __author__ = 'Borja'
-import re
+from validator.cwr_regex import regex
+from validator.cwr_regex.value_tables import TRANSACTION_VALUES
+from validator.domain.record import Record
 
 
-class GroupHeader(object):
-    TRANSACTION_VALUES = {'AGR', 'NWR', 'REV'}
+class GroupHeader(Record):
+    RECORD_TYPE = regex.get_defined_values_regex(3, False, 'GRH')
+    TRANSACTION_TYPE = regex.get_alpha_regex(3)
+    GROUP_ID = regex.get_numeric_regex(5)
+    VERSION_NUMBER = regex.get_defined_values_regex(5, False, '02\.10')
+    BATCH_REQUEST = regex.get_numeric_regex(10, True)
+    SUB_DIST_TYPE = regex.get_optional_regex(2)
 
-    RECORD_TYPE = 'GRH'
-    TRANSACTION_TYPE = '([A-Z]{3})'  # Three upper case characters
-    GROUP_ID = '\d{5}'
-    VERSION_NUMBER = '02\.10'
-    BATCH_REQUEST = '\d{10}'
-    SUB_DIST_TYPE = '([ -~]{2})?'
-
-    GROUP_HEADER_REGEX = "^{0}{1}{2}{3}{4}{5}$".format(
+    REGEX = "^{0}{1}{2}{3}{4}{5}$".format(
         RECORD_TYPE, TRANSACTION_TYPE, GROUP_ID, VERSION_NUMBER, BATCH_REQUEST, SUB_DIST_TYPE)
 
     def __init__(self, record):
-        matcher = re.compile(self.GROUP_HEADER_REGEX)
-        if matcher.match(record):
-            self._build_group_header(record)
-        else:
-            raise ValueError('Given record: %s does not match required format' % record)
+        super(GroupHeader, self).__init__(record, self.REGEX)
 
-    def _build_group_header(self, record):
+    def _build_record(self, record):
         self._transaction_type = record[3:3 + 3]
-        if not self._transaction_type in self.TRANSACTION_VALUES:
+        if not self._transaction_type in TRANSACTION_VALUES:
             raise ValueError('Given transaction type: %s not in required ones' % self._transaction_type)
 
-        self._group_id = record[6:6 + 5]
-        if self._group_id > '00003':
+        self._group_id = int(record[6:6 + 5])
+        if self._group_id > len(TRANSACTION_VALUES):
             raise ValueError('Given group id: %s bigger than expected (00003)' % self._group_id)
         self._version_number = record[11:11 + 5]
         self._batch_request = record[16:16 + 10]

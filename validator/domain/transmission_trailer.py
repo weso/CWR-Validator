@@ -1,24 +1,21 @@
 __author__ = 'Borja'
-import re
+from validator.cwr_regex import regex
+from validator.domain.record import Record
 
 
-class TransmissionTrailer(object):
-    RECORD_TYPE = 'TRL'
-    GROUP_COUNT = '\d{5}'
-    TRANSACTION_COUNT = '\d{8}'
-    RECORD_COUNT = '\d{8}'
+class TransmissionTrailer(Record):
+    RECORD_TYPE = regex.get_defined_values_regex(3, False, 'TRL')
+    GROUP_COUNT = regex.get_numeric_regex(5)
+    TRANSACTION_COUNT = regex.get_numeric_regex(8)
+    RECORD_COUNT = regex.get_numeric_regex(8)
 
-    TRANSMISSION_TRAILER_REGEX = "^{0}{1}{2}{3}$".format(
+    REGEX = "^{0}{1}{2}{3}$".format(
         RECORD_TYPE, GROUP_COUNT, TRANSACTION_COUNT, RECORD_COUNT)
 
     def __init__(self, record):
-        matcher = re.compile(self.TRANSMISSION_TRAILER_REGEX)
-        if matcher.match(record):
-            self._build_transmission_trailer(record)
-        else:
-            raise ValueError('Given record: %s does not match required format' % record)
+        super(TransmissionTrailer, self).__init__(record, self.REGEX)
 
-    def _build_transmission_trailer(self, record):
+    def _build_record(self, record):
         self._group_count = int(record[3:3 + 5])
         self._transaction_count = int(record[8:8 + 8])
         self._record_count = int(record[16:16 + 8])

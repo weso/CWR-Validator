@@ -1,43 +1,39 @@
 __author__ = 'Borja'
-import re
+from validator.cwr_regex import regex
+from validator.cwr_regex.value_tables import IPA_TYPES
+from validator.cwr_regex.value_tables import SOCIETY_CODES
+from validator.domain.record import Record
 
 
-class InterestedPartyRecord(object):
-    IPA_TYPES = ['AC', 'AS']
+class InterestedPartyRecord(Record):
+    RECORD_TYPE = regex.get_defined_values_regex(3, False, 'IPA')
+    AGREEMENT_ID = regex.get_numeric_regex(8)
+    RECORD_NUMBER = regex.get_numeric_regex(8)
+    ROLE_CODE = regex.get_alpha_regex(2)
+    CAE_IPI_NAME = regex.get_numeric_regex(11, True)
+    IPI_BASE_NUMBER = regex.get_numeric_regex(13, True)
+    IPA_NUMBER = regex.get_ascii_regex(9)
+    IPA_LAST_NAME = regex.get_ascii_regex(45)
+    IPA_FIRST_NAME = regex.get_ascii_regex(30, True)
+    PR_AFFILIATION_SOCIETY = regex.get_numeric_regex(2, True) + regex.get_optional_regex(1)
+    PR_SHARE = regex.get_numeric_regex(5)
+    MR_AFFILIATION_SOCIETY = regex.get_numeric_regex(2, True) + regex.get_optional_regex(1)
+    MR_SHARE = regex.get_numeric_regex(5)
+    SR_AFFILIATION_SOCIETY = regex.get_numeric_regex(2, True) + regex.get_optional_regex(1)
+    SR_SHARE = regex.get_numeric_regex(5)
 
-    RECORD_TYPE = 'IPA'
-    AGREEMENT_ID = '\d{8}'
-    RECORD_NUMBER = '\d{8}'
-    ROLE_CODE = '[A-Z]{2}'
-    CAE_IPI_NAME = '00\d{9}'
-    IPI_BASE_NUMBER = '\d{13}'
-    IPA_NUMBER = '[ -~]{9}'
-    IPA_LAST_NAME = '[ -~]{45}'
-    IPA_FIRST_NAME = '[ -~]{30}'
-    PR_AFFILIATION_SOCIETY = '[ -~]{3}'
-    PR_SHARE = '\d{5}'
-    MR_AFFILIATION_SOCIETY = '[ -~]{3}'
-    MR_SHARE = '\d{5}'
-    SR_AFFILIATION_SOCIETY = '[ -~]{3}'
-    SR_SHARE = '\d{5}'
-
-    IPA_RECORD_REGEX = "^{0}{1}{2}{3}{4}{5}{6}{7}{8}{9}{10}{11}{12}{13}{14}$".format(
+    REGEX = "^{0}{1}{2}{3}{4}{5}{6}{7}{8}{9}{10}{11}{12}{13}{14}$".format(
         RECORD_TYPE, AGREEMENT_ID, RECORD_NUMBER, ROLE_CODE, CAE_IPI_NAME, IPI_BASE_NUMBER, IPA_NUMBER,
         IPA_LAST_NAME, IPA_FIRST_NAME, PR_AFFILIATION_SOCIETY, PR_SHARE, MR_AFFILIATION_SOCIETY, MR_SHARE,
         SR_AFFILIATION_SOCIETY, SR_SHARE)
 
     def __init__(self, record):
-        matcher = re.compile(self.IPA_RECORD_REGEX)
-        if matcher.match(record):
-            self._build_ipa_record(record)
-        else:
-            raise ValueError(
-                'Given record: %s does not match required format %s' % (record, self.IPA_RECORD_REGEX))
+        super(InterestedPartyRecord, self).__init__(record, self.REGEX)
 
-    def _build_ipa_record(self, record):
+    def _build_record(self, record):
         self._agreement_id = int(record[3:3 + 8])
         self._role = record[19:19 + 2]
-        if self._role not in self.IPA_TYPES:
+        if self._role not in IPA_TYPES:
             raise ValueError('Given role %s not in the specified types' % self._role)
 
         self._cae_number = int(record[21:21 + 11])
@@ -59,20 +55,20 @@ class InterestedPartyRecord(object):
         self._pr_share = float(record[132:132 + 3] + '.' + record[132 + 3:132 + 3 + 2])
         self._pr_society = int(record[129:129 + 3]) if record[129:129 + 3].strip() else None
         if self._pr_share > 0:
-            if self._pr_society is None:  # Check pr_society within the table
-                raise ValueError('PR Society should be specified as pr share is greater than 0')
+            if self._pr_society not in SOCIETY_CODES:  # Check pr_society within the table
+                raise ValueError('Given PR Society  %s not in societies table' % self._pr_society)
 
         self._mr_share = float(record[140:140 + 3] + '.' + record[140 + 3:140 + 3 + 2])
         self._mr_society = int(record[137:137 + 3]) if record[137:137 + 3].strip() else None
         if self._mr_share > 0:
-            if self._mr_society is None:  # Check pr_society within the table
-                raise ValueError('MR Society should be specified as mr share is greater than 0')
+            if self._mr_society not in SOCIETY_CODES:  # Check pr_society within the table
+                raise ValueError('Given MR Society  %s not in societies table' % self._mr_society)
 
         self._sr_share = float(record[148:148 + 3] + '.' + record[148 + 3:148 + 3 + 2])
         self._sr_society = int(record[145:145 + 3]) if record[145:145 + 3].strip() else None
         if self._sr_share > 0:
-            if self._sr_society is None:  # Check pr_society within the table
-                raise ValueError('SR Society should be specified as mr share is greater than 0')
+            if self._sr_society not in SOCIETY_CODES:  # Check pr_society within the table
+                raise ValueError('Given SR Society  %s not in societies table' % self._sr_society)
 
     def __str__(self):
         return 'Not implemented yet'

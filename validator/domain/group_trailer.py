@@ -1,33 +1,34 @@
 __author__ = 'Borja'
-import re
+from validator.cwr_regex import regex
+from validator.cwr_regex.value_tables import CURRENCY_VALUES
+from validator.domain.record import Record
 
 
-class GroupTrailer(object):
-    RECORD_TYPE = 'GRT'
-    GROUP_ID = '\d{5}'
-    TRANSACTION_COUNT = '\d{8}'
-    RECORD_COUNT = '\d{8}'
+class GroupTrailer(Record):
+    RECORD_TYPE = regex.get_defined_values_regex(3, False, 'GRT')
+    GROUP_ID = regex.get_numeric_regex(5)
+    TRANSACTION_COUNT = regex.get_numeric_regex(8)
+    RECORD_COUNT = regex.get_numeric_regex(8)
 
-    CURRENCY = '([ -~]{3}\d{10})?'
+    CURRENCY = regex.get_alpha_regex(3, True)
+    MONETARY_VALUE = regex.get_numeric_regex(10, True)
 
-    GROUP_TRAILER_REGEX = "^{0}{1}{2}{3}{4}$".format(
-        RECORD_TYPE, GROUP_ID, TRANSACTION_COUNT, RECORD_COUNT, CURRENCY)
+    REGEX = "^{0}{1}{2}{3}{4}{5}$".format(
+        RECORD_TYPE, GROUP_ID, TRANSACTION_COUNT, RECORD_COUNT, CURRENCY, MONETARY_VALUE)
 
     def __init__(self, record):
-        matcher = re.compile(self.GROUP_TRAILER_REGEX)
-        if matcher.match(record):
-            self._build_group_trailer(record)
-        else:
-            raise ValueError('Given record: %s does not match required format' % record)
+        super(GroupTrailer, self).__init__(record, self.REGEX)
 
-    def _build_group_trailer(self, record):
+    def _build_record(self, record):
         self._group_id = record[3:3 + 5]
         self._transaction_count = int(record[8:8 + 8])
         self._record_count = int(record[16:16 + 8])
 
-        if len(record) > 25:
+        self._monetary_value = int(record[27:27 + 10])
+        if self._monetary_value > 0:
             self._currency_indicator = record[24:24 + 3]
-            self._monetary_value = float(record[27:27 + 10])
+            if self._currency_indicator not in CURRENCY_VALUES:
+                raise ValueError('Given currency %s indicator not in currency codes' % self._currency_indicator)
 
     @property
     def group_id(self):
