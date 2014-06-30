@@ -25,12 +25,18 @@ CURRENCY_VALUES = _load_currency_values()
 
 DISTRIBUTION_CATEGORY_TABLE = ['JAZ', 'POP', 'SER', 'UNC']
 
+EXCERPT_TYPE = ['MOV', 'UEX']
+
 IPA_TYPES = ['AC', 'AS']
 
 
 def _load_language_code_values():
+    language_codes = []
     with open('../files/language_codes.csv') as csv_file:
-        language_codes = csv.reader(csv_file)
+        reader = csv.reader(csv_file)
+        for csv_list in reader:
+            for value in csv_list:
+                language_codes.append(value)
 
     return language_codes
 
@@ -72,10 +78,16 @@ TIS_CODES = _load_tis_codes()
 
 TRANSACTION_VALUES = {'AGR', 'NWR', 'REV'}
 
+VERSION_TYPES = ['MOD', 'ORI']
+
 
 def _load_work_types():
+    work_types = []
     with open('../files/cwr_work_types.csv') as csv_file:
-        work_types = csv.reader(csv_file)
+        reader = csv.reader(csv_file)
+        for csv_list in reader:
+            for value in csv_list:
+                work_types.append(value)
 
     return work_types
 

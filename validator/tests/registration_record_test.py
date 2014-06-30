@@ -16,6 +16,10 @@ class REGValidationTest(unittest.TestCase):
     def test_empty(self):
         self.assertFalse(self._validator.validate_registration_record(''))
 
+    def test_record(self):
+        self.assertTrue(self._validator.validate_registration_record(
+            'NWR0000017900000000ESQUINA LIBERTAD                                              1430374       T037306869919980730            UNC000000YMTX   ORI   ORIORI                                          N00000000000U                                                  Y'))
+
     def test_file(self):
         with open('files/CW1328EMI_059.V21') as cwr_file:
             file_content = cwr_file.readlines()
