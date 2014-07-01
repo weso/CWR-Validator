@@ -5,6 +5,7 @@ from domain.agreement_record import AgreementRecord
 from domain.group_header import GroupHeader
 from domain.group_trailer import GroupTrailer
 from domain.ipa_record import InterestedPartyRecord
+from domain.party_control_record import PartyControlRecord
 from domain.registration_record import RegistrationRecord
 from domain.territory_record import TerritoryRecord
 from domain.transmission_header import TransmissionHeader
@@ -116,6 +117,18 @@ class Validator(object):
             return False
         try:
             RegistrationRecord(record.upper())
+            return True
+        except ValueError as detail:
+            print 'Next record didn\'t validate correctly: [%s]' % record
+            print detail
+            return False
+
+    @staticmethod
+    def validate_control_party_record(record):
+        if record is None:
+            return False
+        try:
+            PartyControlRecord(record.upper())
             return True
         except ValueError as detail:
             print 'Next record didn\'t validate correctly: [%s]' % record
