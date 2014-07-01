@@ -46,6 +46,8 @@ LYRIC_ADAPTATION = ['NEW', 'MOD', 'NON', 'ORI', 'REP', 'ADL', 'UNS', 'TRA']
 
 MUSIC_ARRANGEMENT_TYPES = ['NEW', 'ARR', 'ADM', 'UNS', 'ORI']
 
+PUBLISHER_TYPES = ['AM', 'AQ', 'E', 'ES', 'PA', 'SE']
+
 SENDER_VALUES = {'PB', 'SO', 'AA', 'WR'}
 
 
