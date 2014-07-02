@@ -44,75 +44,62 @@ class PartyControlRecord(Record):
         super(PartyControlRecord, self).__init__(record, self.REGEX)
 
     def _build_record(self, record):
-        self._record_type = record[0:0 + 3]
-        self._registration_id = int(record[3:3 + 8])
-        self._publisher_number = int(record[19:19 + 2])
-        self._ipa_number = record[21:21 + 9]
-        if not self._ipa_number.strip():
-            if self._record_type == 'SPU':
+        self._record_type = self.get_value(0, 3)
+        self._registration_id = self.get_integer_value(3, 8)
+        self._publisher_number = self.get_integer_value(19, 2)
+        self._ipa_number = self.get_value(21, 9)
+        if (self._ipa_number is None or self._ipa_number == 0) and self._record_type == 'SPU':
                 raise ValueError('Expected ipa number for SPU record')
-        else:
-            self._ipa_number = int(self._ipa_number.strip())
 
-        self._publisher_name = record[30:30 + 45]
-        if not self._publisher_name.strip():
-            if self._record_type == 'SPU':
+        self._publisher_name = self.get_value(30, 45)
+        if not self._publisher_name is None and self._record_type == 'SPU':
                 raise ValueError('Expected publisher name for SPU record')
 
-        unknown_publisher = record[75:75 + 1]
-        if not unknown_publisher.strip():
-            if not self._publisher_name.strip():
+        unknown_publisher = self.get_value(75, 1)
+        if unknown_publisher is None:
+            if self._publisher_name is None:
                 raise ValueError('Unknown publisher indicator must be Y for OPU without publisher name')
         else:
             if self._record_type == 'SPU':
                 raise ValueError('Unknown publisher indicator must be blank for SPU records')
 
-        self._publisher_type = record[76:76 + 2]
-        if self._publisher_type.strip() not in PUBLISHER_TYPES:
+        self._publisher_type = self.get_value(76, 2)
+        if self._publisher_type not in PUBLISHER_TYPES:
             raise ValueError('Given publisher type %s not in table' % self._publisher_type)
 
-        self._publisher_tax_id = record[78:78 + 9].strip()
-        if self._publisher_tax_id:
-            self._publisher_tax_id = int(self._publisher_tax_id)
-
-        self._publisher_cae_ipi = record[87:87 + 11].strip()
-        if self._publisher_cae_ipi:
-            self._publisher_cae_ipi = int(self._publisher_cae_ipi)
-
-        self._submitter_agreement_number = record[98:98 + 13].strip()
-        if self._submitter_agreement_number:
-            self._submitter_agreement_number = int(self._submitter_agreement_number)
-
-        self._pr_share = float(record[115:115 + 3] + '.' + record[115 + 3:115 + 3 + 2])
-        self._pr_society = int(record[112:112 + 3]) if record[129:129 + 3].strip() else None
-        if self._pr_share > 0:
+        self._publisher_tax_id = self.get_integer_value(78, 9)
+        self._publisher_cae_ipi = self.get_integer_value(87, 11)
+        self._submitter_agreement_number = self.get_integer_value(98, 13)
+        self._pr_share = self.get_float_value(115, 5, 3)
+        self._pr_society = self.get_integer_value(112, 3)
+        if self._pr_share is not None and self._pr_share > 0:
             if self._pr_share > 50:
                 raise ValueError('PR share can\'t be greater than 50 within individual SPU records')
-            if self._pr_society not in SOCIETY_CODES:  # Check pr_society within the table
+            if self._pr_society not in SOCIETY_CODES:
                 raise ValueError('Given PR Society  %s not in societies table' % self._pr_society)
 
-        self._mr_share = float(record[123:123 + 3] + '.' + record[123 + 3:123 + 3 + 2])
-        self._mr_society = int(record[120:120 + 3]) if record[120:120 + 3].strip() else None
-        if self._mr_share > 0:
-            if self._mr_society not in SOCIETY_CODES:  # Check pr_society within the table
+        self._mr_share = self.get_float_value(123, 5, 3)
+        self._mr_society = self.get_integer_value(120, 3)
+        if self._mr_share is not None and self._mr_share > 0:
+            if self._mr_society not in SOCIETY_CODES:
                 raise ValueError('Given MR Society  [%s] not in societies table' % self._mr_society)
 
-        self._sr_share = float(record[131:131 + 3] + '.' + record[131 + 3:131 + 3 + 2])
-        self._sr_society = int(record[128:128 + 3]) if record[128:128 + 3].strip() else None
-        if self._sr_share > 0:
-            if self._sr_society not in SOCIETY_CODES:  # Check pr_society within the table
+        self._sr_share = self.get_float_value(131, 5, 3)
+        self._sr_society = self.get_integer_value(128, 3)
+        if self._sr_share is not None and self._sr_share > 0:
+            if self._sr_society not in SOCIETY_CODES:
                 raise ValueError('Given SR Society  %s not in societies table' % self._sr_society)
 
-        self._reversionary = True if record[136:136 + 1] == 'Y' else False
-        self._recoding_refusal = True if record[137:137 + 1] == 'Y' else False
-        self._publisher_ipi = record[139:139 + 13]
-        self._international_agreement_code = record[152:152 + 14]
-        self._society_assigned_agreement_code = record[166:166 + 14]
-        self._agreement_type = record[180:180 + 2]
+        self._reversionary = self.get_value(136, 1) == 'Y'
+        self._recoding_refusal = self.get_value(137, 1) == 'Y'
+        self._publisher_ipi = self.get_value(139, 13)
+        self._international_agreement_code = self.get_value(152, 14)
+        self._society_assigned_agreement_code = self.get_value(166, 14)
+        self._agreement_type = self.get_value(180, 2)
         if self._agreement_type not in AGREEMENT_TYPE_VALUES:
             raise ValueError('Given agreement type %s not in table' % self._agreement_type)
 
-        self._usa_license = True if record[182:182 + 1] else False
+        self._usa_license = self.get_value(182, 1) == 'Y'
 
     def validate(self):
         pass
