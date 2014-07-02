@@ -1,6 +1,6 @@
 __author__ = 'Borja'
-from validator.cwr_regex import regex
-from validator.cwr_regex.value_tables import TIS_CODES
+from validator.cwr_utils import regex
+from validator.cwr_utils.value_tables import TIS_CODES
 from validator.domain.record import Record
 
 
@@ -18,11 +18,14 @@ class TerritoryRecord(Record):
         super(TerritoryRecord, self).__init__(record, self.REGEX)
 
     def _build_record(self, record):
-        self._agreement_id = int(record[3:3 + 8])
-        self._excluded = True if record[19:19 + 1] == 'E' else False
-        self._tis_code = int(record[20:20 + 4])
+        self._agreement_id = self.get_integer_value(3, 8)
+        self._excluded = self.get_value(19, 1) == 'E'
+        self._tis_code = self.get_integer_value(20, 4)
         if self._tis_code not in TIS_CODES:
             raise ValueError('Given TIS code %s not recognized' % self._tis_code)
+
+    def validate(self):
+        pass
 
     def __str__(self):
         return 'Not implemented yet'

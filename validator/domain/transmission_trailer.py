@@ -1,5 +1,5 @@
 __author__ = 'Borja'
-from validator.cwr_regex import regex
+from validator.cwr_utils import regex
 from validator.domain.record import Record
 
 
@@ -16,10 +16,13 @@ class TransmissionTrailer(Record):
         super(TransmissionTrailer, self).__init__(record, self.REGEX)
 
     def _build_record(self, record):
-        self._group_count = int(record[3:3 + 5])
-        self._transaction_count = int(record[8:8 + 8])
-        self._record_count = int(record[16:16 + 8])
+        self._group_count = self.get_integer_value(3, 5)
+        self._transaction_count = self.get_integer_value(8, 8)
+        self._record_count = self.get_integer_value(16, 8)
 
+    def validate(self):
+        pass
+    
     def __str__(self):
         return 'group count: {0}\ntransaction count: {1}\nrecord count: {2}\n'\
             .format(self._group_count, self._transaction_count, self._record_count)

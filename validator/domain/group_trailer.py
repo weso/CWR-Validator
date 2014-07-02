@@ -1,6 +1,6 @@
 __author__ = 'Borja'
-from validator.cwr_regex import regex
-from validator.cwr_regex.value_tables import CURRENCY_VALUES
+from validator.cwr_utils import regex
+from validator.cwr_utils.value_tables import CURRENCY_VALUES
 from validator.domain.record import Record
 
 
@@ -20,15 +20,18 @@ class GroupTrailer(Record):
         super(GroupTrailer, self).__init__(record, self.REGEX)
 
     def _build_record(self, record):
-        self._group_id = record[3:3 + 5]
-        self._transaction_count = int(record[8:8 + 8])
-        self._record_count = int(record[16:16 + 8])
+        self._group_id = self.get_value(3, 5)
+        self._transaction_count = self.get_integer_value(8, 8)
+        self._record_count = self.get_integer_value(16, 8)
 
-        self._monetary_value = int(record[27:27 + 10])
-        if self._monetary_value > 0:
-            self._currency_indicator = record[24:24 + 3]
+        self._monetary_value = self.get_integer_value(27, 10)
+        self._currency_indicator = self.get_value(24, 3)
+        if self._monetary_value is not None and self._monetary_value > 0:
             if self._currency_indicator not in CURRENCY_VALUES:
                 raise ValueError('Given currency %s indicator not in currency codes' % self._currency_indicator)
+
+    def validate(self):
+        pass
 
     @property
     def group_id(self):
