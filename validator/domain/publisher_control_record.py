@@ -52,7 +52,7 @@ class PublisherControlRecord(Record):
                 raise ValueError('Expected ipa number for SPU record')
 
         self._publisher_name = self.get_value(30, 45)
-        if not self._publisher_name is None and self._record_type == 'SPU':
+        if self._publisher_name is None and self._record_type == 'SPU':
                 raise ValueError('Expected publisher name for SPU record')
 
         unknown_publisher = self.get_value(75, 1)
