@@ -27,5 +27,5 @@ class PublisherControlValidationTest(unittest.TestCase):
             file_content = cwr_file.readlines()
 
         for line in file_content:
-            if line[0:0 + 3] in ['SPU', 'OPU']:
+            if line[0:0 + 3] in ['OWR', 'OPU']:
                 self.assertTrue(self._validator.validate_publisher_control_record(line))
