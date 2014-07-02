@@ -1,8 +1,6 @@
 __author__ = 'Borja'
-import datetime
-
-from validator.cwr_regex import regex
-from validator.cwr_regex.value_tables import AGREEMENT_TYPE_VALUES
+from validator.cwr_utils import regex
+from validator.cwr_utils.value_tables import AGREEMENT_TYPE_VALUES
 from validator.domain.record import Record
 
 
@@ -36,55 +34,46 @@ class AgreementRecord(Record):
         super(AgreementRecord, self).__init__(record, self.REGEX)
 
     def _build_record(self, record):
-        self._number = int(record[3:3 + 8])
-        self._submitter = record[19:19 + 14]
-        self._international_code = record[33:33 + 14] if record[33:33 + 14] else None
-        self._type = record[47:47 + 2]
+        self._number = self.get_integer_value(8, 3)
+        self._submitter = self.get_value(19, 14)
+        self._international_code = self.get_value(33, 14)
+        self._type = self.get_value(47, 2)
         if self._type not in AGREEMENT_TYPE_VALUES:
-            raise ValueError('Given agreement type: %s not in the required ones' % self._type)
+            raise ValueError('Given agreement type: [%s] not in the required ones' % self._type)
 
-        self._start_date = datetime.datetime.strptime(record[49:49 + 8], '%Y%m%d').date()
-        if record[57:57 + 8].strip():
-            self._end_date = datetime.datetime.strptime(record[57:57 + 8], '%Y%m%d').date()
-        else:
-            self._end_date = None
-
-        # Not in a single line for reading purposes
-        if record[65:65 + 8].strip():
-            self._retention_end_date = datetime.datetime.strptime(record[65:65 + 8], '%Y%m%d').date()
-        else:
-            self._retention_end_date = None
-
-        self._prior_royalty_status = record[73:73 + 1]
+        self._start_date = self.get_date_value(49, 8)
+        self._end_date = self.get_date_value(57, 8)
+        self._retention_end_date = self.get_date_value(65, 8)
+        self._prior_royalty_status = self.get_value(73, 1)
+        self._prior_royalty_date = self.get_date_value(74, 8)
         if self._prior_royalty_status == 'D':
-            self._prior_royalty_date = datetime.datetime.strptime(record[74:74 + 8], '%Y%m%d').date()
-        elif record[74:74 + 8].strip():
+            if self._prior_royalty_date is None:
+                raise ValueError('Expecting royalty date')
+        elif self._prior_royalty_date is not None:
             raise ValueError('Not expecting royalty date for royalty status %s' % self._prior_royalty_status)
 
-        self._post_term_collection_stat = record[82:82 + 1]
+        self._post_term_collection_stat = self.get_value(82, 1)
+        self._post_term_collection_date = self.get_date_value(83, 8)
         if self._post_term_collection_stat == 'D':
-            self._post_term_collection_date = datetime.datetime.strptime(record[83:83 + 8], '%Y%m%d').date()
-        elif record[83:83 + 8].strip():
+            if self._post_term_collection_date is None:
+                raise ValueError('Expecting post term collection date')
+        elif self._post_term_collection_date is not None:
             raise ValueError('Not expecting post-term collection date for status %s' % self._post_term_collection_stat)
 
-        # Not in a single line for reading purposes
-        if record[91:91 + 8].strip():
-            self._signature_date = datetime.datetime.strptime(record[91:91 + 8], '%Y%m%d').date()
-        else:
-            self._signature_date = None
-
-        self._works_number = int(record[99:99 + 5])
-
+        self._signature_date = self.get_date_value(91, 8)
+        self._works_number = self.get_integer_value(99, 5)
+        self._sales_clause = self.get_value(104, 1)
         # Sales clause is only mandatory for OS and PS agreements
-        if record[104:104 + 1].strip():
-            self._sales_clause = record[104:104 + 1]
-        elif self._type == 'OS' or self._type == 'PS':
-            raise ValueError('Sales clause not specified for an agreement type of %s' % self._type)
+        if self._sales_clause is None:
+            if self._type == 'OS' or self._type == 'PS':
+                raise ValueError('Sales clause not specified for an agreement type of %s' % self._type)
 
-        self._shares_change = record[105:105 + 1] == 'T'
-        self._advance_given = record[106:106 + 1] == 'T'
+        self._shares_change = self.get_value(105, 1) == 'T'
+        self._advance_given = self.get_value(106, 1) == 'T'
+        self._society_assigned_number = self.get_value(107, 14)
 
-        self._society_assigned_number = record[107:107 + 14] if record[107:107 + 14].strip() else None
+    def validate(self):
+        pass
 
     def __str__(self):
         return 'Not implemented yet'

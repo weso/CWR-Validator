@@ -1,6 +1,6 @@
 __author__ = 'Borja'
-from validator.cwr_regex import regex
-from validator.cwr_regex.value_tables import TRANSACTION_VALUES
+from validator.cwr_utils import regex
+from validator.cwr_utils.value_tables import TRANSACTION_VALUES
 from validator.domain.record import Record
 
 
@@ -19,18 +19,20 @@ class GroupHeader(Record):
         super(GroupHeader, self).__init__(record, self.REGEX)
 
     def _build_record(self, record):
-        self._transaction_type = record[3:3 + 3]
+        self._transaction_type = self.get_value(3, 3)
         if not self._transaction_type in TRANSACTION_VALUES:
-            raise ValueError('Given transaction type: %s not in required ones' % self._transaction_type)
+            raise ValueError('Given transaction type: [%s] not in required ones' % self._transaction_type)
 
-        self._group_id = int(record[6:6 + 5])
+        self._group_id = self.get_integer_value(6, 5)
         if self._group_id > len(TRANSACTION_VALUES):
             raise ValueError('Given group id: %s bigger than expected (00003)' % self._group_id)
-        self._version_number = record[11:11 + 5]
-        self._batch_request = record[16:16 + 10]
+        self._version_number = self.get_value(11, 5)
+        self._batch_request = self.get_value(16, 10)
 
-        if len(record) > 27:
-            self._submission_distribution_type = record[26:26 + 2]
+        self._submission_distribution_type = self.get_value(26, 2)
+
+    def validate(self):
+        pass
 
     @property
     def transaction_type(self):

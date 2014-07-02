@@ -1,8 +1,8 @@
 __author__ = 'Borja'
-from validator.cwr_regex import regex
-from validator.cwr_regex.value_tables import AGREEMENT_TYPE_VALUES
-from validator.cwr_regex.value_tables import PUBLISHER_TYPES
-from validator.cwr_regex.value_tables import SOCIETY_CODES
+from validator.cwr_utils import regex
+from validator.cwr_utils.value_tables import AGREEMENT_TYPE_VALUES
+from validator.cwr_utils.value_tables import PUBLISHER_TYPES
+from validator.cwr_utils.value_tables import SOCIETY_CODES
 from validator.domain.record import Record
 
 
@@ -113,6 +113,9 @@ class PartyControlRecord(Record):
             raise ValueError('Given agreement type %s not in table' % self._agreement_type)
 
         self._usa_license = True if record[182:182 + 1] else False
+
+    def validate(self):
+        pass
 
     def __str__(self):
         return 'Not implemented yet'
