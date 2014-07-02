@@ -41,8 +41,11 @@ class Record(object):
 
     def get_float_value(self, starts, size, integer_part_size):
         value = self.get_value(starts, size)
-        return float(
-            value[starts:starts + integer_part_size] + '.' + value[starts + integer_part_size:size]) if value else None
+        try:
+            return float(
+                value[0:0 + integer_part_size] + '.' + value[0 + integer_part_size:size]) if value else None
+        except ValueError:
+            return None
 
     def get_time_value(self, starts, size):
         value = self.get_value(starts, size)

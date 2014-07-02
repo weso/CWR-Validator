@@ -6,7 +6,7 @@ from validator.cwr_utils.value_tables import SOCIETY_CODES
 from validator.domain.record import Record
 
 
-class PartyControlRecord(Record):
+class PublisherControlRecord(Record):
     RECORD_TYPE = regex.get_defined_values_regex(3, False, 'OPU', 'SPU')
     TRANSACTION_NUMBER = regex.get_numeric_regex(8)
     RECORD_NUMBER = regex.get_numeric_regex(8)
@@ -41,7 +41,7 @@ class PartyControlRecord(Record):
         USA_LICENSE)
 
     def __init__(self, record):
-        super(PartyControlRecord, self).__init__(record, self.REGEX)
+        super(PublisherControlRecord, self).__init__(record, self.REGEX)
 
     def _build_record(self, record):
         self._record_type = self.get_value(0, 3)
