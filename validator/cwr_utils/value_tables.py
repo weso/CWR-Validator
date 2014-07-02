@@ -95,4 +95,6 @@ def _load_work_types():
 
 WORK_TYPES = _load_work_types()
 
+WRITER_DESIGNATIONS = ['AD', 'AR', 'A', 'C', 'CA', 'SR', 'SA', 'TR', 'PA']
+
 

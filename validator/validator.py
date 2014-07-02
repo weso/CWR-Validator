@@ -11,6 +11,7 @@ from domain.registration_record import RegistrationRecord
 from domain.territory_record import TerritoryRecord
 from domain.transmission_header import TransmissionHeader
 from domain.transmission_trailer import TransmissionTrailer
+from domain.writer_control_record import WriterControlRecord
 
 
 class Validator(object):
@@ -142,6 +143,18 @@ class Validator(object):
             return False
         try:
             PublisherTerritoryRecord(record.upper())
+            return True
+        except ValueError as detail:
+            print 'Next record didn\'t validate correctly: [%s]' % record
+            print detail
+            return False
+
+    @staticmethod
+    def validate_writer_control_record(record):
+        if record is None:
+            return False
+        try:
+            WriterControlRecord(record.upper())
             return True
         except ValueError as detail:
             print 'Next record didn\'t validate correctly: [%s]' % record
