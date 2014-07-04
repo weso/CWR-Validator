@@ -4,7 +4,7 @@ import re
 from domain.agreement_record import AgreementRecord
 from domain.group_header import GroupHeader
 from domain.group_trailer import GroupTrailer
-from domain.ipa_record import InterestedPartyRecord
+from domain.interested_party_record import InterestedPartyRecord
 from domain.performing_artist_record import PerformingArtistRecord
 from domain.publisher_control_record import PublisherControlRecord
 from domain.publisher_territory_record import PublisherTerritoryRecord
@@ -12,6 +12,7 @@ from domain.registration_record import RegistrationRecord
 from domain.territory_record import TerritoryRecord
 from domain.transmission_header import TransmissionHeader
 from domain.transmission_trailer import TransmissionTrailer
+from domain.work_alternative_title import WorkAlternativeTitleRecord
 from domain.writer_agent_record import WriterAgentRecord
 from domain.writer_control_record import WriterControlRecord
 from domain.writer_territory_record import WriterTerritoryRecord
@@ -193,6 +194,18 @@ class Validator(object):
             return False
         try:
             PerformingArtistRecord(record.upper())
+            return True
+        except ValueError as detail:
+            print 'Next record didn\'t validate correctly: [%s]' % record
+            print detail
+            return False
+
+    @staticmethod
+    def validate_alternative_title(record):
+        if record is None:
+            return False
+        try:
+            WorkAlternativeTitleRecord(record.upper())
             return True
         except ValueError as detail:
             print 'Next record didn\'t validate correctly: [%s]' % record

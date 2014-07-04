@@ -76,6 +76,8 @@ def _load_tis_codes():
 
 TEXT_MUSIC_TABLE = ['MUS', 'MTX', 'TXT']
 
+TITLE_TYPES = ['AT', 'TE', 'FT', 'IT', 'OT', 'TT', 'PT', 'RT', 'ET', 'OL', 'AL']
+
 TIS_CODES = _load_tis_codes()
 
 TRANSACTION_VALUES = {'AGR', 'NWR', 'REV'}
