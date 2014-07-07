@@ -11,10 +11,10 @@ class WorkExcerptTitleValidationTest(unittest.TestCase):
         self._validator = Validator()
 
     def test_null(self):
-        self.assertFalse(self._validator.validate_version_title(None))
+        self.assertFalse(self._validator.validate_recording_detail(None))
 
     def test_empty(self):
-        self.assertFalse(self._validator.validate_version_title(''))
+        self.assertFalse(self._validator.validate_recording_detail(''))
 
     def test_record(self):
         pass  # Need more examples
@@ -24,5 +24,5 @@ class WorkExcerptTitleValidationTest(unittest.TestCase):
             file_content = cwr_file.readlines()
 
         for line in file_content:
-            if line[0:0 + 3] in ['EWT', 'VER']:
-                self.assertTrue(self._validator.validate_version_title(line))
+            if line[0:0 + 3] == 'REC':
+                self.assertTrue(self._validator.validate_recording_detail(line))

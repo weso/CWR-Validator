@@ -44,9 +44,28 @@ LANGUAGE_CODES = _load_language_code_values()
 
 LYRIC_ADAPTATION = ['NEW', 'MOD', 'NON', 'ORI', 'REP', 'ADL', 'UNS', 'TRA']
 
+
+def _load_media_types():
+    media_types = []
+    workbook = xlrd.open_workbook('../files/BIEM-Media_types.xlsx')
+    worksheet = workbook.sheet_by_index(0)
+    for curr_row in range(2, worksheet.nrows):
+        media_types.append(worksheet.cell_value(curr_row, 4))
+
+    media_types = sorted(list(set(media_types)))  # Remove duplicates
+    media_types.remove('')  # Remove empty values
+
+    return media_types
+
+MEDIA_TYPES = _load_media_types()
+
 MUSIC_ARRANGEMENT_TYPES = ['NEW', 'ARR', 'ADM', 'UNS', 'ORI']
 
 PUBLISHER_TYPES = ['AM', 'AQ', 'E', 'ES', 'PA', 'SE']
+
+RECORDING_FORMAT = ['A', 'V']
+
+RECORDING_TECHNIQUE = ['A', 'D', 'U']
 
 SENDER_VALUES = {'PB', 'SO', 'AA', 'WR'}
 
