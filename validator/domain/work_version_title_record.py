@@ -5,12 +5,12 @@ from validator.cwr_utils.value_tables import TITLE_TYPES
 from validator.domain.record import Record
 
 
-class WorkExcerptTitleRecord(Record):
-    RECORD_TYPE = regex.get_defined_values_regex(3, False, 'EWT')
+class WorkVersionTitleRecord(Record):
+    RECORD_TYPE = regex.get_defined_values_regex(3, False, 'EWT', 'VER')
     TRANSACTION_NUMBER = regex.get_numeric_regex(8)
     RECORD_NUMBER = regex.get_numeric_regex(8)
-    ENTIRE_WORK_TITLE = regex.get_ascii_regex(60)
-    ENTIRE_WORK_ISWC = regex.get_ascii_regex(11, True)
+    WORK_TITLE = regex.get_ascii_regex(60)
+    WORK_ISWC = regex.get_ascii_regex(11, True)
     LANGUAGE_CODE = regex.get_alpha_regex(2, True)
     FIRST_WRITER_LAST_NAME = regex.get_ascii_regex(45, True)
     FIRST_WRITER_NAME = regex.get_ascii_regex(30, True)
@@ -23,14 +23,14 @@ class WorkExcerptTitleRecord(Record):
     SECOND_WRITER_IPI_BASE = regex.get_numeric_regex(13, True)
     SUBMITTER_WORK_NUMBER = regex.get_ascii_regex(14, True)
 
-    REGEX = "^{0}{1}{2}{3}{4}{5}$".format(
-        RECORD_TYPE, TRANSACTION_NUMBER, RECORD_NUMBER, ENTIRE_WORK_TITLE, ENTIRE_WORK_ISWC,
+    REGEX = "^{0}{1}{2}{3}{4}{5}{6}{7}{8}{9}{10}{11}{12}{13}{14}{15}$".format(
+        RECORD_TYPE, TRANSACTION_NUMBER, RECORD_NUMBER, WORK_TITLE, WORK_ISWC,
         LANGUAGE_CODE, FIRST_WRITER_LAST_NAME, FIRST_WRITER_NAME, SOURCE, FIRST_WRITER_CAE_IPI,
         FIRST_WRITER_IPI_BASE, SECOND_WRITER_LAST_NAME, SECOND_WRITER_NAME, SECOND_WRITER_CAE_IPI,
         SECOND_WRITER_IPI_BASE, SUBMITTER_WORK_NUMBER)
 
     def __init__(self, record):
-        super(WorkExcerptTitleRecord, self).__init__(record, self.REGEX)
+        super(WorkVersionTitleRecord, self).__init__(record, self.REGEX)
 
     def _build_record(self, record):
         self._registration_id = self.get_integer_value(3, 8)

@@ -24,5 +24,5 @@ class WorkExcerptTitleValidationTest(unittest.TestCase):
             file_content = cwr_file.readlines()
 
         for line in file_content:
-            if line[0:0 + 3] == 'EWT':
+            if line[0:0 + 3] in ['EWT', 'VER']:
                 self.assertTrue(self._validator.validate_excerpt_title(line))

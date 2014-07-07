@@ -13,7 +13,7 @@ from domain.territory_record import TerritoryRecord
 from domain.transmission_header_record import TransmissionHeader
 from domain.transmission_trailer_record import TransmissionTrailer
 from domain.work_alternative_title_record import WorkAlternativeTitleRecord
-from domain.work_excerpt_title_record import WorkExcerptTitleRecord
+from domain.work_version_title_record import WorkVersionTitleRecord
 from domain.writer_agent_record import WriterAgentRecord
 from domain.writer_control_record import WriterControlRecord
 from domain.writer_territory_record import WriterTerritoryRecord
@@ -218,7 +218,7 @@ class Validator(object):
         if record is None:
             return False
         try:
-            WorkExcerptTitleRecord(record.upper())
+            WorkVersionTitleRecord(record.upper())
             return True
         except ValueError as detail:
             print 'Next record didn\'t validate correctly: [%s]' % record
