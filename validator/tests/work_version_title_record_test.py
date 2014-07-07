@@ -11,10 +11,10 @@ class WorkExcerptTitleValidationTest(unittest.TestCase):
         self._validator = Validator()
 
     def test_null(self):
-        self.assertFalse(self._validator.validate_excerpt_title(None))
+        self.assertFalse(self._validator.validate_version_title(None))
 
     def test_empty(self):
-        self.assertFalse(self._validator.validate_excerpt_title(''))
+        self.assertFalse(self._validator.validate_version_title(''))
 
     def test_record(self):
         pass  # Need more examples
@@ -25,4 +25,4 @@ class WorkExcerptTitleValidationTest(unittest.TestCase):
 
         for line in file_content:
             if line[0:0 + 3] in ['EWT', 'VER']:
-                self.assertTrue(self._validator.validate_excerpt_title(line))
+                self.assertTrue(self._validator.validate_version_title(line))

@@ -8,6 +8,7 @@ from domain.interested_party_record import InterestedPartyRecord
 from domain.performing_artist_record import PerformingArtistRecord
 from domain.publisher_control_record import PublisherControlRecord
 from domain.publisher_territory_record import PublisherTerritoryRecord
+from domain.recording_detail_record import RecordingDetailRecord
 from domain.registration_record import RegistrationRecord
 from domain.territory_record import TerritoryRecord
 from domain.transmission_header_record import TransmissionHeader
@@ -214,7 +215,7 @@ class Validator(object):
             return False
 
     @staticmethod
-    def validate_excerpt_title(record):
+    def validate_version_title(record):
         if record is None:
             return False
         try:
@@ -224,6 +225,20 @@ class Validator(object):
             print 'Next record didn\'t validate correctly: [%s]' % record
             print detail
             return False
+
+    @staticmethod
+    def validate_recording_detail(record):
+        if record is None:
+            return False
+        try:
+            RecordingDetailRecord(record.upper())
+            return True
+        except ValueError as detail:
+            print 'Next record didn\'t validate correctly: [%s]' % record
+            print detail
+            return False
+        except:
+            print record
 
     def validate_group_trailer(self, record):
         if record is None:
