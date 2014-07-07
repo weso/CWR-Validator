@@ -1,0 +1,2 @@
+pyBarcode==0.7
+xlrd==0.9.3
