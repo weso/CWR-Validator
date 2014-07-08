@@ -1,7 +1,8 @@
 __author__ = 'Borja'
 from barcode.ean import EAN13
+
 from validator.cwr_utils import regex
-from validator.domain.record import Record
+from validator.domain.records.record import Record
 from validator.cwr_utils.value_tables import MEDIA_TYPES
 from validator.cwr_utils.value_tables import RECORDING_FORMAT
 from validator.cwr_utils.value_tables import RECORDING_TECHNIQUE

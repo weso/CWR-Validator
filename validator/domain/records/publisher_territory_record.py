@@ -1,7 +1,7 @@
 __author__ = 'Borja'
 from validator.cwr_utils import regex
 from validator.cwr_utils.value_tables import TIS_CODES
-from validator.domain.record import Record
+from validator.domain.records.record import Record
 
 
 class PublisherTerritoryRecord(Record):
