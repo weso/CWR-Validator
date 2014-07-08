@@ -3,7 +3,7 @@ from validator.cwr_utils import regex
 from validator.cwr_utils.value_tables import AGREEMENT_TYPE_VALUES
 from validator.cwr_utils.value_tables import PUBLISHER_TYPES
 from validator.cwr_utils.value_tables import SOCIETY_CODES
-from validator.domain.record import Record
+from validator.domain.records.record import Record
 
 
 class PublisherControlRecord(Record):

@@ -1,6 +1,6 @@
 __author__ = 'Borja'
 from validator.cwr_utils import regex
-from validator.domain.record import Record
+from validator.domain.records.record import Record
 
 
 class TransmissionTrailer(Record):

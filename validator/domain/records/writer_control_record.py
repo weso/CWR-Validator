@@ -2,7 +2,7 @@ __author__ = 'Borja'
 from validator.cwr_utils import regex
 from validator.cwr_utils.value_tables import SOCIETY_CODES
 from validator.cwr_utils.value_tables import WRITER_DESIGNATIONS
-from validator.domain.record import Record
+from validator.domain.records.record import Record
 
 
 class WriterControlRecord(Record):

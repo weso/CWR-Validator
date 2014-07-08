@@ -1,23 +1,24 @@
 __author__ = 'Borja'
 import re
 
-from domain.agreement_record import AgreementRecord
-from domain.group_header_record import GroupHeader
-from domain.group_trailer_record import GroupTrailer
-from domain.interested_party_record import InterestedPartyRecord
-from domain.performing_artist_record import PerformingArtistRecord
-from domain.publisher_control_record import PublisherControlRecord
-from domain.publisher_territory_record import PublisherTerritoryRecord
-from domain.recording_detail_record import RecordingDetailRecord
-from domain.registration_record import RegistrationRecord
-from domain.territory_record import TerritoryRecord
-from domain.transmission_header_record import TransmissionHeader
-from domain.transmission_trailer_record import TransmissionTrailer
-from domain.work_alternative_title_record import WorkAlternativeTitleRecord
-from domain.work_version_title_record import WorkVersionTitleRecord
-from domain.writer_agent_record import WriterAgentRecord
-from domain.writer_control_record import WriterControlRecord
-from domain.writer_territory_record import WriterTerritoryRecord
+from domain.records.agreement_record import AgreementRecord
+from domain.records.group_header_record import GroupHeader
+from domain.records.group_trailer_record import GroupTrailer
+from domain.records.interested_party_record import InterestedPartyRecord
+from domain.records.performing_artist_record import PerformingArtistRecord
+from domain.records.publisher_control_record import PublisherControlRecord
+from domain.records.publisher_territory_record import PublisherTerritoryRecord
+from domain.records.recording_detail_record import RecordingDetailRecord
+from domain.records.registration_record import RegistrationRecord
+from domain.records.territory_record import TerritoryRecord
+from domain.records.transmission_header_record import TransmissionHeader
+from domain.records.transmission_trailer_record import TransmissionTrailer
+from domain.records.work_alternative_title_record import WorkAlternativeTitleRecord
+from domain.records.work_origin_record import WorkOriginRecord
+from domain.records.work_version_title_record import WorkVersionTitleRecord
+from domain.records.writer_agent_record import WriterAgentRecord
+from domain.records.writer_control_record import WriterControlRecord
+from domain.records.writer_territory_record import WriterTerritoryRecord
 
 
 class Validator(object):
@@ -237,8 +238,18 @@ class Validator(object):
             print 'Next record didn\'t validate correctly: [%s]' % record
             print detail
             return False
-        except:
-            print record
+
+    @staticmethod
+    def validate_work_origin(record):
+        if record is None:
+            return False
+        try:
+            WorkOriginRecord(record.upper())
+            return True
+        except ValueError as detail:
+            print 'Next record didn\'t validate correctly: [%s]' % record
+            print detail
+            return False
 
     def validate_group_trailer(self, record):
         if record is None:
