@@ -4,7 +4,7 @@ from validator.cwr_utils.value_tables import LANGUAGE_CODES
 from validator.domain.records.record import Record
 
 
-class NRAgreementPartyName(Record):
+class NRAgreementPartyNameRecord(Record):
     RECORD_TYPE = regex.get_defined_values_regex(3, False, 'NPA')
     TRANSACTION_NUMBER = regex.get_numeric_regex(8)
     RECORD_NUMBER = regex.get_numeric_regex(8)
@@ -17,7 +17,7 @@ class NRAgreementPartyName(Record):
         RECORD_TYPE, TRANSACTION_NUMBER, RECORD_NUMBER, IPA_ID, IPA_NAME, IPA_WRITER_NAME, LANGUAGE_CODE)
 
     def __init__(self, record):
-        super(NRAgreementPartyName, self).__init__(record, self.REGEX)
+        super(NRAgreementPartyNameRecord, self).__init__(record, self.REGEX)
 
     def _build_record(self, record):
         self._registration_id = self.get_integer_value(3, 8)
