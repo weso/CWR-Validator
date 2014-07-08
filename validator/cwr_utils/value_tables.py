@@ -27,6 +27,22 @@ DISTRIBUTION_CATEGORY_TABLE = ['JAZ', 'POP', 'SER', 'UNC']
 
 EXCERPT_TYPE = ['MOV', 'UEX']
 
+
+def _load_instrumentation_codes():
+    codes = []
+    workbook = xlrd.open_workbook('../files/CISAC-Standard_instrumentation.xlsx')
+    worksheet = workbook.sheet_by_index(0)
+
+    for curr_row in range(2, worksheet.nrows):
+        codes.append(int(worksheet.cell_value(curr_row, 2)))
+
+    codes = sorted(list(set(codes)))  # Remove duplicates
+    codes.remove('')  # Remove empty values
+
+    return codes
+
+INSTRUMENTATION_CODES = _load_instrumentation_codes()
+
 INTENDED_PURPOSES = ['COM', 'FIL', 'GEN', 'LIB', 'MUL', 'RAD', 'TEL', 'THR', 'VID']
 
 IPA_TYPES = ['AC', 'AS']
@@ -79,6 +95,9 @@ def _load_societies_codes():
 
     for curr_row in range(1, worksheet.nrows):
         codes.append(int(worksheet.cell_value(curr_row, 0)))
+
+    codes = sorted(list(set(codes)))  # Remove duplicates
+    codes.remove('')  # Remove empty values
 
     return codes
 
