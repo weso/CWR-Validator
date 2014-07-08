@@ -28,6 +28,22 @@ DISTRIBUTION_CATEGORY_TABLE = ['JAZ', 'POP', 'SER', 'UNC']
 EXCERPT_TYPE = ['MOV', 'UEX']
 
 
+def _load_instrument_codes():
+    codes = []
+    workbook = xlrd.open_workbook('../files/CISAC-Instrument.xlsx')
+    worksheet = workbook.sheet_by_index(0)
+
+    for curr_row in range(2, worksheet.nrows):
+        codes.append(int(worksheet.cell_value(curr_row, 3)))
+
+    codes = sorted(list(set(codes)))  # Remove duplicates
+    codes.remove('')  # Remove empty values
+
+    return codes
+
+INSTRUMENT_CODES = _load_instrument_codes()
+
+
 def _load_instrumentation_codes():
     codes = []
     workbook = xlrd.open_workbook('../files/CISAC-Standard_instrumentation.xlsx')
