@@ -39,6 +39,11 @@ def get_flag_regex(optional=False):
     return '({0}|{1})'.format(regex, get_optional_regex(1)) if optional else regex
 
 
+def get_non_roman_regex(size, optional=False):
+    regex = '(.{%d})' % size
+    return '({0}|{1})'.format(regex, get_optional_regex(size)) if optional else regex
+
+
 def get_numeric_regex(size, optional=False):
     regex = '(\d{%d})' % size
     return '({0}|{1})'.format(regex, get_optional_regex(size)) if optional else regex
