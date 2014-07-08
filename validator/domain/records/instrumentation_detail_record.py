@@ -4,7 +4,7 @@ from validator.cwr_utils.value_tables import INSTRUMENT_CODES
 from validator.domain.records.record import Record
 
 
-class InstrumentationSummaryRecord(Record):
+class InstrumentationDetailRecord(Record):
     RECORD_TYPE = regex.get_defined_values_regex(3, False, 'IND')
     TRANSACTION_NUMBER = regex.get_numeric_regex(8)
     RECORD_NUMBER = regex.get_numeric_regex(8)
@@ -12,10 +12,10 @@ class InstrumentationSummaryRecord(Record):
     PLAYERS_NUMBER = regex.get_numeric_regex(3, True)
 
     REGEX = "^{0}{1}{2}{3}{4}$".format(RECORD_TYPE, TRANSACTION_NUMBER, RECORD_NUMBER,
-                                        INSTRUMENT_CODE, PLAYERS_NUMBER)
+                                       INSTRUMENT_CODE, PLAYERS_NUMBER)
 
     def __init__(self, record):
-        super(InstrumentationSummaryRecord, self).__init__(record, self.REGEX)
+        super(InstrumentationDetailRecord, self).__init__(record, self.REGEX)
 
     def _build_record(self, record):
         self._registration_id = self.get_integer_value(3, 8)
