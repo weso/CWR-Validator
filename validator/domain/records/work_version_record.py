@@ -4,7 +4,7 @@ from validator.cwr_utils.value_tables import LANGUAGE_CODES
 from validator.domain.records.record import Record
 
 
-class WorkVersionTitleRecord(Record):
+class WorkVersionRecord(Record):
     RECORD_TYPE = regex.get_defined_values_regex(3, False, 'EWT', 'VER')
     TRANSACTION_NUMBER = regex.get_numeric_regex(8)
     RECORD_NUMBER = regex.get_numeric_regex(8)
@@ -29,7 +29,7 @@ class WorkVersionTitleRecord(Record):
         SECOND_WRITER_IPI_BASE, SUBMITTER_WORK_NUMBER)
 
     def __init__(self, record):
-        super(WorkVersionTitleRecord, self).__init__(record, self.REGEX)
+        super(WorkVersionRecord, self).__init__(record, self.REGEX)
 
     def _build_record(self, record):
         self._registration_id = self.get_integer_value(3, 8)
@@ -45,9 +45,9 @@ class WorkVersionTitleRecord(Record):
         self._first_writer_cae = self.get_integer_value(227, 11)
         self._first_writer_ipi = self.get_integer_value(238, 13)
         self._second_writer_last_name = self.get_value(251, 45)
-        self._first_writer_name = self.get_value(296, 30)
-        self._first_writer_cae = self.get_integer_value(326, 11)
-        self._first_writer_ipi = self.get_integer_value(337, 13)
+        self._second_writer_name = self.get_value(296, 30)
+        self._second_writer_cae = self.get_integer_value(326, 11)
+        self._second_writer_ipi = self.get_integer_value(337, 13)
         self._work_number = self.get_integer_value(350, 14)
 
     def validate(self):
