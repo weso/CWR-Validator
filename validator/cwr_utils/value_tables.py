@@ -159,4 +159,5 @@ WORK_TYPES = _load_work_types()
 
 WRITER_DESIGNATIONS = ['AD', 'AR', 'A', 'C', 'CA', 'SR', 'SA', 'TR', 'PA']
 
+WRITER_POSITIONS = ['COW', 'EWT', 'VER']
 
