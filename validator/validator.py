@@ -4,6 +4,7 @@ import re
 from domain.records.agreement_record import AgreementRecord
 from domain.records.group_header_record import GroupHeader
 from domain.records.group_trailer_record import GroupTrailer
+from domain.records.instrumentation_summary_record import InstrumentationSummaryRecord
 from domain.records.interested_party_record import InterestedPartyRecord
 from domain.records.performing_artist_record import PerformingArtistRecord
 from domain.records.publisher_control_record import PublisherControlRecord
@@ -245,6 +246,18 @@ class Validator(object):
             return False
         try:
             WorkOriginRecord(record.upper())
+            return True
+        except ValueError as detail:
+            print 'Next record didn\'t validate correctly: [%s]' % record
+            print detail
+            return False
+
+    @staticmethod
+    def validate_instrumentation_summary(record):
+        if record is None:
+            return False
+        try:
+            InstrumentationSummaryRecord(record.upper())
             return True
         except ValueError as detail:
             print 'Next record didn\'t validate correctly: [%s]' % record
