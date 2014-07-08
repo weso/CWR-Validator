@@ -5,7 +5,7 @@ from validator.domain.records.record import Record
 
 
 class NRPublisherName(Record):
-    RECORD_TYPE = regex.get_defined_values_regex(3, False, 'NPA')
+    RECORD_TYPE = regex.get_defined_values_regex(3, False, 'NPN')
     TRANSACTION_NUMBER = regex.get_numeric_regex(8)
     RECORD_NUMBER = regex.get_numeric_regex(8)
     PUBLISHER_SEQUENCE_ID = regex.get_numeric_regex(2)
