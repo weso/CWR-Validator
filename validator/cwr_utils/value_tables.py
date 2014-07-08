@@ -101,6 +101,8 @@ RECORDING_FORMAT = ['A', 'V']
 
 RECORDING_TECHNIQUE = ['A', 'D', 'U']
 
+RIGHT_TYPES = ['ALL', 'MEC', 'PER', 'SYN']
+
 SENDER_VALUES = {'PB', 'SO', 'AA', 'WR'}
 
 
@@ -118,6 +120,8 @@ def _load_societies_codes():
     return codes
 
 SOCIETY_CODES = _load_societies_codes()
+
+SUBJECT_CODES = ['DL', 'SC', 'DW', 'IQ', 'RQ']
 
 
 def _load_tis_codes():
