@@ -4,28 +4,19 @@ from validator.domain.records.record import Record
 
 
 class TransmissionTrailer(Record):
-    RECORD_TYPE = regex.get_defined_values_regex(3, False, 'TRL')
-    GROUP_COUNT = regex.get_numeric_regex(5)
-    TRANSACTION_COUNT = regex.get_numeric_regex(8)
-    RECORD_COUNT = regex.get_numeric_regex(8)
+    FIELD_NAMES = ['Record type', 'Group count', 'Transaction count', 'Record count']
 
-    REGEX = "^{0}{1}{2}{3}$".format(
-        RECORD_TYPE, GROUP_COUNT, TRANSACTION_COUNT, RECORD_COUNT)
+    FIELD_REGEX = [regex.get_defined_values_regex(3, False, 'TRL'), regex.get_numeric_regex(5),
+                   regex.get_numeric_regex(8), regex.get_numeric_regex(8)]
 
     def __init__(self, record):
-        super(TransmissionTrailer, self).__init__(record, self.REGEX)
+        super(TransmissionTrailer, self).__init__(record)
 
     def _build_record(self, record):
-        self._group_count = self.get_integer_value(3, 5)
-        self._transaction_count = self.get_integer_value(8, 8)
-        self._record_count = self.get_integer_value(16, 8)
+        self.extract_value(0, 3)
+        self.extract_integer_value(3, 5)
+        self.extract_integer_value(8, 8)
+        self.extract_integer_value(16, 8)
 
     def validate(self):
         pass
-    
-    def __str__(self):
-        return 'group count: {0}\ntransaction count: {1}\nrecord count: {2}\n'\
-            .format(self._group_count, self._transaction_count, self._record_count)
-
-    def __repr__(self):
-        return self.__str__()
