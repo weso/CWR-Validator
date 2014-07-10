@@ -53,9 +53,9 @@ class Record(object):
         start = 0
         for i, regex in enumerate(self.FIELD_REGEX):
             matcher = re.compile(str(regex))
-            if not matcher.match(self._record[start:regex.size]):
+            if not matcher.match(self._record[start:start+regex.size]):
                 raise ValueError('REGEX ERROR: Record field {} does not validate with expression given {}'.format(
-                    self.FIELD_NAMES[i], self._record[start:regex.size]))
+                    self.FIELD_NAMES[i], self._record[start:start+regex.size]))
             else:
                 start += regex.size
 

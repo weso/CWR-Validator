@@ -7,7 +7,7 @@ from validator.domain.records.record import Record
 class TransmissionHeader(Record):
     FIELD_NAMES = ['Record type', 'Sender type', 'Sender ID', 'Sender name', 'EDI Standard version number',
                    'Creation date', 'Creation time', 'Transmission date', 'Character set']
-    
+
     FIELD_REGEX = [regex.get_defined_values_regex(3, False, 'HDR'), regex.get_alpha_regex(2),
                    regex.get_numeric_regex(9), regex.get_ascii_regex(45),
                    regex.get_defined_values_regex(5, False, '01\.10'), regex.get_date_regex(),
