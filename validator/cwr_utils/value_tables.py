@@ -34,10 +34,11 @@ def _load_instrument_codes():
     worksheet = workbook.sheet_by_index(0)
 
     for curr_row in range(2, worksheet.nrows):
-        codes.append(int(worksheet.cell_value(curr_row, 3)))
+        codes.append(worksheet.cell_value(curr_row, 3))
 
     codes = sorted(list(set(codes)))  # Remove duplicates
-    codes.remove('')  # Remove empty values
+    if '' in codes:
+        codes.remove('')  # Remove empty values
 
     return codes
 
@@ -50,10 +51,11 @@ def _load_instrumentation_codes():
     worksheet = workbook.sheet_by_index(0)
 
     for curr_row in range(2, worksheet.nrows):
-        codes.append(int(worksheet.cell_value(curr_row, 2)))
+        codes.append(worksheet.cell_value(curr_row, 2))
 
     codes = sorted(list(set(codes)))  # Remove duplicates
-    codes.remove('')  # Remove empty values
+    if '' in codes:
+        codes.remove('')  # Remove empty values
 
     return codes
 
@@ -87,7 +89,8 @@ def _load_media_types():
         media_types.append(worksheet.cell_value(curr_row, 4))
 
     media_types = sorted(list(set(media_types)))  # Remove duplicates
-    media_types.remove('')  # Remove empty values
+    if '' in media_types:
+        media_types.remove('')  # Remove empty values
 
     return media_types
 
@@ -115,7 +118,8 @@ def _load_societies_codes():
         codes.append(int(worksheet.cell_value(curr_row, 0)))
 
     codes = sorted(list(set(codes)))  # Remove duplicates
-    codes.remove('')  # Remove empty values
+    if '' in codes:
+        codes.remove('')  # Remove empty values
 
     return codes
 
