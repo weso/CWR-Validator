@@ -1,19 +1,57 @@
 __author__ = 'Borja'
 
 
+class Regex(object):
+
+    def __init__(self, regex=None, size=None):
+        self._regex = regex
+        self.__size = size
+
+    @property
+    def regex(self):
+        return self._regex
+
+    @property
+    def size(self):
+        return self.__size
+
+    def __add__(self, other):
+        if isinstance(other, self.__class__):
+            return self._regex + other._regex
+        elif isinstance(other, str):
+            return self._regex + other
+        else:
+            raise TypeError("unsupported operand type(s) for +: '{}' and '{}'").format(self.__class__, type(other))
+
+    def __str__(self):
+        return self._regex
+
+
 def get_alpha_regex(size, optional=False):
-    regex = '([A-Z]{%d})' % size
-    return '({0}|{1})'.format(regex, get_optional_regex(size)) if optional else regex
+    if optional:
+        regex = '({0}|{1})'.format('([A-Z]{%d})' % size, str(get_optional_regex(size)))
+    else:
+        regex = '([A-Z]{%d})' % size
+
+    return Regex(regex, size)
 
 
 def get_alphanumeric_regex(size, optional=False):
-    regex = '([0-9A-Z]{%d})' % size
-    return '({0}|{1})'.format(regex, get_optional_regex(size)) if optional else regex
+    if optional:
+        regex = '({0}|{1})'.format('([0-9A-Z]{%d})' % size, str(get_optional_regex(size)))
+    else:
+        regex = '([0-9A-Z]{%d})' % size
+
+    return Regex(regex, size)
 
 
 def get_ascii_regex(size, optional=False):
-    regex = '([ -~]{%d})' % size
-    return '({0}|{1})'.format(regex, get_optional_regex(size)) if optional else regex
+    if optional:
+        regex = '({0}|{1})'.format('([ -~]{%d})' % size, str(get_optional_regex(size)))
+    else:
+        regex = '([ -~]{%d})' % size
+
+    return Regex(regex, size)
 
 
 def get_date_regex(optional=False):
@@ -30,23 +68,36 @@ def get_defined_values_regex(size, optional=False, *args):
         else:
             regex += ('|(' + value + ')')
 
-    regex += '|' + get_optional_regex(size) + ')' if optional else ')'
-    return regex
+    regex += '|' + str(get_optional_regex(size)) + ')' if optional else ')'
+
+    return Regex(regex, size)
 
 
 def get_flag_regex(optional=False):
-    regex = '([YNU])'
-    return '({0}|{1})'.format(regex, get_optional_regex(1)) if optional else regex
+    if optional:
+        regex = '({0}|{1})'.format('([YNU])', str(get_optional_regex(1)))
+    else:
+        regex = '([YNU])'
+
+    return Regex(regex, 1)
 
 
 def get_non_roman_regex(size, optional=False):
-    regex = '(.{%d})' % size
-    return '({0}|{1})'.format(regex, get_optional_regex(size)) if optional else regex
+    if optional:
+        regex = '({0}|{1})'.format('(.{%d})' % size, str(get_optional_regex(size)))
+    else:
+        regex = '(.{%d})' % size
+
+    return Regex(regex, size)
 
 
 def get_numeric_regex(size, optional=False):
-    regex = '(\d{%d})' % size
-    return '({0}|{1})'.format(regex, get_optional_regex(size)) if optional else regex
+    if optional:
+        regex = '({0}|{1})'.format('(\d{%d})', str(get_optional_regex(size)))
+    else:
+        regex = '(\d{%d})' % size
+
+    return Regex(regex, size)
 
 
 def get_time_regex(optional=False):
@@ -54,4 +105,4 @@ def get_time_regex(optional=False):
 
 
 def get_optional_regex(size):
-    return '( {%d})' % size
+    return Regex('( {%d})' % size, size)
