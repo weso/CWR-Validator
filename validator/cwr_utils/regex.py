@@ -93,7 +93,7 @@ def get_non_roman_regex(size, optional=False):
 
 def get_numeric_regex(size, optional=False):
     if optional:
-        regex = '({0}|{1})'.format('(\d{%d})', str(get_optional_regex(size)))
+        regex = '({0}|{1})'.format('(\d{%d})' % size, str(get_optional_regex(size)))
     else:
         regex = '(\d{%d})' % size
 

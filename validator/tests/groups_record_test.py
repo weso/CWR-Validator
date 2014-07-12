@@ -1,34 +1,40 @@
 import unittest
-
-from validator.validator import Validator
-
+from validator.domain.records.group_header_record import GroupHeader
 
 __author__ = 'Borja'
 
 
 class GRPValidationTest(unittest.TestCase):
-    def setUp(self):
-        self._validator = Validator()
-
     def test_null(self):
-        self.assertFalse(self._validator.validate_group_header(None))
+        with self.assertRaisesRegexp(ValueError, 'REGEX ERROR:*'):
+            GroupHeader(None)
 
     def test_empty(self):
-        self.assertFalse(self._validator.validate_group_header(''))
+        with self.assertRaisesRegexp(ValueError, 'REGEX ERROR:*'):
+            GroupHeader('')
+
+    def test_header_record(self):
+        record = GroupHeader(
+            'GRHAGR0000102.100130400001  ')
+        self.assertEqual(record.attr_dict['Record type'], 'GRH')
+        self.assertEqual(record.attr_dict['Transaction type'], 'AGR')
+        self.assertEqual(record.attr_dict['Group ID'], 1)
+        self.assertEqual(record.attr_dict['Transaction type version number'], '02.10')
+        self.assertEqual(record.attr_dict['Batch request'], 130400001)
+        self.assertIsNone(record.attr_dict['Submission/Distribution type'])
 
     def test_headers(self):
-        self.assertTrue(self._validator.validate_group_header(
-            'GRHAGR0000102.100130400001  '))
-        self.assertTrue(self._validator.validate_group_header(
-            'GRHNWR0000202.100130500002  '))
-        self.assertTrue(self._validator.validate_group_header(
-            'GRHREV0000202.100130500002  '))
+        record = None
+        record = GroupHeader('GRHAGR0000102.100130400001  ')
+        self.assertIsNotNone(record)
 
-        # Same transaction group can't be validated twice
-        self.assertFalse(self._validator.validate_group_header(
-            'GRHAGR0000102.100130400001  '))
-        self.assertFalse(self._validator.validate_group_header(
-            'REV0000202.100130500002  '))
+        record = None
+        record = GroupHeader('GRHNWR0000202.100130500002  ')
+        self.assertIsNotNone(record)
+
+        record = None
+        record = GroupHeader('GRHREV0000202.100130500002  ')
+        self.assertIsNotNone(record)
 
     def test_trailers(self):
         self.assertTrue(self._validator.validate_group_trailer(

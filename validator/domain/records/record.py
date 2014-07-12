@@ -21,11 +21,8 @@ class Record(object):
         matcher = re.compile(self._regex)
         if matcher.match(record):
             self._build_record(record)
-            if len(self.FIELD_NAMES) != len(self.FIELD_VALUES):
-                raise ValueError("PARSE ERROR: Extracted values number {} must correspond with field names given {}"
-                                 .format(len(self.FIELD_VALUES), len(self.FIELD_NAMES)))
-
             self._attr_dict = self._build_attr_dict()
+            self.format()
             self.validate()
         else:
             self._check_regex_fields()
@@ -34,10 +31,15 @@ class Record(object):
     def attr_dict(self):
         return self._attr_dict
 
-    @abc.abstractmethod
     def _build_record(self, record):
-        """ This method should build the record object related
-            by reading the line in the CWR and validating the fields"""
+        start = 0
+        for regex in self.FIELD_REGEX:
+            self.extract_value(start, regex.size)
+            start += regex.size
+
+    @abc.abstractmethod
+    def format(self):
+        """ This method must give format to non string values """
         return
 
     @abc.abstractmethod
@@ -54,37 +56,37 @@ class Record(object):
         for i, regex in enumerate(self.FIELD_REGEX):
             matcher = re.compile(str(regex))
             if not matcher.match(self._record[start:start+regex.size]):
-                raise ValueError('REGEX ERROR: Record field {} does not validate with expression given {}'.format(
-                    self.FIELD_NAMES[i], self._record[start:start+regex.size]))
+                raise ValueError('REGEX ERROR: Record field {} does not validate value {} with expression given {}'.format(
+                    self.FIELD_NAMES[i], self._record[start:start+regex.size], str(regex)))
             else:
                 start += regex.size
 
     def _generate_regex(self):
         return '^' + "".join(str(regex) for regex in self.FIELD_REGEX) + '$'
 
-    def extract_date_value(self, starts, size):
-        value = self.get_value(starts, size)
+    @staticmethod
+    def format_date_value(value):
         try:
-            self.FIELD_VALUES.append(datetime.datetime.strptime(value, '%Y%m%d').date() if value else None)
+            return datetime.datetime.strptime(value, '%Y%m%d').date() if value else None
         except ValueError:
             return None
 
-    def extract_integer_value(self, starts, size):
-        value = self.get_value(starts, size)
-        self.FIELD_VALUES.append(int(value) if value else None)
+    @staticmethod
+    def format_integer_value(value):
+        return int(value) if value else None
 
-    def extract_float_value(self, starts, size, integer_part_size):
-        value = self.get_value(starts, size)
+    @staticmethod
+    def format_float_value(value, integer_part_size):
         try:
-            self.FIELD_VALUES.append(float(
-                value[0:0 + integer_part_size] + '.' + value[0 + integer_part_size:size]) if value else None)
+            return float(
+                value[0:0 + integer_part_size] + '.' + value[0 + integer_part_size:len(value)]) if value else None
         except ValueError:
             return None
 
-    def extract_time_value(self, starts, size):
-        value = self.get_value(starts, size)
+    @staticmethod
+    def format_time_value(value):
         try:
-            self.FIELD_VALUES.append(datetime.datetime.strptime(value, '%H%M%S').time() if value else None)
+            return datetime.datetime.strptime(value, '%H%M%S').time() if value else None
         except ValueError:
             return None
 

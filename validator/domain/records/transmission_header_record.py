@@ -16,16 +16,11 @@ class TransmissionHeader(Record):
     def __init__(self, record):
         super(TransmissionHeader, self).__init__(record)
 
-    def _build_record(self, record):
-        self.extract_value(0, 3)
-        self.extract_value(3, 2)
-        self.extract_integer_value(5, 9)
-        self.extract_value(14, 45)
-        self.extract_value(59, 5)
-        self.extract_date_value(64, 8)
-        self.extract_time_value(72, 6)
-        self.extract_date_value(78, 8)
-        self.extract_value(86, 15)
+    def format(self):
+        self.attr_dict['Sender ID'] = self.format_integer_value(self.attr_dict['Sender ID'])
+        self.attr_dict['Creation date'] = self.format_date_value(self.attr_dict['Creation date'])
+        self.attr_dict['Creation time'] = self.format_time_value(self.attr_dict['Creation time'])
+        self.attr_dict['Transmission date'] = self.format_date_value(self.attr_dict['Transmission date'])
 
     def validate(self):
         if not self._attr_dict['Sender type'] in SENDER_VALUES:
