@@ -4,7 +4,7 @@ from validator.cwr_utils.value_tables import TRANSACTION_VALUES
 from validator.domain.records.record import Record
 
 
-class GroupHeader(Record):
+class GroupHeaderRecord(Record):
     FIELD_NAMES = ['Record type', 'Transaction type', 'Group ID', 'Transaction type version number',
                    'Batch request', 'Submission/Distribution type']
 
@@ -13,7 +13,7 @@ class GroupHeader(Record):
                    regex.get_numeric_regex(10, True), regex.get_optional_regex(2)]
 
     def __init__(self, record):
-        super(GroupHeader, self).__init__(record)
+        super(GroupHeaderRecord, self).__init__(record)
 
     def format(self):
         self.attr_dict['Group ID'] = self.format_integer_value(self.attr_dict['Group ID'])

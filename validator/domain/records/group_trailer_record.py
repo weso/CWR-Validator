@@ -4,42 +4,24 @@ from validator.cwr_utils.value_tables import CURRENCY_VALUES
 from validator.domain.records.record import Record
 
 
-class GroupTrailer(Record):
-    RECORD_TYPE = regex.get_defined_values_regex(3, False, 'GRT')
-    GROUP_ID = regex.get_numeric_regex(5)
-    TRANSACTION_COUNT = regex.get_numeric_regex(8)
-    RECORD_COUNT = regex.get_numeric_regex(8)
+class GroupTrailerRecord(Record):
+    FIELD_NAMES = ['Record type', 'Group ID', 'Transaction count',
+                   'Record count', 'Currency indicator', 'Total monetary value']
 
-    CURRENCY = regex.get_alpha_regex(3, True)
-    MONETARY_VALUE = regex.get_numeric_regex(10, True)
-
-    REGEX = "^{0}{1}{2}{3}{4}{5}$".format(
-        RECORD_TYPE, GROUP_ID, TRANSACTION_COUNT, RECORD_COUNT, CURRENCY, MONETARY_VALUE)
+    FIELD_REGEX = [regex.get_defined_values_regex(3, False, 'GRT'), regex.get_numeric_regex(5),
+                   regex.get_numeric_regex(8), regex.get_numeric_regex(8),
+                   regex.get_alpha_regex(3, True), regex.get_numeric_regex(10, True)]
 
     def __init__(self, record):
-        super(GroupTrailer, self).__init__(record, self.REGEX)
+        super(GroupTrailerRecord, self).__init__(record)
 
-    def _build_record(self, record):
-        self._group_id = self.get_value(3, 5)
-        self._transaction_count = self.get_integer_value(8, 8)
-        self._record_count = self.get_integer_value(16, 8)
-
-        self._monetary_value = self.get_integer_value(27, 10)
-        self._currency_indicator = self.get_value(24, 3)
-        if self._monetary_value is not None and self._monetary_value > 0:
-            if self._currency_indicator not in CURRENCY_VALUES:
-                raise ValueError('Given currency %s indicator not in currency codes' % self._currency_indicator)
+    def format(self):
+        self.attr_dict['Group ID'] = self.format_integer_value(self.attr_dict['Group ID'])
+        self.attr_dict['Transaction count'] = self.format_integer_value(self.attr_dict['Transaction count'])
+        self.attr_dict['Record count'] = self.format_integer_value(self.attr_dict['Record count'])
+        self.attr_dict['Total monetary value'] = self.format_integer_value(self.attr_dict['Total monetary value'])
 
     def validate(self):
-        pass
-
-    @property
-    def group_id(self):
-        return self._group_id
-
-    def __str__(self):
-        return 'group id: {0}\ntransaction count: {1}\nrecord count: {2}\n'\
-            .format(self._group_id, self._transaction_count, self._record_count)
-
-    def __repr__(self):
-        return self.__str__()
+        if self.attr_dict['Total monetary value'] is not None and self.attr_dict['Total monetary value'] > 0:
+            if self.attr_dict['Currency indicator'] not in CURRENCY_VALUES:
+                raise ValueError('FIELD ERROR: Given currency indicator: {} not in currency codes'.format(self._currency_indicator))
