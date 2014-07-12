@@ -2,8 +2,8 @@ __author__ = 'Borja'
 import re
 
 from domain.records.agreement_record import AgreementRecord
-from domain.records.group_header_record import GroupHeader
-from domain.records.group_trailer_record import GroupTrailer
+from domain.records.group_header_record import GroupHeaderRecord
+from domain.records.group_trailer_record import GroupTrailerRecord
 from domain.records.instrumentation_summary_record import InstrumentationSummaryRecord
 from domain.records.interested_party_record import InterestedPartyRecord
 from domain.records.performing_artist_record import PerformingArtistRecord
@@ -75,7 +75,7 @@ class Validator(object):
             return False
 
         try:
-            group_header = GroupHeader(record.upper())
+            group_header = GroupHeaderRecord(record.upper())
             if group_header.transaction_type not in self._group_headers.keys():
                 self._group_headers[group_header.transaction_type] = group_header
                 print group_header
@@ -269,7 +269,7 @@ class Validator(object):
             return False
 
         try:
-            group_trailer = GroupTrailer(record.upper())
+            group_trailer = GroupTrailerRecord(record.upper())
             if group_trailer.group_id not in self._group_trailers.keys():
                 self._group_trailers[group_trailer.group_id] = group_trailer
                 print group_trailer
