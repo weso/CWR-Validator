@@ -54,6 +54,15 @@ def get_ascii_regex(size, optional=False):
     return Regex(regex, size)
 
 
+def get_boolean_regex(optional=False):
+    if optional:
+        regex = '({0}|{1})'.format('([YN])', str(get_optional_regex(1)))
+    else:
+        regex = '([YN])'
+
+    return Regex(regex, 1)
+
+
 def get_date_regex(optional=False):
     return get_numeric_regex(8, optional)
 
