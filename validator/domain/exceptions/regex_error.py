@@ -8,5 +8,5 @@ class RegexError(Exception):
         self.value = value
 
     def __str__(self):
-        return 'REGEX ERROR: Record field {} does not validate value {} with expression given {}'.format(
+        return 'Record field {} does not validate value {} with expression given {}'.format(
                     self.field, self.value, self.regex)
