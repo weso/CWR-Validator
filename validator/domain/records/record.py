@@ -68,7 +68,10 @@ class Record(object):
     @staticmethod
     def format_date_value(value):
         try:
-            return datetime.datetime.strptime(value, '%Y%m%d').date() if value else None
+            if int(value) != 0:
+                return datetime.datetime.strptime(value, '%Y%m%d').date() if value else None
+            else:
+                return None
         except ValueError:
             return None
 
@@ -87,7 +90,10 @@ class Record(object):
     @staticmethod
     def format_time_value(value):
         try:
-            return datetime.datetime.strptime(value, '%H%M%S').time() if value else None
+            if int(value) != 0:
+                return datetime.datetime.strptime(value, '%H%M%S').time() if value else None
+            else:
+                return None
         except ValueError:
             return None
 
