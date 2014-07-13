@@ -1,4 +1,6 @@
 import unittest
+from validator.domain.exceptions.field_validation_error import FieldValidationError
+from validator.domain.exceptions.regex_error import RegexError
 from validator.domain.records.group_header_record import GroupHeaderRecord
 from validator.domain.records.group_trailer_record import GroupTrailerRecord
 
@@ -7,11 +9,11 @@ __author__ = 'Borja'
 
 class GRPValidationTest(unittest.TestCase):
     def test_null(self):
-        with self.assertRaisesRegexp(ValueError, 'REGEX ERROR:*'):
+        with self.assertRaisesRegexp(ValueError, "Record can't be None"):
             GroupHeaderRecord(None)
 
     def test_empty(self):
-        with self.assertRaisesRegexp(ValueError, 'REGEX ERROR:*'):
+        with self.assertRaisesRegexp(ValueError, "Record can't be None"):
             GroupHeaderRecord('')
 
     def test_header_record(self):
@@ -47,17 +49,21 @@ class GRPValidationTest(unittest.TestCase):
         self.assertEqual(record.attr_dict['Total monetary value'], 0)
 
     def test_regex_error(self):
-        with self.assertRaisesRegexp(ValueError, 'REGEX ERROR:*'):
+        with self.assertRaisesRegexp(RegexError, 'Record type'):
             GroupHeaderRecord('GRPREV0000202.100130500002  ')
+        with self.assertRaisesRegexp(RegexError, 'Record type'):
             GroupTrailerRecord('GRR000010000017900000719   0000000000')
 
     def test_field_validation_error(self):
-        with self.assertRaisesRegexp(ValueError, 'FIELD ERROR:*'):
+        with self.assertRaisesRegexp(FieldValidationError, 'transaction type'):
             GroupHeaderRecord('GRHPPP0000202.100130500002  ')
+        with self.assertRaisesRegexp(FieldValidationError, 'group id'):
             GroupHeaderRecord('GRHREV0000502.100130500002  ')
 
-            GroupTrailerRecord('GRR000010000017900000719   0000000001')
-            GroupTrailerRecord('GRR000010000017900000719ABC0000000001')
+        with self.assertRaisesRegexp(FieldValidationError, 'currency indicator'):
+            GroupTrailerRecord('GRT000010000017900000719   0000000001')
+        with self.assertRaisesRegexp(FieldValidationError, 'currency indicator'):
+            GroupTrailerRecord('GRT000010000017900000719ABC0000000001')
 
     def test_file(self):
         with open('files/CW1328EMI_059.V21') as cwr_file:

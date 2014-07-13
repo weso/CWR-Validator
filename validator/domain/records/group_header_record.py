@@ -1,3 +1,5 @@
+from validator.domain.exceptions.field_validation_error import FieldValidationError
+
 __author__ = 'Borja'
 from validator.cwr_utils import regex
 from validator.cwr_utils.value_tables import TRANSACTION_VALUES
@@ -21,6 +23,8 @@ class GroupHeaderRecord(Record):
 
     def validate(self):
         if self.attr_dict['Transaction type'] not in TRANSACTION_VALUES:
-            raise ValueError('FIELD ERROR: Given transaction type: {} not in required ones'.format(self.attr_dict['Transaction type']))
+            raise FieldValidationError('Given transaction type: {} not in required ones'.format(self.attr_dict[
+                "Transaction type"]))
         if self.attr_dict['Group ID'] > len(TRANSACTION_VALUES):
-            raise ValueError('FIELD ERROR: Given group id: {} bigger than expected (00003)'.format(self.attr_dict['Group ID']))
+            raise FieldValidationError('Given group id: {} bigger than expected (00003)'.format(self.attr_dict[
+                "Group ID"]))

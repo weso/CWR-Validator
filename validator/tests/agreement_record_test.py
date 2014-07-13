@@ -1,17 +1,21 @@
-__author__ = 'Borja'
 import datetime
 import unittest
+
+from validator.domain.exceptions.field_validation_error import FieldValidationError
+from validator.domain.exceptions.regex_error import RegexError
+
+__author__ = 'Borja'
 
 from validator.domain.records.agreement_record import AgreementRecord
 
 
 class AGRValidationTest(unittest.TestCase):
     def test_null(self):
-        with self.assertRaisesRegexp(ValueError, 'REGEX ERROR:*'):
+        with self.assertRaisesRegexp(ValueError, "Record can't be None"):
             AgreementRecord(None)
 
     def test_empty(self):
-        with self.assertRaisesRegexp(ValueError, 'REGEX ERROR:*'):
+        with self.assertRaisesRegexp(ValueError, "Record can't be None"):
             AgreementRecord('')
 
     def test_record(self):
@@ -40,39 +44,52 @@ class AGRValidationTest(unittest.TestCase):
         self.assertIsNone(record.attr_dict['Society-assigned agreement number'])
 
     def test_regex_error(self):
-        with self.assertRaisesRegexp(ValueError, 'REGEX ERROR:*'):
+        with self.assertRaisesRegexp(RegexError, 'Record prefix'):
             AgreementRecord(
             'AGR0000002A0000000000532827921033              PS19900801                N        O                00001SYN              ')
+        with self.assertRaisesRegexp(RegexError, 'Prior royalty status'):
             AgreementRecord(
             'AGR000000230000000000532827921033              PS19900801                Z        O                00001SYN              ')
+        with self.assertRaisesRegexp(RegexError, 'Advance given'):
             AgreementRecord(
             'AGR000000230000000000532827921033              PS19900801                N        O                00001SYL              ')
 
 
     def test_field_validation_error(self):
-        with self.assertRaisesRegexp(ValueError, 'FIELD ERROR:*'):
+        with self.assertRaisesRegexp(FieldValidationError, 'record type'):
             AgreementRecord(
             'ADR000000230000000000532827921033              PS19900801                N        O                00001SYN              ')
+        with self.assertRaisesRegexp(FieldValidationError, 'agreement type'):
             AgreementRecord(
             'AGR000000230000000000532827921033              LL19900801                N        O                00001SYN              ')
+        with self.assertRaisesRegexp(FieldValidationError, 'Retention end date'):
             AgreementRecord(
             'AGR000000230000000000532827921033              PS199008012000010119990101N        O                00001SYN              ')
+        with self.assertRaisesRegexp(FieldValidationError, 'Expected royalty date'):
             AgreementRecord(
             'AGR000000230000000000532827921033              PS19900801                D        O                00001SYN              ')
+        with self.assertRaisesRegexp(FieldValidationError, 'Not expected royalty date'):
             AgreementRecord(
             'AGR000000230000000000532827921033              PS19900801                N19900101O                00001SYN              ')
+        with self.assertRaisesRegexp(FieldValidationError, 'royalty start date'):
             AgreementRecord(
             'AGR000000230000000000532827921033              PS19900801                D19910101O                00001SYN              ')
+        with self.assertRaisesRegexp(FieldValidationError, 'Expected post-term collection end date'):
             AgreementRecord(
             'AGR000000230000000000532827921033              PS19900801                N        D                00001SYN              ')
+        with self.assertRaisesRegexp(FieldValidationError, 'Not expected post-term collection end date'):
             AgreementRecord(
             'AGR000000230000000000532827921033              PS19900801                N        O20001212        00001SYN              ')
+        with self.assertRaisesRegexp(FieldValidationError, 'Post-term collection end date must be greater'):
             AgreementRecord(
             'AGR000000230000000000532827921033              PS1990080120000101        N        D19990101        00001SYN              ')
+        with self.assertRaisesRegexp(FieldValidationError, 'Post-term collection end date must be greater'):
             AgreementRecord(
             'AGR000000230000000000532827921033              PS19900801        20000101N        D19990101        00001SYN              ')
+        with self.assertRaisesRegexp(FieldValidationError, 'Expected sales clause'):
             AgreementRecord(
             'AGR000000230000000000532827921033              PS19900801                N        O                00001 YN              ')
+        with self.assertRaisesRegexp(FieldValidationError, 'Number of works'):
             AgreementRecord(
             'AGR000000230000000000532827921033              PS19900801                N        O                00000SYN              ')
 

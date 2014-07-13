@@ -3,8 +3,10 @@ from validator.cwr_utils import regex
 from validator.cwr_utils.value_tables import SENDER_VALUES
 from validator.domain.records.record import Record
 
+from validator.domain.exceptions.field_validation_error import FieldValidationError
 
-class TransmissionHeader(Record):
+
+class TransmissionHeaderRecord(Record):
     FIELD_NAMES = ['Record type', 'Sender type', 'Sender ID', 'Sender name', 'EDI Standard version number',
                    'Creation date', 'Creation time', 'Transmission date', 'Character set']
 
@@ -14,7 +16,7 @@ class TransmissionHeader(Record):
                    regex.get_time_regex(), regex.get_date_regex(), regex.get_alphanumeric_regex(15, True)]
 
     def __init__(self, record):
-        super(TransmissionHeader, self).__init__(record)
+        super(TransmissionHeaderRecord, self).__init__(record)
 
     def format(self):
         self.attr_dict['Sender ID'] = self.format_integer_value(self.attr_dict['Sender ID'])
@@ -24,5 +26,5 @@ class TransmissionHeader(Record):
 
     def validate(self):
         if not self._attr_dict['Sender type'] in SENDER_VALUES:
-            raise ValueError('FIELD ERROR: Given sender type: {} not in required ones'.format(
+            raise FieldValidationError('Given sender type: {} not in required ones'.format(
                 self._attr_dict['Sender type']))

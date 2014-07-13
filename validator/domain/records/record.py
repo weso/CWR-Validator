@@ -3,6 +3,8 @@ import abc
 import datetime
 import re
 
+from validator.domain.exceptions.regex_error import RegexError
+
 
 class Record(object):
     __metaclass__ = abc.ABCMeta
@@ -14,7 +16,7 @@ class Record(object):
     def __init__(self, record):
         self.FIELD_VALUES = []
         if record is None or record == '':
-            raise ValueError("REGEX ERROR: Expected record couldn't be None")
+            raise ValueError("Record can't be None")
 
         self._record = record
         self._regex = self._generate_regex()
@@ -56,8 +58,7 @@ class Record(object):
         for i, regex in enumerate(self.FIELD_REGEX):
             matcher = re.compile(str(regex))
             if not matcher.match(self._record[start:start+regex.size]):
-                raise ValueError('REGEX ERROR: Record field {} does not validate value {} with expression given {}'.format(
-                    self.FIELD_NAMES[i], self._record[start:start+regex.size], str(regex)))
+                raise RegexError(self.FIELD_NAMES[i], str(regex), self._record[start:start+regex.size])
             else:
                 start += regex.size
 
