@@ -1,34 +1,28 @@
+from validator.domain.exceptions.field_validation_error import FieldValidationError
+
 __author__ = 'Borja'
 from validator.cwr_utils import regex
 from validator.cwr_utils.value_tables import TIS_CODES
 from validator.domain.records.record import Record
+from validator.domain.values.record_prefix import RecordPrefix
 
 
 class TerritoryRecord(Record):
-    RECORD_TYPE = regex.get_defined_values_regex(3, False, 'TER')
-    AGREEMENT_ID = regex.get_numeric_regex(8)
-    RECORD_NUMBER = regex.get_numeric_regex(8)
-    EXCLUSION_INDICATOR = regex.get_defined_values_regex(1, False, 'E', 'I')
-    TIS_NUMERIC_CODE = regex.get_numeric_regex(4)
+    FIELD_NAMES = ['Record prefix', 'Inclusion/Exclusion indicator', 'TIS numeric code']
 
-    REGEX = "^{0}{1}{2}{3}{4}$".format(
-        RECORD_TYPE, AGREEMENT_ID, RECORD_NUMBER, EXCLUSION_INDICATOR, TIS_NUMERIC_CODE)
+    FIELD_VALUES = [RecordPrefix.REGEX, regex.get_defined_values_regex(1, False, 'E', 'I'), regex.get_numeric_regex(4)]
 
     def __init__(self, record):
-        super(TerritoryRecord, self).__init__(record, self.REGEX)
+        super(TerritoryRecord, self).__init__(record)
 
-    def _build_record(self, record):
-        self._agreement_id = self.get_integer_value(3, 8)
-        self._excluded = self.get_value(19, 1) == 'E'
-        self._tis_code = self.get_integer_value(20, 4)
-        if self._tis_code not in TIS_CODES:
-            raise ValueError('Given TIS code %s not recognized' % self._tis_code)
+    def format(self):
+        self.attr_dict['Record prefix'] = RecordPrefix(self.attr_dict['Record prefix'])
+        self.attr_dict['TIS numeric code'] = self.format_integer_value(self.attr_dict['TIS numeric code'])
 
     def validate(self):
-        pass
+        if self.attr_dict['Record prefix'].record_type != 'TER':
+            raise FieldValidationError('TER record type expected, obtained {}'.format(
+                self.attr_dict['Record prefix'].record_type))
 
-    def __str__(self):
-        return 'Not implemented yet'
-
-    def __repr__(self):
-        return self.__str__()
+        if self.attr_dict['TIS numeric code'] not in TIS_CODES:
+            raise FieldValidationError('Given TIS code: {} not in table'.format(self.attr_dict['TIS numeric code']))
