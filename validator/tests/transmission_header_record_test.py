@@ -1,20 +1,23 @@
+from validator.domain.exceptions.field_validation_error import FieldValidationError
+from validator.domain.exceptions.regex_error import RegexError
+
 __author__ = 'Borja'
 import datetime
 import unittest
-from validator.domain.records.transmission_header_record import TransmissionHeader
+from validator.domain.records.transmission_header_record import TransmissionHeaderRecord
 
 
 class HDRValidationTest(unittest.TestCase):
     def test_null(self):
-        with self.assertRaisesRegexp(ValueError, 'REGEX ERROR:*'):
-            TransmissionHeader(None)
+        with self.assertRaisesRegexp(ValueError, "Record can't be None"):
+            TransmissionHeaderRecord(None)
 
     def test_empty(self):
-        with self.assertRaisesRegexp(ValueError, 'REGEX ERROR:*'):
-            TransmissionHeader('')
+        with self.assertRaisesRegexp(ValueError, "Record can't be None"):
+            TransmissionHeaderRecord('')
 
     def test_record(self):
-        record = TransmissionHeader(
+        record = TransmissionHeaderRecord(
             'HDRPB226144593EMI MUSICAL SA DE CV                         01.102013080902591120130809               ')
 
         self.assertEqual(record.attr_dict['Record type'], 'HDR')
@@ -28,13 +31,14 @@ class HDRValidationTest(unittest.TestCase):
         self.assertIsNone(record.attr_dict['Character set'])
 
     def test_regex_error(self):
-        with self.assertRaisesRegexp(ValueError, 'REGEX ERROR:*'):
-            TransmissionHeader(
+        with self.assertRaisesRegexp(RegexError, 'Record type'):
+            TransmissionHeaderRecord(
             'HDDPB226144593EMI MUSICAL SA DE CV                         01.102013080902591120130809               ')
-            TransmissionHeader(
+        with self.assertRaisesRegexp(RegexError, 'Character set'):
+            TransmissionHeaderRecord(
             'HDRPB226144593EMI MUSICAL SA DE CV                         01.102013080902591120130809')
 
     def test_field_validation_error(self):
-        with self.assertRaisesRegexp(ValueError, 'FIELD ERROR:*'):
-            TransmissionHeader(
+        with self.assertRaisesRegexp(FieldValidationError, 'sender type'):
+            TransmissionHeaderRecord(
             'HDRCC226144593EMI MUSICAL SA DE CV                         01.102013080902591120130809               ')

@@ -12,8 +12,8 @@ from domain.records.publisher_territory_record import PublisherTerritoryRecord
 from domain.records.recording_detail_record import RecordingDetailRecord
 from domain.records.registration_record import RegistrationRecord
 from domain.records.territory_record import TerritoryRecord
-from domain.records.transmission_header_record import TransmissionHeader
-from domain.records.transmission_trailer_record import TransmissionTrailer
+from domain.records.transmission_header_record import TransmissionHeaderRecord
+from domain.records.transmission_trailer_record import TransmissionTrailerRecord
 from domain.records.work_alternative_title_record import WorkAlternativeTitleRecord
 from domain.records.work_origin_record import WorkOriginRecord
 from domain.records.work_version_record import WorkVersionRecord
@@ -63,7 +63,7 @@ class Validator(object):
             return False
 
         try:
-            self._transmission_header = TransmissionHeader(record.upper())
+            self._transmission_header = TransmissionHeaderRecord(record.upper())
             print self._transmission_header
             return True
         except ValueError as detail:
@@ -285,7 +285,7 @@ class Validator(object):
             return False
 
         try:
-            self._transmission_trailer = TransmissionTrailer(record.upper())
+            self._transmission_trailer = TransmissionTrailerRecord(record.upper())
             print self._transmission_trailer
             return True
         except ValueError as detail:

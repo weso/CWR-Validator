@@ -1,3 +1,5 @@
+from validator.domain.exceptions.field_validation_error import FieldValidationError
+
 __author__ = 'Borja'
 from validator.cwr_utils import regex
 from validator.cwr_utils.value_tables import CURRENCY_VALUES
@@ -24,4 +26,5 @@ class GroupTrailerRecord(Record):
     def validate(self):
         if self.attr_dict['Total monetary value'] is not None and self.attr_dict['Total monetary value'] > 0:
             if self.attr_dict['Currency indicator'] not in CURRENCY_VALUES:
-                raise ValueError('FIELD ERROR: Given currency indicator: {} not in currency codes'.format(self._currency_indicator))
+                raise FieldValidationError('Given currency indicator: {} not in currency codes'.format(
+                    self.attr_dict['Currency indicator']))
