@@ -5,7 +5,7 @@ class Regex(object):
 
     def __init__(self, regex=None, size=None):
         self._regex = regex
-        self.__size = size
+        self._size = size
 
     @property
     def regex(self):
@@ -13,13 +13,11 @@ class Regex(object):
 
     @property
     def size(self):
-        return self.__size
+        return self._size
 
     def __add__(self, other):
         if isinstance(other, self.__class__):
-            return self._regex + other._regex
-        elif isinstance(other, str):
-            return self._regex + other
+            return Regex(self._regex + other._regex, self._size + other._size)
         else:
             raise TypeError("unsupported operand type(s) for +: '{}' and '{}'").format(self.__class__, type(other))
 
