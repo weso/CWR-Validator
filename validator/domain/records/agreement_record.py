@@ -27,19 +27,15 @@ class AgreementRecord(Record):
 
     def format(self):
         self.attr_dict['Record prefix'] = RecordPrefix(self.attr_dict['Record prefix'])
-        self.attr_dict['Submitter agreement number'] = self.format_integer_value(
-            self.attr_dict['Submitter agreement number'])
-        self.attr_dict['International standard agreement number'] = self.format_integer_value(
-            self.attr_dict['International standard agreement number'])
-        self.attr_dict['Agreement start date'] = self.format_date_value(self.attr_dict['Agreement start date'])
-        self.attr_dict['Agreement end date'] = self.format_date_value(self.attr_dict['Agreement end date'])
-        self.attr_dict['Retention end date'] = self.format_date_value(self.attr_dict['Retention end date'])
-        self.attr_dict['Prior royalty start date'] = self.format_date_value(self.attr_dict['Prior royalty start date'])
-        self.attr_dict['Post-term collection end date'] = self.format_date_value(
-            self.attr_dict['Post-term collection end date'])
-        self.attr_dict['Date of signature agreement'] = self.format_date_value(
-            self.attr_dict['Date of signature agreement'])
-        self.attr_dict['Number of works'] = self.format_integer_value(self.attr_dict['Number of works'])
+        self.format_integer_value('Submitter agreement number')
+        self.format_integer_value('International standard agreement number')
+        self.format_date_value('Agreement start date')
+        self.format_date_value('Agreement end date')
+        self.format_date_value('Retention end date')
+        self.format_date_value('Prior royalty start date')
+        self.format_date_value('Post-term collection end date')
+        self.format_date_value('Date of signature agreement')
+        self.format_integer_value('Number of works')
 
     def validate(self):
         if self.attr_dict['Record prefix'].record_type != 'AGR':

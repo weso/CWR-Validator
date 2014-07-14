@@ -38,12 +38,10 @@ class RegistrationRecord(Record):
 
     def format(self):
         self.attr_dict['Record prefix'] = RecordPrefix(self.attr_dict['Record prefix'])
-        self.attr_dict['Copyright date'] = self.format_date_value(self.attr_dict['Copyright date'])
-        self.attr_dict['Duration'] = self.format_time_value(self.attr_dict['Duration'])
-        self.attr_dict['Composite component count'] = self.format_integer_value(
-            self.attr_dict['Composite component count'])
-        self.attr_dict['Date of publication of printed edition'] = self.format_date_value(
-            self.attr_dict['Date of publication of printed edition'])
+        self.format_date_value('Copyright date')
+        self.format_time_value('Duration')
+        self.format_integer_value('Composite component count')
+        self.format_date_value('Date of publication of printed edition')
 
     def validate(self):
         if self.attr_dict['Record prefix'].record_type not in ['NWR', 'REV']:

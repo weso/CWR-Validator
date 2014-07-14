@@ -26,15 +26,14 @@ class InterestedPartyRecord(Record):
 
     def format(self):
         self.attr_dict['Record prefix'] = RecordPrefix(self.attr_dict['Record prefix'])
-        self.attr_dict['Interested party CAE/IPI ID'] = self.format_integer_value(
-            self.attr_dict['Interested party CAE/IPI ID'])
-        self.attr_dict['IPI base number'] = self.format_integer_value(self.attr_dict['IPI base number'])
-        self.attr_dict['PR affiliation society'] = self.format_integer_value(self.attr_dict['PR affiliation society'])
-        self.attr_dict['PR share'] = self.format_float_value(self.attr_dict['PR share'], 3)
-        self.attr_dict['MR affiliation society'] = self.format_integer_value(self.attr_dict['MR affiliation society'])
-        self.attr_dict['MR share'] = self.format_float_value(self.attr_dict['MR share'], 3)
-        self.attr_dict['SR affiliation society'] = self.format_integer_value(self.attr_dict['SR affiliation society'])
-        self.attr_dict['SR share'] = self.format_float_value(self.attr_dict['SR share'], 3)
+        self.format_integer_value('Interested party CAE/IPI ID')
+        self.format_integer_value('IPI base number')
+        self.format_integer_value('PR affiliation society')
+        self.format_float_value('PR share', 3)
+        self.format_integer_value('MR affiliation society')
+        self.format_float_value('MR share', 3)
+        self.format_integer_value('SR affiliation society')
+        self.format_float_value('SR share', 3)
 
     def validate(self):
         if self.attr_dict['Record prefix'].record_type != 'IPA':
@@ -76,12 +75,12 @@ class InterestedPartyRecord(Record):
             if self.attr_dict['SR affiliation society'] not in SOCIETY_CODES:
                 raise FieldValidationError('Given SR society: {} not in table'.format(
                     self.attr_dict['SR affiliation society']))
-        elif self.attr_dict['SR affiliation society'] is None:
-            raise FieldValidationError('Expected SR society with share {}'. format(self.attr_dict['SR share']))
 
         if 0 > self.attr_dict['SR share'] or self.attr_dict['SR share'] > 100:
             raise FieldValidationError('Expected SR share between 0 and 100, obtained {}'.format(
                 self.attr_dict['SR share']))
+        elif self.attr_dict['SR affiliation society'] is None:
+            raise FieldValidationError('Expected SR society with share {}'. format(self.attr_dict['SR share']))
 
         if self.attr_dict['PR affiliation society'] is None and self.attr_dict['MR affiliation society'] is None:
             raise FieldValidationError('Expected at least one PR or MR society')

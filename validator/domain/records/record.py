@@ -65,37 +65,37 @@ class Record(object):
     def _generate_regex(self):
         return '^' + "".join(str(regex) for regex in self.FIELD_REGEX) + '$'
 
-    @staticmethod
-    def format_date_value(value):
+    def format_date_value(self, field):
+        value = self._attr_dict[field]
         try:
             if int(value) != 0:
-                return datetime.datetime.strptime(value, '%Y%m%d').date() if value else None
+                self._attr_dict[field] = datetime.datetime.strptime(value, '%Y%m%d').date() if value else None
             else:
-                return None
+                self._attr_dict[field] = None
         except ValueError:
-            return None
+            self._attr_dict[field] = None
 
-    @staticmethod
-    def format_integer_value(value):
-        return int(value) if value else None
+    def format_integer_value(self, field):
+        value = self._attr_dict[field]
+        self._attr_dict[field] = int(value) if value else None
 
-    @staticmethod
-    def format_float_value(value, integer_part_size):
+    def format_float_value(self, field, integer_part_size):
+        value = self._attr_dict[field]
         try:
-            return float(
+            self._attr_dict[field] = float(
                 value[0:0 + integer_part_size] + '.' + value[0 + integer_part_size:len(value)]) if value else None
         except ValueError:
-            return None
+            self._attr_dict[field] = None
 
-    @staticmethod
-    def format_time_value(value):
+    def format_time_value(self, field):
+        value = self._attr_dict[field]
         try:
             if int(value) != 0:
-                return datetime.datetime.strptime(value, '%H%M%S').time() if value else None
+                self._attr_dict[field] = datetime.datetime.strptime(value, '%H%M%S').time() if value else None
             else:
-                return None
+                self._attr_dict[field] = None
         except ValueError:
-            return None
+            self._attr_dict[field] = None
 
     def extract_value(self, starts, size):
         self.FIELD_VALUES.append(self.get_value(starts, size))

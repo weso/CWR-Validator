@@ -18,10 +18,10 @@ class GroupTrailerRecord(Record):
         super(GroupTrailerRecord, self).__init__(record)
 
     def format(self):
-        self.attr_dict['Group ID'] = self.format_integer_value(self.attr_dict['Group ID'])
-        self.attr_dict['Transaction count'] = self.format_integer_value(self.attr_dict['Transaction count'])
-        self.attr_dict['Record count'] = self.format_integer_value(self.attr_dict['Record count'])
-        self.attr_dict['Total monetary value'] = self.format_integer_value(self.attr_dict['Total monetary value'])
+        self.format_integer_value('Group ID')
+        self.format_integer_value('Transaction count')
+        self.format_integer_value('Record count')
+        self.format_integer_value('Total monetary value')
 
     def validate(self):
         if self.attr_dict['Total monetary value'] is not None and self.attr_dict['Total monetary value'] > 0:

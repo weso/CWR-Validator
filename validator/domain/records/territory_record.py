@@ -17,7 +17,7 @@ class TerritoryRecord(Record):
 
     def format(self):
         self.attr_dict['Record prefix'] = RecordPrefix(self.attr_dict['Record prefix'])
-        self.attr_dict['TIS numeric code'] = self.format_integer_value(self.attr_dict['TIS numeric code'])
+        self.format_integer_value('TIS numeric code')
 
     def validate(self):
         if self.attr_dict['Record prefix'].record_type != 'TER':
