@@ -1,3 +1,6 @@
+from validator.domain.exceptions.field_validation_error import FieldValidationError
+from validator.domain.values.record_prefix import RecordPrefix
+
 __author__ = 'Borja'
 from validator.cwr_utils import regex
 from validator.cwr_utils.value_tables import TIS_CODES
@@ -5,45 +8,43 @@ from validator.domain.records.record import Record
 
 
 class PublisherTerritoryRecord(Record):
-    RECORD_TYPE = regex.get_defined_values_regex(3, False, 'SPT')
-    TRANSACTION_NUMBER = regex.get_numeric_regex(8)
-    RECORD_NUMBER = regex.get_numeric_regex(8)
-    IPA_NUMBER = regex.get_ascii_regex(9)
-    CONSTANT = regex.get_optional_regex(6)
-    PR_SHARE = regex.get_numeric_regex(5, True)
-    MR_SHARE = regex.get_numeric_regex(5, True)
-    SR_SHARE = regex.get_numeric_regex(5, True)
-    INCLUSION_EXCLUSION = regex.get_defined_values_regex(1, False, 'E', 'I')
-    TIS_NUMERIC_CODE = regex.get_numeric_regex(4)
-    SHARES_CHANGE = regex.get_flag_regex(True)
-    SEQUENCE_NUMBER = regex.get_numeric_regex(3)
+    FIELD_NAMES = ['Record prefix', 'Interested party ID', 'Constant', 'PR collection share', 'MR collection share',
+                   'SR collection share', 'Inclusion/Exclusion indicator', 'TIS numeric code', 'Shares change',
+                   'Sequence ID']
 
-    REGEX = "^{0}{1}{2}{3}{4}{5}{6}{7}{8}{9}{10}{11}$".format(
-        RECORD_TYPE, TRANSACTION_NUMBER, RECORD_NUMBER, IPA_NUMBER, CONSTANT, PR_SHARE, MR_SHARE, SR_SHARE,
-        INCLUSION_EXCLUSION, TIS_NUMERIC_CODE, SHARES_CHANGE, SEQUENCE_NUMBER)
+    FIELD_REGEX = [RecordPrefix.REGEX, regex.get_ascii_regex(9), regex.get_optional_regex(6),
+                   regex.get_numeric_regex(5, True), regex.get_numeric_regex(5, True), regex.get_numeric_regex(5, True),
+                   regex.get_defined_values_regex(1, False, 'E', 'I'), regex.get_numeric_regex(4),
+                   regex.get_boolean_regex(), regex.get_numeric_regex(3)]
 
     def __init__(self, record):
-        super(PublisherTerritoryRecord, self).__init__(record, self.REGEX)
+        super(PublisherTerritoryRecord, self).__init__(record)
 
-    def _build_record(self, record):
-        self._registration_id = self.get_integer_value(3, 8)
-        self._ipa_number = self.get_value(19, 9)
-        self._pr_collection_share = self.get_float_value(34, 5, 3)
-        self._mr_collection_share = self.get_float_value(39, 5, 3)
-        self._sr_collection_share = self.get_float_value(44, 5, 3)
-        self._excluded = self.get_value(49, 1) == 'E'
-        self._tis_code = self.get_integer_value(50, 4)
-        if self._tis_code not in TIS_CODES:
-            raise ValueError('Given TIS code %d not in table' % self._tis_code)
-
-        self._shares_change = self.get_value(54, 1) == 'Y'
-        self._sequence_number = self.get_integer_value(55, 3)
+    def format(self):
+        self.attr_dict['Record prefix'] = RecordPrefix(self.attr_dict['Record prefix'])
+        self.format_float_value('PR collection share', 3)
+        self.format_float_value('MR collection share', 3)
+        self.format_float_value('SR collection share', 3)
+        self.format_integer_value('TIS numeric code')
+        self.format_integer_value('Sequence ID')
 
     def validate(self):
-        pass
+        if self.attr_dict['Record prefix'].record_type != 'SPT':
+            raise FieldValidationError('SPT record type expected, obtained: {}'.format(
+                self.attr_dict['Record prefix'].record_type))
 
-    def __str__(self):
-        return 'Not implemented yet'
+        if self.attr_dict['TIS numeric code'] not in TIS_CODES:
+            raise FieldValidationError('Given TIS numeric code: {} not in table'.format(
+                self.attr_dict['TIS numeric code']))
 
-    def __repr__(self):
-        return self.__str__()
+        if 0 > self.attr_dict['PR ownership share'] or self.attr_dict['PR share'] > 50:
+            raise FieldValidationError('Expected PR share between 0 and 50, obtained {}'.format(
+                self.attr_dict['PR ownership share']))
+
+        if 0 > self.attr_dict['MR ownership share'] or self.attr_dict['MR share'] > 100:
+            raise FieldValidationError('Expected MR share between 0 and 100, obtained {}'.format(
+                self.attr_dict['MR ownership share']))
+
+        if 0 > self.attr_dict['SR ownership share'] or self.attr_dict['SR ownership share'] > 100:
+            raise FieldValidationError('Expected SR share between 0 and 100, obtained {}'.format(
+                self.attr_dict['SR ownership share']))

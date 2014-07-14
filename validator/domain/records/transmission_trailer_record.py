@@ -13,9 +13,9 @@ class TransmissionTrailerRecord(Record):
         super(TransmissionTrailerRecord, self).__init__(record)
 
     def format(self):
-        self._attr_dict['Group count'] = self.format_integer_value(self._attr_dict['Group count'])
-        self.attr_dict['Transaction count'] = self.format_integer_value(self.attr_dict['Transaction count'])
-        self.attr_dict['Record count'] = self.format_integer_value(self.attr_dict['Record count'])
+        self.format_integer_value('Group count')
+        self.format_integer_value('Transaction count')
+        self.format_integer_value('Record count')
 
     def validate(self):
         pass

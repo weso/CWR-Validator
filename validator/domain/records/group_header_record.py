@@ -18,13 +18,14 @@ class GroupHeaderRecord(Record):
         super(GroupHeaderRecord, self).__init__(record)
 
     def format(self):
-        self.attr_dict['Group ID'] = self.format_integer_value(self.attr_dict['Group ID'])
-        self.attr_dict['Batch request'] = self.format_integer_value(self.attr_dict['Batch request'])
+        self.format_integer_value('Group ID')
+        self.format_integer_value('Batch request')
 
     def validate(self):
         if self.attr_dict['Transaction type'] not in TRANSACTION_VALUES:
             raise FieldValidationError('Given transaction type: {} not in required ones'.format(self.attr_dict[
                 "Transaction type"]))
+
         if self.attr_dict['Group ID'] > len(TRANSACTION_VALUES):
             raise FieldValidationError('Given group id: {} bigger than expected (00003)'.format(self.attr_dict[
                 "Group ID"]))
