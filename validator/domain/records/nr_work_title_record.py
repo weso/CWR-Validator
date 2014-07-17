@@ -1,3 +1,6 @@
+from validator.domain.exceptions.field_validation_error import FieldValidationError
+from validator.domain.values.record_prefix import RecordPrefix
+
 __author__ = 'Borja'
 from validator.cwr_utils import regex
 from validator.cwr_utils.value_tables import LANGUAGE_CODES
@@ -6,32 +9,27 @@ from validator.domain.records.record import Record
 
 
 class NRWorkTitleRecord(Record):
-    RECORD_TYPE = regex.get_defined_values_regex(3, False, 'NAT')
-    TRANSACTION_NUMBER = regex.get_numeric_regex(8)
-    RECORD_NUMBER = regex.get_numeric_regex(8)
-    WORK_TITLE = regex.get_ascii_regex(640)
-    TITLE_TYPE = regex.get_ascii_regex(2)
-    LANGUAGE_CODE = regex.get_alpha_regex(2, True)
+    FIELD_NAMES = ['Record prefix', 'Title', 'Title type', 'Language code']
 
-    REGEX = "^{0}{1}{2}{3}{4}{5}$".format(
-        RECORD_TYPE, TRANSACTION_NUMBER, RECORD_NUMBER, WORK_TITLE, TITLE_TYPE, LANGUAGE_CODE)
+    FIELD_REGEX = [RecordPrefix.REGEX, regex.get_ascii_regex(640), regex.get_ascii_regex(2),
+                   regex.get_alpha_regex(2, True)]
 
     def __init__(self, record):
-        super(NRWorkTitleRecord, self).__init__(record, self.REGEX)
+        super(NRWorkTitleRecord, self).__init__(record)
 
-    def _build_record(self, record):
-        self._registration_id = self.get_integer_value(3, 8)
-        self._title = self.get_value(19, 640)
-        self._title_type = self.get_value(659, 2)
-        if self._title_type not in TITLE_TYPES:
-            raise ValueError()
-        
-        self._language_code = self.get_value(348, 2)
-        if self._language_code is not None and self._language_code not in LANGUAGE_CODES:
-            raise ValueError()
+    def format(self):
+        self.attr_dict['Record prefix'] = RecordPrefix(self.attr_dict['Record prefix'])
 
     def validate(self):
-        pass
+        if self.attr_dict['Record prefix'].record_type != 'NAT':
+            raise FieldValidationError('NAT record type expected, obtained: {}'.format(
+                self.attr_dict['Record prefix'].record_type))
+
+        if self.attr_dict['Title type'] not in TITLE_TYPES:
+            raise FieldValidationError('Given title type: {} not in table'.format(self.attr_dict['Title type']))
+
+        if self.attr_dict['Language code'] is not None and self.attr_dict['Language code'] not in LANGUAGE_CODES:
+            raise FieldValidationError('Given language code: {} not in table'.format(self.attr_dict['Language code']))
 
     def __str__(self):
         return 'Not implemented yet'

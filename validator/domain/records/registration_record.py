@@ -55,9 +55,9 @@ class RegistrationRecord(Record):
             raise FieldValidationError('Given distribution category {} not in table'.format(
                 self.attr_dict['Musical work distribution category']))
 
-        if self.attr_dict['Duration'] is None and self.attr_dict['Musical work distribution category'] ==  'SER':
-                raise FieldValidationError('Expected duration for given work distribution {}'.format(
-                    self.attr_dict['Musical work distribution category']))
+        if self.attr_dict['Duration'] is None and self.attr_dict['Musical work distribution category'] == 'SER':
+            raise FieldValidationError('Expected duration for given work distribution {}'.format(
+                self.attr_dict['Musical work distribution category']))
 
         if self.attr_dict['Text music relationship'] is not None:
             if self.attr_dict['Text music relationship'] not in TEXT_MUSIC_TABLE:
@@ -75,7 +75,7 @@ class RegistrationRecord(Record):
             raise FieldValidationError('Given version type: {} not in table'.format(self.attr_dict['Version type']))
 
         if self.attr_dict['Excerpt type'] is not None and self.attr_dict['Excerpt type'] not in EXCERPT_TYPE:
-                raise FieldValidationError('Given excerpt type: {} not in table'.format(self.attr_dict['Excerpt type']))
+            raise FieldValidationError('Given excerpt type: {} not in table'.format(self.attr_dict['Excerpt type']))
 
         if self.attr_dict['Version type'] == 'MOD':
             if self.attr_dict['Music arrangement'] is not None:
@@ -93,5 +93,5 @@ class RegistrationRecord(Record):
                 raise FieldValidationError('Expected lyric adaptation for MOD version type')
 
         if self.attr_dict['CWR work type'] is not None and self.attr_dict['CWR work type'] not in WORK_TYPES:
-                raise FieldValidationError('Given CWR work type: {} not in table'.format(
-                    self.attr_dict['CWR work type']))
+            raise FieldValidationError('Given CWR work type: {} not in table'.format(
+                self.attr_dict['CWR work type']))

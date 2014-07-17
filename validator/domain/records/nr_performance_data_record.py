@@ -1,52 +1,42 @@
+from validator.domain.exceptions.field_validation_error import FieldValidationError
+from validator.domain.values.record_prefix import RecordPrefix
+
 __author__ = 'Borja'
 from validator.cwr_utils import regex
 from validator.cwr_utils.value_tables import LANGUAGE_CODES
-from validator.cwr_utils.value_tables import TITLE_TYPES
 from validator.domain.records.record import Record
 
 
 class NRPerformanceDataRecord(Record):
-    RECORD_TYPE = regex.get_defined_values_regex(3, False, 'NPR')
-    TRANSACTION_NUMBER = regex.get_numeric_regex(8)
-    RECORD_NUMBER = regex.get_numeric_regex(8)
-    ARTIST_NAME = regex.get_ascii_regex(160, True)
-    ARTIST_FIRST_NAME = regex.get_ascii_regex(160, True)
-    ARTIST_CAE_IPI = regex.get_ascii_regex(11, True)
-    ARTIST_IPI_BASE = regex.get_ascii_regex(13, True)
-    LANGUAGE_CODE = regex.get_alpha_regex(2, True)
-    PERFORMANCE_LANGUAGE = regex.get_alpha_regex(2, True)
-    PERFORMANCE_DIALECT = regex.get_alpha_regex(3, True)
+    FIELD_NAMES = ['Record prefix', 'Performing artist name', 'Performing artist first name',
+                   'Performing artist IPI/CAE name ID', 'Performing artist IPI base number', 'Language code',
+                   'Performance language', 'Performance dialect']
 
-    REGEX = "^{0}{1}{2}{3}{4}{5}{6}{7}{8}{9}$".format(
-        RECORD_TYPE, TRANSACTION_NUMBER, RECORD_NUMBER, ARTIST_NAME, ARTIST_FIRST_NAME, ARTIST_CAE_IPI,
-        ARTIST_IPI_BASE, LANGUAGE_CODE, PERFORMANCE_LANGUAGE, PERFORMANCE_DIALECT)
+    FIELD_REGEX = [RecordPrefix.REGEX, regex.get_ascii_regex(160, True),regex.get_ascii_regex(160, True),
+                   regex.get_ascii_regex(11, True), regex.get_ascii_regex(13, True), regex.get_alpha_regex(2, True),
+                   regex.get_alpha_regex(2, True), regex.get_alpha_regex(3, True)]
 
     def __init__(self, record):
-        super(NRPerformanceDataRecord, self).__init__(record, self.REGEX)
+        super(NRPerformanceDataRecord, self).__init__(record)
 
-    def _build_record(self, record):
-        self._registration_id = self.get_integer_value(3, 8)
-        self._artist_name = self.get_value(19, 160)
-        self._artist_first_name = self.get_value(179, 160)
-        self._artist_cae = self.get_value(339, 11)
-        self._artist_ipi_base = self.get_integer_value(350, 13)
-        self._language_code = self.get_value(363, 2)
-        if self._language_code is not None and self._language_code not in LANGUAGE_CODES:
-            raise ValueError()
-
-        self._performance_language = self.get_value(365, 2)
-        if self._performance_language is not None and self._performance_language not in LANGUAGE_CODES:
-            raise ValueError()
-
-        self._performance_dialect = self.get_value(366, 3)
-        """if self._performance_dialect is not None:
-            raise ValueError()"""
+    def format(self):
+        self.attr_dict['Record prefix'] = RecordPrefix(self.attr_dict['Record prefix'])
+        self.format_integer_value('Performing artist IPI base number')
 
     def validate(self):
-        pass
+        if self.attr_dict['Record prefix'].record_type != 'NPR':
+            raise FieldValidationError('NPR record type expected, obtained {}'.format(
+                self.attr_dict['Record prefix'].record_type))
 
-    def __str__(self):
-        return 'Not implemented yet'
+        if self.attr_dict['Language code'] is not None and self.attr_dict['Language code'] not in LANGUAGE_CODES:
+            raise FieldValidationError('Given language code: {} not in table'.format(self.attr_dict['Language code']))
 
-    def __repr__(self):
-        return self.__str__()
+        if self.attr_dict['Performance language'] is not None:
+            if self.attr_dict['Performance language'] not in LANGUAGE_CODES:
+                raise FieldValidationError('Given performance language: {} not in table'.format(
+                    self.attr_dict['Performance language']))
+
+        if self.attr_dict['Performing artist name'] is None:
+            if self.attr_dict['Performance language'] is None:
+                if self.attr_dict['Performance dialect'] is None:
+                    raise FieldValidationError('Expected at least one of performing artist, language or dialect fields')

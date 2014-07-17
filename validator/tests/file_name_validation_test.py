@@ -7,7 +7,6 @@ __author__ = 'Borja'
 
 
 class NameValidationTest(unittest.TestCase):
-
     def setUp(self):
         self._validator = Validator()
 

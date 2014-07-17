@@ -1,3 +1,6 @@
+from validator.domain.exceptions.field_validation_error import FieldValidationError
+from validator.domain.values.record_prefix import RecordPrefix
+
 __author__ = 'Borja'
 from validator.cwr_utils import regex
 from validator.cwr_utils.value_tables import INTENDED_PURPOSES
@@ -7,69 +10,43 @@ from validator.domain.values.v_isan import VIsan
 
 
 class WorkOriginRecord(Record):
-    RECORD_TYPE = regex.get_defined_values_regex(3, False, 'ORN')
-    TRANSACTION_NUMBER = regex.get_numeric_regex(8)
-    RECORD_NUMBER = regex.get_numeric_regex(8)
-    INTENDED_PURPOSE = regex.get_ascii_regex(3)
-    PRODUCTION_TITLE = regex.get_ascii_regex(60, True)
-    CD_IDENTIFIER = regex.get_ascii_regex(15, True)
-    CUT_NUMBER = regex.get_numeric_regex(4, True)
-    LIBRARY = regex.get_ascii_regex(60, True)
-    BLT = regex.get_ascii_regex(1, True)
-    V_ISAN = VIsan.REGEX
-    PRODUCTION_NUMBER = regex.get_ascii_regex(12, True)
-    EPISODE_TITLE = regex.get_ascii_regex(60, True)
-    EPISODE_NUMBER = regex.get_ascii_regex(20, True)
-    PRODUCTION_YEAR = regex.get_numeric_regex(4, True)
-    AVI_KEY = AviKey.REGEX
+    FIELD_NAMES = ['Record prefix', 'Intended purpose', 'Production title', 'CD identifier', 'Cut number', 'Library',
+                   'BLT', 'V_ISAN', 'Production ID', 'Episode title', 'Episode ID', 'Year of production', 'AVI key']
 
-    REGEX = "^{0}{1}{2}{3}{4}{5}{6}{7}{8}{9}{10}{11}{12}{13}{14}$".format(
-        RECORD_TYPE, TRANSACTION_NUMBER, RECORD_NUMBER, INTENDED_PURPOSE, PRODUCTION_TITLE, CD_IDENTIFIER,
-        CUT_NUMBER, LIBRARY, BLT, V_ISAN, PRODUCTION_NUMBER, EPISODE_TITLE, EPISODE_NUMBER, PRODUCTION_YEAR,
-        AVI_KEY)
+    FIELD_REGEX = [RecordPrefix.REGEX, regex.get_ascii_regex(3), regex.get_ascii_regex(60, True),
+                   regex.get_ascii_regex(15, True), regex.get_numeric_regex(4, True), regex.get_ascii_regex(60, True),
+                   regex.get_ascii_regex(1, True), VIsan.REGEX, regex.get_ascii_regex(12, True),
+                   regex.get_ascii_regex(60, True), regex.get_ascii_regex(20, True), regex.get_numeric_regex(4, True),
+                   AviKey.REGEX]
 
     def __init__(self, record):
-        super(WorkOriginRecord, self).__init__(record, self.REGEX)
+        super(WorkOriginRecord, self).__init__(record)
+
+    def format(self):
+        self.attr_dict['Record prefix'] = RecordPrefix(self.attr_dict['Record prefix'])
+        self.format_integer_value('Cut number')
+        self.attr_dict['V_ISAN'] = VIsan(self.attr_dict['V_ISAN'])
+        self.format_integer_value('Year of production')
+        self.attr_dict['AVI key'] = AviKey(self.attr_dict['AVI key'])
 
     def _build_record(self, record):
-        self._registration_id = self.get_integer_value(3, 8)
-        self._intended_purpose = self.get_value(19, 3)
-        if self._intended_purpose is not None and self._intended_purpose not in INTENDED_PURPOSES:
-            raise ValueError()
+        if self.attr_dict['Record prefix'].record_type != 'ORN':
+            raise FieldValidationError('ORN record type expected, obtained {}'.format(
+                self.attr_dict['Record prefix'].record_type))
 
-        self._production_title = self.get_value(22, 60)
-        if self._intended_purpose == 'LIB' and self._production_title is None:
-            raise ValueError()
+        if self.attr_dict['Intended purpose'] is not None:
+            if self.attr_dict['Intended purpose'] not in INTENDED_PURPOSES:
+                raise FieldValidationError('Given intended purpose: {} not in table'.format(
+                    self.attr_dict['Intended purpose']))
 
-        self._cd = self.get_value(82, 15)
-        if self._intended_purpose == 'LIB' and self._cd is None:
-            raise ValueError()
+        if self.attr_dict['CD identifier'] is not None and self.attr_dict['Cut number'] is None:
+            raise FieldValidationError('CD identifier and Cut number must be both blank or vice versa')
+        if self.attr_dict['CD identifier'] is None and self.attr_dict['Cut number'] is not None:
+            raise FieldValidationError('CD identifier and Cut number must be both blank or vice versa')
 
-        self._cut_number = self.get_integer_value(97, 4)
-        if self._intended_purpose == 'LIB' and self._cut_number in [0, None]:
-            raise ValueError()
+        if self.attr_dict['Intended purpose'] == 'LIB':
+            if self.attr_dict['CD identifier'] is None:
+                raise FieldValidationError('Expected CD identifier for LIB intended purpose')
 
-        self._library = self.get_value(101, 60)
-        if self._intended_purpose == 'LIB' and self._library is None:
-            raise ValueError()
-
-        self._blt = self.get_value(161, 1)
-        self._visan = VIsan(self.get_integer_value(162, 8),
-                            self.get_integer_value(170, 12),
-                            self.get_integer_value(182, 4),
-                            self.get_integer_value(186, 1))
-        self._production_number = self.get_value(187, 12)
-        self._episode_title = self.get_value(199, 60)
-        self._episode_number = self.get_value(259, 20)
-        self._production_year = self.get_integer_value(279, 4)
-        self._avikey = AviKey(self.get_integer_value(283, 3),
-                              self.get_integer_value(286, 15))
-
-    def validate(self):
-        pass
-
-    def __str__(self):
-        return 'Not implemented yet'
-
-    def __repr__(self):
-        return self.__str__()
+        if self.attr_dict['Production title'] is None and self.attr_dict['Library'] is None:
+            raise FieldValidationError('Expected one of production title or library')
