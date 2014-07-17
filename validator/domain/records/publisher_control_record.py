@@ -103,7 +103,8 @@ class PublisherControlRecord(Record):
             raise FieldValidationError('Expected SR society with share {}'.format(self.attr_dict['SR ownership share']))
 
         if self.attr_dict['Publisher type'] in ['E', 'AQ']:
-            if self.attr_dict['PR ownership share'] != self.attr_dict['MR ownership share'] != self.attr_dict['SR ownership share'] != 0:
+            if self.attr_dict['PR ownership share'] != self.attr_dict['MR ownership share'] != self.attr_dict[
+                'SR ownership share'] != 0:
                 raise FieldValidationError(
                     'All ownership shares must be equal to zero as this is not an original publisher')
 
