@@ -8,8 +8,8 @@ class VIsan(object):
     EPISODE = regex.get_numeric_regex(4, True)
     CHECK_DIGIT = regex.get_numeric_regex(1, True)
 
-    REGEX = '{}{}{}{}'.format(
-        VERSION, ISAN, EPISODE, CHECK_DIGIT)
+    REGEX = regex.Regex('{}{}{}{}'.format(
+        VERSION, ISAN, EPISODE, CHECK_DIGIT), 25)
 
     def __init__(self, visan=None):
         self.version = int(visan[0:7])

@@ -29,7 +29,7 @@ class WorkOriginRecord(Record):
         self.format_integer_value('Year of production')
         self.attr_dict['AVI key'] = AviKey(self.attr_dict['AVI key'])
 
-    def _build_record(self, record):
+    def validate(self):
         if self.attr_dict['Record prefix'].record_type != 'ORN':
             raise FieldValidationError('ORN record type expected, obtained {}'.format(
                 self.attr_dict['Record prefix'].record_type))
