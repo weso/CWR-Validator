@@ -72,7 +72,7 @@ class Record(object):
                 self._attr_dict[field] = datetime.datetime.strptime(value, '%Y%m%d').date() if value else None
             else:
                 self._attr_dict[field] = None
-        except ValueError:
+        except (TypeError, ValueError):
             self._attr_dict[field] = None
 
     def format_integer_value(self, field):
@@ -84,7 +84,7 @@ class Record(object):
         try:
             self._attr_dict[field] = float(
                 value[0:0 + integer_part_size] + '.' + value[0 + integer_part_size:len(value)]) if value else None
-        except ValueError:
+        except (TypeError, ValueError):
             self._attr_dict[field] = None
 
     def format_time_value(self, field):
@@ -94,7 +94,7 @@ class Record(object):
                 self._attr_dict[field] = datetime.datetime.strptime(value, '%H%M%S').time() if value else None
             else:
                 self._attr_dict[field] = None
-        except ValueError:
+        except (TypeError, ValueError):
             self._attr_dict[field] = None
 
     def extract_value(self, starts, size):

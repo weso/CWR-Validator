@@ -19,7 +19,7 @@ class WriterAgentRecord(Record):
     def format(self):
         self.attr_dict['Record prefix'] = RecordPrefix(self.attr_dict['Record prefix'])
         self.format_integer_value('Submitter agreement number')
-        self.format('Society assigned agreement number')
+        self.format_integer_value('Society assigned agreement number')
 
     def validate(self):
         if self.attr_dict['Record prefix'].record_type != 'PWR':

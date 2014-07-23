@@ -37,14 +37,14 @@ class PublisherTerritoryRecord(Record):
             raise FieldValidationError('Given TIS numeric code: {} not in table'.format(
                 self.attr_dict['TIS numeric code']))
 
-        if 0 > self.attr_dict['PR ownership share'] or self.attr_dict['PR share'] > 50:
+        if 0 > self.attr_dict['PR collection share'] or self.attr_dict['PR collection share'] > 50:
             raise FieldValidationError('Expected PR share between 0 and 50, obtained {}'.format(
-                self.attr_dict['PR ownership share']))
+                self.attr_dict['PR collection share']))
 
-        if 0 > self.attr_dict['MR ownership share'] or self.attr_dict['MR share'] > 100:
+        if 0 > self.attr_dict['MR collection share'] or self.attr_dict['MR collection share'] > 100:
             raise FieldValidationError('Expected MR share between 0 and 100, obtained {}'.format(
-                self.attr_dict['MR ownership share']))
+                self.attr_dict['MR collection share']))
 
-        if 0 > self.attr_dict['SR ownership share'] or self.attr_dict['SR ownership share'] > 100:
+        if 0 > self.attr_dict['SR collection share'] or self.attr_dict['SR collection share'] > 100:
             raise FieldValidationError('Expected SR share between 0 and 100, obtained {}'.format(
-                self.attr_dict['SR ownership share']))
+                self.attr_dict['SR collection share']))

@@ -10,7 +10,7 @@ from validator.domain.values.record_prefix import RecordPrefix
 class TerritoryRecord(Record):
     FIELD_NAMES = ['Record prefix', 'Inclusion/Exclusion indicator', 'TIS numeric code']
 
-    FIELD_VALUES = [RecordPrefix.REGEX, regex.get_defined_values_regex(1, False, 'E', 'I'), regex.get_numeric_regex(4)]
+    FIELD_REGEX = [RecordPrefix.REGEX, regex.get_defined_values_regex(1, False, 'E', 'I'), regex.get_numeric_regex(4)]
 
     def __init__(self, record):
         super(TerritoryRecord, self).__init__(record)

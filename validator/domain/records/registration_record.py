@@ -8,14 +8,16 @@ from validator.cwr_utils.value_tables import TEXT_MUSIC_TABLE
 from validator.cwr_utils.value_tables import VERSION_TYPES
 from validator.cwr_utils.value_tables import WORK_TYPES
 from validator.cwr_utils import regex
+from validator.domain.exceptions.document_validation_error import DocumentValidationError
 from validator.domain.records.record import Record
+from validator.domain.records.transaction_header_record import TransactionHeader
 from validator.domain.values.record_prefix import RecordPrefix
 from validator.domain.exceptions.field_validation_error import FieldValidationError
 
 __author__ = 'Borja'
 
 
-class RegistrationRecord(Record):
+class RegistrationRecord(TransactionHeader):
     FIELD_NAMES = ['Record prefix', 'Work title', 'Language code', 'Submitter work ID', 'ISWC', 'Copyright date',
                    'Copyright number', 'Musical work distribution category', 'Duration', 'Recorded indicator',
                    'Text music relationship', 'Composite type', 'Version type', 'Excerpt type', 'Music arrangement',
@@ -95,3 +97,34 @@ class RegistrationRecord(Record):
         if self.attr_dict['CWR work type'] is not None and self.attr_dict['CWR work type'] not in WORK_TYPES:
             raise FieldValidationError('Given CWR work type: {} not in table'.format(
                 self.attr_dict['CWR work type']))
+
+    def add_record(self, record):
+        if not isinstance(record, Record):
+            raise ValueError('Expected a record object, not the string')
+
+        if record.attr_dict['Record prefix'].record_type not in ['SPU', 'NPN', 'SPT', 'OPU', 'SWR', 'NWN', 'SWT', 'PWR',
+                                                                 'OWR', 'ALT', 'NAT', 'EWT', 'NET', 'VER', 'NVT', 'PER',
+                                                                 'NPR', 'REC', 'ORN', 'INS', 'IND', 'COM', 'NCT',
+                                                                 'NOW', 'ARI']:
+            raise DocumentValidationError('Trying to add a non compatible record type: {} to {} work registration'.
+                                          format(record.attr_dict['Record prefix'].record_type,
+                                                 self.attr_dict['Record prefix'].record_type))
+
+        if record.attr_dict['Record prefix'].record_type in ['EWT', 'NET', 'VER', 'NVT', 'REC']:
+            if record.attr_dict['Record prefix'].record_type in self._records.keys():
+                raise DocumentValidationError('{} record used more than its specified max use'.format(
+                    record.attr_dict['Record prefix'].record_type))
+
+        if record.attr_dict['Record prefix'].record_type in ['SPU', 'OPU'] \
+                and record.attr_dict['Record prefix'].record_type not in self._records.keys():
+            if record.attr_dict['Publisher type'] not in ['E', 'PA']:
+                raise DocumentValidationError('First SPU or OPU within a chain must have E or PA as publisher type')
+        elif record.attr_dict['Record prefix'].record_type == 'OPU' \
+            and self._records[record.attr_dict['Record prefix'].record_type].attr_dict[
+                'Record prefix'].record_number + 1 != record.attr_dict['Record prefix'].record_number:
+            raise DocumentValidationError('SPU and OPU record expected to be a chain')
+
+        if record.attr_dict['Record prefix'].record_type not in self._records.keys():
+            self._records[record.attr_dict['Record prefix'].record_type] = []
+
+        self._records[record.attr_dict['Record prefix'].record_type].append(record)

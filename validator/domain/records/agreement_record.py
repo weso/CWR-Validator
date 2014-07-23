@@ -1,13 +1,15 @@
+from validator.domain.exceptions.document_validation_error import DocumentValidationError
 from validator.domain.exceptions.field_validation_error import FieldValidationError
+from validator.domain.records.record import Record
+from validator.domain.records.transaction_header_record import TransactionHeader
 
 __author__ = 'Borja'
 from validator.cwr_utils import regex
 from validator.cwr_utils.value_tables import AGREEMENT_TYPE_VALUES
-from validator.domain.records.record import Record
 from validator.domain.values.record_prefix import RecordPrefix
 
 
-class AgreementRecord(Record):
+class AgreementRecord(TransactionHeader):
     FIELD_NAMES = ['Record prefix', 'Submitter agreement number', 'International standard agreement number',
                    'Agreement type', 'Agreement start date', 'Agreement end date', 'Retention end date',
                    'Prior royalty status', 'Prior royalty start date', 'Post-term collection status',
@@ -82,3 +84,16 @@ class AgreementRecord(Record):
 
         if self.attr_dict['Number of works'] <= 0:
             raise FieldValidationError('Number of works must be greater than zero')
+
+    def add_record(self, record):
+        if not isinstance(record, Record):
+            raise ValueError('Expected a record object, not the string')
+
+        if record.attr_dict['Record prefix'].record_type not in ['TER', 'IPA', 'NPA']:
+            raise DocumentValidationError('Trying to add a non compatible record type: {} to agreement'.format(
+                record.attr_dict['Record prefix'].record_type))
+
+        if record.attr_dict['Record prefix'].record_type not in self._records.keys():
+            self._records[record.attr_dict['Record prefix'].record_type] = []
+
+        self._records[record.attr_dict['Record prefix'].record_type].append(record)

@@ -13,3 +13,10 @@ class RecordPrefix(object):
         self.record_type = prefix[0:3]
         self.transaction_number = int(prefix[3:11])
         self.record_number = int(prefix[11:19])
+
+    def __str__(self):
+        return "'Record type': {}, 'Transaction number': {}, 'Record number': {}".format(
+            self.record_type, self.transaction_number, self.record_number)
+
+    def __repr__(self):
+        return self.__str__()
