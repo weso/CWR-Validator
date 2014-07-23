@@ -8,7 +8,6 @@ from validator.validator import Validator
 __author__ = 'Borja'
 
 app = Flask(__name__)
-Bootstrap(app)
 app.config['UPLOAD_FOLDER'] = 'uploads/'
 app.config['ALLOWED_EXTENSIONS'] = set(['V21'])
 
