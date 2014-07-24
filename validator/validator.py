@@ -1,7 +1,8 @@
-import re
-from domain.document import Document
-from domain.exceptions.regex_error import RegexError
+from __future__ import absolute_import
+from validator.domain.document import Document
+from validator.domain.exceptions.regex_error import RegexError
 
+import re
 __author__ = 'Borja'
 
 

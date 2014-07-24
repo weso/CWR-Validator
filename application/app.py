@@ -1,10 +1,9 @@
-import os
+from __future__ import absolute_import
 from flask import Flask, render_template, request, redirect, url_for, send_from_directory
-from flask.ext.bootstrap import Bootstrap
-from validator import validator
 from werkzeug.utils import secure_filename
 from validator.validator import Validator
 
+import os
 __author__ = 'Borja'
 
 app = Flask(__name__)
