@@ -10,6 +10,10 @@ class TransactionHeader(Record):
         super(TransactionHeader, self).__init__(record)
         self._records = {}
 
+    @property
+    def records(self):
+        return self._records
+
     @abc.abstractmethod
     def validate(self):
         pass

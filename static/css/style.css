@@ -9,3 +9,7 @@
 .bg-success {
     background-color: #dff0d8 !important;
 }
+
+.transaction-summary dt{
+    width: auto;
+}

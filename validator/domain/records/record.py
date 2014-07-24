@@ -33,6 +33,10 @@ class Record(object):
     def attr_dict(self):
         return self._attr_dict
 
+    @property
+    def record(self):
+        return str(self._record)
+
     def _build_record(self, record):
         start = 0
         for regex in self.FIELD_REGEX:
@@ -108,4 +112,4 @@ class Record(object):
         return str(self._attr_dict)
 
     def __repr__(self):
-        return self.__str__()
+        return self

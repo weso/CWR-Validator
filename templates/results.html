@@ -9,6 +9,7 @@
     <script
 	  src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/cwr.js') }}"></script>
   </head>
   <body>
     <div id="wrapper" class="container">
@@ -42,22 +43,65 @@
               <li><a href="#failure" data-toggle="tab">Missed records</a></li>
             </ul>
             <div class="tab-content">
-                <div class="tab-pane" id="summary">
+                <div class="tab-pane active" id="summary">
                   <dl>
                     <dt>Document name</dt>
                     <dd> {{ document._name }} </dd>
                     <dt>Records found</dt>
                     <dd> {{ document._records_number}} </dd>
+                    <dt>Transactions found</dt>
+                    <dd>{{ document.transactions|length }}</dd>
+                    <dt>Successful records</dt>
+                    <dd> {{ 2 + document._group_types|length + document.transactions|length + document._records|length }} </dd>
+                    <dt>Missed records</dt>
+                    <dd> {{ document.errors|length }} </dd>
                     <dt>Document header</dt>
                     <dd> {{ document._transmission_header._record }} </dd>
                     <dt>Document trailer</dt>
                     <dd> {{ document._transmission_trailer._record }} </dd>
                   </dl>
+                  <p><a class="btn btn-primary disabled" role="button" href="#">Download generated response</a></p>
                 </div>
                 <div class="tab-pane" id="success">
-                {% for transaction in document.transactions.values() %}
-                  <li class="list-group-item bg-success">{{ transaction._record }}</li>
-                {% endfor %}
+                  <div class="well well-lg">
+                  <div class="btn-group">
+                    <label class="btn btn-default active">
+                      <input id="agr" type="checkbox" checked onclick="togglePanels(this)"> Agreements
+                    </label>
+                    <label class="btn btn-default active">
+                      <input id="nwr" type="checkbox" checked onclick="togglePanels(this)"> New works registration
+                    </label>
+                    <label class="btn btn-default active">
+                      <input id="rev" type="checkbox" checked onclick="togglePanels(this)"> Revised works registration
+                    </label>
+                  </div>
+                  </div>
+                  {% for transaction in document.transactions.values() %}
+                    <div class="panel panel-success {{ transaction.attr_dict['Record prefix'].record_type.lower() }}">
+                      <div class="panel-heading">
+                        {{ transaction._record }}
+                      </div>
+                      <div class="panel-body">
+                        <dl class="dl-horizontal transaction-summary">
+                          {% if transaction.attr_dict['Record prefix'].record_type.lower() == 'agr' %}
+                          <dt>Territory records</dt>
+                          <dd> {{ transaction._records['TER']|length }}</dd>
+                          <dt>Interested party records</dt>
+                          <dd> {{ transaction._records['IPA']|length }}</dd>
+                          {% else %}
+                          <p><strong>Not aviable yet</strong></p>
+                          {% endif %}
+                        </dl>
+                      </div>
+                      <ul class="list-group">
+                          {% for record_list in transaction._records.values() %}
+                            {% for record in record_list %}
+                            <li class="list-group-item"> {{ record.record }}</li>
+                            {% endfor %}
+                          {% endfor %}
+                      </ul>
+                    </div>
+                    {% endfor %}
                 </div>
                 <div class="tab-pane" id="failure">
                   <ul class="list-group">
