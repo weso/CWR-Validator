@@ -1,4 +1,3 @@
-from __future__ import absolute_import
 from flask import Flask, render_template, request, redirect, url_for, send_from_directory
 from werkzeug.utils import secure_filename
 from validator.validator import Validator
@@ -65,6 +64,6 @@ def uploaded_file(filename):
 if __name__ == '__main__':
     app.run(
         host="0.0.0.0",
-        port=int("80"),
+        port=int("5000"),
         debug=True
     )
