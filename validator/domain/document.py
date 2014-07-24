@@ -220,6 +220,8 @@ class Document(object):
 
     def _add_territory_record(self, record):
         territory = TerritoryRecord(record)
+        if self._last_transaction_type != 'AGR':
+            raise DocumentValidationError('TER record expected within AGR transactions')
         if self._last_record_type not in ['AGR', 'TER']:
             raise DocumentValidationError('TER records expected after AGR or TER, found {}'.format(
                 self._last_record_type))
@@ -228,6 +230,8 @@ class Document(object):
 
     def _add_ipa_record(self, record):
         ipa = InterestedPartyRecord(record)
+        if self._last_transaction_type != 'AGR':
+            raise DocumentValidationError('IPA record expected within AGR transactions')
         if self._last_record_type not in ['TER', 'IPA']:
             raise DocumentValidationError('IPA records expected after TER or IPA, found {}'.format(
                 self._last_record_type))
@@ -236,6 +240,8 @@ class Document(object):
 
     def _add_npa_record(self, record):
         npa = NRAgreementPartyNameRecord(record)
+        if self._last_transaction_type != 'AGR':
+            raise DocumentValidationError('NPA record expected within AGR transactions')
         if self._last_record_type != 'IPA' \
                 and self._get_last_record(npa).attr_dict['Interested party ID'] != npa.attr_dict['Interested party ID']:
             raise DocumentValidationError('NPA must follow an IPA record and share the Interested party ID')
