@@ -54,83 +54,83 @@ class Document(object):
         self._records_number = 0
 
     def add_record(self, record=None):
+        record_utf8 = record.encode('utf-8')
         self._records_number += 1
-
         if self._last_record_type == 'TRL':
             raise DocumentValidationError('TRL record must be the last one in the document')
 
-        record_type = record[0:3]
+        record_type = record_utf8[0:3]
         try:
             if record_type == 'HDR':
-                self._add_transmission_header(record)
+                self._add_transmission_header(record_utf8)
             elif record_type == 'TRL':
-                self._add_transmission_trailer(record)
+                self._add_transmission_trailer(record_utf8)
             elif record_type == 'GRH':
-                self._add_group_header_record(record)
+                self._add_group_header_record(record_utf8)
             elif record_type == 'GRT':
-                self._add_group_trailer_record(record)
+                self._add_group_trailer_record(record_utf8)
             elif record_type == 'AGR':
-                self._add_agreement_record(record)
+                self._add_agreement_record(record_utf8)
             elif record_type in ['NWR', 'REV']:
-                self._add_registration_record(record)
+                self._add_registration_record(record_utf8)
             elif record_type == 'TER':
-                self._add_territory_record(record)
+                self._add_territory_record(record_utf8)
             elif record_type == 'IPA':
-                self._add_ipa_record(record)
+                self._add_ipa_record(record_utf8)
             elif record_type == 'NPA':
-                self._add_npa_record(record)
+                self._add_npa_record(record_utf8)
             elif record_type in ['SPU', 'OPU']:
-                self._add_publisher_record(record)
+                self._add_publisher_record(record_utf8)
             elif record_type == 'NPN':
-                self._add_npn_record(record)
+                self._add_npn_record(record_utf8)
             elif record_type == 'SPT':
-                self._add_publisher_territory_record(record)
+                self._add_publisher_territory_record(record_utf8)
             elif record_type in ['SWR', 'OWR']:
-                self._add_writer_control_record(record)
+                self._add_writer_control_record(record_utf8)
             elif record_type == 'NWN':
-                self._add_nwn_record(record)
+                self._add_nwn_record(record_utf8)
             elif record_type == 'SWT':
-                self._add_writer_territory_record(record)
+                self._add_writer_territory_record(record_utf8)
             elif record_type == 'PWR':
-                self._add_agent_record(record)
+                self._add_agent_record(record_utf8)
             elif record_type == 'ALT':
-                self._add_alternative_title_record(record)
+                self._add_alternative_title_record(record_utf8)
             elif record_type == 'NAT':
-                self._add_nat_record(record)
+                self._add_nat_record(record_utf8)
             elif record_type == 'EWT':
-                self._add_entire_title_record(record)
+                self._add_entire_title_record(record_utf8)
             elif record_type == 'VER':
-                self._add_original_title_record(record)
+                self._add_original_title_record(record_utf8)
             elif record_type == 'PER':
-                self._add_performing_artist_record(record)
+                self._add_performing_artist_record(record_utf8)
             elif record_type == 'NPR':
-                self._add_npr_record(record)
+                self._add_npr_record(record_utf8)
             elif record_type == 'REC':
-                self._add_recording_detail_record(record)
+                self._add_recording_detail_record(record_utf8)
             elif record_type == 'ORN':
-                self._add_work_origin_record(record)
+                self._add_work_origin_record(record_utf8)
             elif record_type == 'INS':
-                self._add_instrumentation_summary_record(record)
+                self._add_instrumentation_summary_record(record_utf8)
             elif record_type == 'IND':
-                self._add_instrumentation_detail_record(record)
+                self._add_instrumentation_detail_record(record_utf8)
             elif record_type == 'COM':
-                self._add_component_record(record)
+                self._add_component_record(record_utf8)
             elif record_type in ['NWT', 'NCT', 'NVT']:
-                self._add_nr_title_record(record)
+                self._add_nr_title_record(record_utf8)
             elif record_type == 'NOW':
-                self._add_now_record(record)
+                self._add_now_record(record_utf8)
             elif record_type == 'ARI':
-                self._add_additional_info_record(record)
+                self._add_additional_info_record(record_utf8)
             else:
-                raise FieldValidationError('Unrecognized record type: {}'.format(record))
+                raise FieldValidationError('Unrecognized record type: {}'.format(record_utf8))
 
             self._last_record_type = record_type
         except (RegexError, FieldValidationError, DocumentValidationError) as error:
             try:
-                self._errors[int(record[11:19])] = (str('{} validation error: {} \n\t{}'.format(
-                    record_type, str(error).replace("'", ""), record)).encode(encoding='UTF-8', errors='replace'))
+                self._errors[int(record_utf8[11:19])] = (str('{} validation error: {} \n\t{}'.format(
+                    record_type, str(error).replace("'", ""), record_utf8)).encode(encoding='utf-8', errors='replace'))
             except UnicodeDecodeError:
-                print error
+                print '----------------' + str(error)
 
     def _add_transmission_header(self, record):
         try:
@@ -198,9 +198,6 @@ class Document(object):
         self._add_transaction(transaction)
 
     def _add_record_to_transaction(self, record):
-        if record.attr_dict['Record prefix'].record_number == 539:
-            print record
-
         if record.attr_dict['Record prefix'].transaction_number not in self._transactions.keys():
             raise DocumentValidationError('Record transaction number {} is not found'.format(
                 record.attr_dict['Record prefix'].transaction_number))
@@ -268,14 +265,22 @@ class Document(object):
 
         count = 1
         publisher = None
-        while True:
+        while territory.attr_dict['Record prefix'].record_number - count in self._records.keys() or \
+                territory.attr_dict['Record prefix'].record_number - count in self._errors.keys():
             if territory.attr_dict['Record prefix'].record_number - count not in self._errors.keys():
                 publisher = self._records.get(territory.attr_dict['Record prefix'].record_number - count, None)
 
-            if publisher is not None and publisher.attr_dict['Record prefix'].record_type == 'SPU':
-                break
+                if publisher is not None and publisher.attr_dict['Record prefix'].record_type == 'SPU':
+                    break
+                else:
+                    publisher = None
+                    count += 1
             else:
-                count += 1
+                raise DocumentValidationError('Previous record: {} was incorrect'.format(
+                    self._errors[territory.attr_dict['Record prefix'].record_number - count]))
+
+        if publisher is None:
+            raise DocumentValidationError('Expected publisher for SPT record')
 
         if publisher is not None \
                 and publisher.attr_dict['Interested party ID'] != territory.attr_dict['Interested party ID']:
@@ -302,14 +307,23 @@ class Document(object):
 
         count = 1
         writer = None
-        while True:
-            writer = self._records[territory.attr_dict['Record prefix'].record_number - count]
-            if writer.attr_dict['Record prefix'].record_type == 'SWR':
-                break
+        while territory.attr_dict['Record prefix'].record_number - count in self._records.keys() or \
+                territory.attr_dict['Record prefix'].record_number - count in self._errors.keys():
+            if territory.attr_dict['Record prefix'].record_number - count not in self._errors.keys():
+                writer = self._records[territory.attr_dict['Record prefix'].record_number - count]
+                if writer.attr_dict['Record prefix'].record_type == 'SWR':
+                    break
+                else:
+                    writer = None
+                    count += 1
             else:
-                count += 1
+                raise DocumentValidationError("Previous record: {} was incorrect, so this can't be evaluated".format(
+                    self._errors[territory.attr_dict['Record prefix'].record_number - count]))
 
-        if writer.attr_dict['Interested party ID'] != record.attr_dict['Interested party ID']:
+        if writer is None:
+            raise DocumentValidationError('Expected writer for SWT record')
+
+        if writer.attr_dict['Interested party ID'] != territory.attr_dict['Interested party ID']:
             raise DocumentValidationError('Preceding SWR record to SWT must share interested party ID')
 
         self._add_record_to_transaction(territory)
@@ -324,22 +338,31 @@ class Document(object):
         writer = None
         publisher = None
         count = 1
-        while True:
-            writer = self._records[agent.attr_dict['Record prefix'].record_number - count]
-            if writer.attr_dict['Record prefix'].record_type == 'SWR':
-                pass
-            elif writer.attr_dict['Record prefix'].record_type == 'SPU':
-                publisher = writer
-            else:
+        while agent.attr_dict['Record prefix'].record_number - count in self._records.keys() or \
+                agent.attr_dict['Record prefix'].record_number - count in self._errors.keys():
+            if agent.attr_dict['Record prefix'].record_number - count not in self._errors.keys():
+                ipa = self._records[agent.attr_dict['Record prefix'].record_number - count]
+                if ipa.attr_dict['Record prefix'].record_type == 'SWR':
+                    writer = ipa
+                elif ipa.attr_dict['Record prefix'].record_type == 'SPU':
+                    publisher = ipa
+
                 count += 1
+                if writer is not None and publisher is not None:
+                    break
+            else:
+                raise DocumentValidationError("Previous record: {} was incorrect, so this can't be evaluated".format(
+                    self._errors[agent.attr_dict['Record prefix'].record_number - count]))
 
-            if writer is not None and publisher is not None:
-                break
+        if publisher is None or writer is None:
+            raise DocumentValidationError('Writer and publisher must be known for a PWT record')
 
-        if publisher.attr_dict['Interested party number'] != agent.attr_dict['Publisher IP ID']:
+        if publisher is not None \
+                and publisher.attr_dict['Interested party ID'] != agent.attr_dict['Publisher IP ID']:
             raise DocumentValidationError('PWR publisher ID must match preceding SPU record IP ID')
 
-        if writer.attr_dict['Interested party number'] != agent.attr_dict['Writer IP ID']:
+        if writer is not None \
+                and writer.attr_dict['Interested party ID'] != agent.attr_dict['Writer IP ID']:
             raise DocumentValidationError('PWR writer ID must match preceding SWR record IP ID')
 
         self._add_record_to_transaction(agent)
