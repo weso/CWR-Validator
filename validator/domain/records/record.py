@@ -28,8 +28,7 @@ class Record(object):
             self.validate()
         else:
             self._check_regex_fields()
-            print 'Record: {}'.format(self._record)
-            print 'Regex: {}'.format(self._regex)
+            raise RegexError('Record', self._regex, self._record)
 
     @property
     def attr_dict(self):
