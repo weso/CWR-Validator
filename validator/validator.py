@@ -30,7 +30,7 @@ class Validator(object):
         while content:
             unicode_line = content.pop(0).decode('utf-8')
             self._document.add_record(unicode_line)
-            
+
     def _validate_name(self, file_name):
         if file_name is None:
             return False
