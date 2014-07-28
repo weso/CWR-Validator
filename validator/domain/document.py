@@ -129,7 +129,7 @@ class Document(object):
             try:
                 self._errors[int(record_utf8[11:19])] = (str('{} validation error: {} \n\t{}'.format(
                     record_type, str(error).replace("'", ""), record_utf8)).encode(encoding='utf-8', errors='replace'))
-            except UnicodeDecodeError:
+            except:
                 print '----------------' + str(error)
 
     def _add_transmission_header(self, record):
