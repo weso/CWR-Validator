@@ -57,7 +57,7 @@ class InterestedPartyRecord(Record):
         if 0 > self.attr_dict['PR share'] or self.attr_dict['PR share'] > 100:
             raise FieldValidationError('Expected PR share between 0 and 100, obtained {}'.format(
                 self.attr_dict['PR share']))
-        elif self.attr_dict['PR affiliation society'] is None:
+        elif self.attr_dict['PR share'] > 0 and self.attr_dict['PR affiliation society'] is None:
             raise FieldValidationError('Expected PR society with share {}'.format(self.attr_dict['PR share']))
 
         if self.attr_dict['MR affiliation society'] is not None:
@@ -68,7 +68,7 @@ class InterestedPartyRecord(Record):
         if 0 > self.attr_dict['MR share'] or self.attr_dict['MR share'] > 100:
             raise FieldValidationError('Expected MR share between 0 and 100, obtained {}'.format(
                 self.attr_dict['MR share']))
-        elif self.attr_dict['MR affiliation society'] is None:
+        elif self.attr_dict['MR share'] > 0 and self.attr_dict['MR affiliation society'] is None:
             raise FieldValidationError('Expected MR society with share {}'.format(self.attr_dict['MR share']))
 
         if self.attr_dict['SR affiliation society'] is not None:
@@ -79,7 +79,7 @@ class InterestedPartyRecord(Record):
         if 0 > self.attr_dict['SR share'] or self.attr_dict['SR share'] > 100:
             raise FieldValidationError('Expected SR share between 0 and 100, obtained {}'.format(
                 self.attr_dict['SR share']))
-        elif self.attr_dict['SR affiliation society'] is None:
+        elif self.attr_dict['SR share'] > 0 and  self.attr_dict['SR affiliation society'] is None:
             raise FieldValidationError('Expected SR society with share {}'.format(self.attr_dict['SR share']))
 
         if self.attr_dict['PR affiliation society'] is None and self.attr_dict['MR affiliation society'] is None:

@@ -77,7 +77,7 @@ class PublisherControlRecord(Record):
         if 0 > self.attr_dict['PR ownership share'] or self.attr_dict['PR ownership share'] > 50:
             raise FieldValidationError('Expected PR share between 0 and 50, obtained {}'.format(
                 self.attr_dict['PR ownership share']))
-        elif self.attr_dict['PR affiliation society'] is None:
+        elif self.attr_dict['PR ownership share'] > 0 and self.attr_dict['PR affiliation society'] is None:
             raise FieldValidationError('Expected PR society with share {}'.format(self.attr_dict['PR ownership share']))
 
         if self.attr_dict['MR affiliation society'] is not None:
@@ -88,7 +88,7 @@ class PublisherControlRecord(Record):
         if 0 > self.attr_dict['MR ownership share'] or self.attr_dict['MR ownership share'] > 100:
             raise FieldValidationError('Expected MR share between 0 and 100, obtained {}'.format(
                 self.attr_dict['MR ownership share']))
-        elif self.attr_dict['MR affiliation society'] is None:
+        elif self.attr_dict['MR ownership share'] > 0 and self.attr_dict['MR affiliation society'] is None:
             raise FieldValidationError('Expected MR society with share {}'.format(self.attr_dict['MR ownership share']))
 
         if self.attr_dict['SR affiliation society'] is not None:
@@ -99,7 +99,7 @@ class PublisherControlRecord(Record):
         if 0 > self.attr_dict['SR ownership share'] or self.attr_dict['SR ownership share'] > 100:
             raise FieldValidationError('Expected SR share between 0 and 100, obtained {}'.format(
                 self.attr_dict['SR ownership share']))
-        elif self.attr_dict['SR affiliation society'] is None:
+        elif self.attr_dict['SR ownership share'] > 0 and self.attr_dict['SR affiliation society'] is None:
             raise FieldValidationError('Expected SR society with share {}'.format(self.attr_dict['SR ownership share']))
 
         if self.attr_dict['Publisher type'] not in ['E', 'AQ']:

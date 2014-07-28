@@ -24,12 +24,13 @@ class Validator(object):
 
     def _validate_file(self, file_path, file_name):
         self._document = Document(file_name)
-        with open(file_path) as file:
-            content = file.readlines()
+        with open(file_path) as file_utf8:
+            content = file_utf8.readlines()
 
-        for line in content:
-            self._document.add_record(line)
-
+        while content:
+            unicode_line = content.pop(0).decode('utf-8')
+            self._document.add_record(unicode_line)
+            
     def _validate_name(self, file_name):
         if file_name is None:
             return False

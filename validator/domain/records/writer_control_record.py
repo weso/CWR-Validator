@@ -42,7 +42,7 @@ class WriterControlRecord(Record):
         self.format_integer_value('Personal number')
 
     def validate(self):
-        if self.attr_dict['Record prefix'].record_type not in ['OWR, SWR']:
+        if self.attr_dict['Record prefix'].record_type not in ['OWR', 'SWR']:
             raise FieldValidationError('OWR or SWR record type expected, obtained {}'.format(
                 self.attr_dict['Record prefix'].record_type))
 
@@ -68,22 +68,22 @@ class WriterControlRecord(Record):
                 raise FieldValidationError('Given PR society: {} not in table'.format(
                     self.attr_dict['PR affiliation society']))
 
-        if 0 > self.attr_dict['PR ownership share'] or self.attr_dict['PR share'] > 100:
+        if 0 > self.attr_dict['PR ownership share'] or self.attr_dict['PR ownership share'] > 100:
             raise FieldValidationError('Expected PR share between 0 and 50, obtained {}'.format(
                 self.attr_dict['PR ownership share']))
-        elif self.attr_dict['PR affiliation society'] is None:
-            raise FieldValidationError('Expected PR society with share {}'.format(self.attr_dict['PR share']))
+        elif self.attr_dict['PR ownership share'] > 0 and self.attr_dict['PR affiliation society'] is None:
+            raise FieldValidationError('Expected PR society with share {}'.format(self.attr_dict['PR ownership share']))
 
         if self.attr_dict['MR affiliation society'] is not None:
             if self.attr_dict['MR affiliation society'] not in SOCIETY_CODES:
                 raise FieldValidationError('Given MR society: {} not in table'.format(
                     self.attr_dict['MR affiliation society']))
 
-        if 0 > self.attr_dict['MR ownership share'] or self.attr_dict['MR share'] > 100:
+        if 0 > self.attr_dict['MR ownership share'] or self.attr_dict['MR ownership share'] > 100:
             raise FieldValidationError('Expected MR share between 0 and 100, obtained {}'.format(
                 self.attr_dict['MR ownership share']))
-        elif self.attr_dict['MR affiliation society'] is None:
-            raise FieldValidationError('Expected MR society with share {}'.format(self.attr_dict['MR share']))
+        elif self.attr_dict['MR ownership share'] > 0 and self.attr_dict['MR affiliation society'] is None:
+            raise FieldValidationError('Expected MR society with share {}'.format(self.attr_dict['MR ownership share']))
 
         if self.attr_dict['SR affiliation society'] is not None:
             if self.attr_dict['SR affiliation society'] not in SOCIETY_CODES:
@@ -93,5 +93,5 @@ class WriterControlRecord(Record):
         if 0 > self.attr_dict['SR ownership share'] or self.attr_dict['SR ownership share'] > 100:
             raise FieldValidationError('Expected SR share between 0 and 100, obtained {}'.format(
                 self.attr_dict['SR ownership share']))
-        elif self.attr_dict['SR affiliation society'] is None:
+        elif self.attr_dict['SR ownership share'] > 0 and self.attr_dict['SR affiliation society'] is None:
             raise FieldValidationError('Expected SR society with share {}'.format(self.attr_dict['SR ownership share']))
