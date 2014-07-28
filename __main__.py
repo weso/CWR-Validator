@@ -1,7 +1,7 @@
 import os
 from validator.domain.exceptions.regex_error import RegexError
 from validator.validator import Validator
-from validator.tests.files import __data__
+from uploads import __data__
 __author__ = 'Borja'
 
 
