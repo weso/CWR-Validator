@@ -19,16 +19,15 @@ class Record(object):
             raise ValueError("Record can't be None")
 
         self._record = record
-        self._regex = self._generate_regex()
-        matcher = re.compile(self._regex)
-        if matcher.match(record):
+        self._regex, self._regex_size = self._generate_regex()
+        matcher = re.compile(str(self._regex))
+        if matcher.match(record[0:self._regex_size]):
             self._build_record(record)
             self._attr_dict = self._build_attr_dict()
             self.format()
             self.validate()
         else:
             self._check_regex_fields()
-            raise RegexError('Record', self._regex, self._record)
 
     @property
     def attr_dict(self):
@@ -65,10 +64,13 @@ class Record(object):
             if not matcher.match(self._record[start:start + regex.size]):
                 raise RegexError(self.FIELD_NAMES[i], str(regex), self._record[start:start + regex.size])
             else:
+                if self._record[0:3] == 'HDR':
+                    print "matches {} with {}".format(self._record[start:start + regex.size], str(regex))
                 start += regex.size
 
     def _generate_regex(self):
-        return '^' + "".join(str(regex) for regex in self.FIELD_REGEX) + '$'
+        return '^' + "".join(str(regex) for regex in self.FIELD_REGEX) + '$', \
+               sum(regex.size for regex in self.FIELD_REGEX)
 
     def format_date_value(self, field):
         value = self._attr_dict[field]

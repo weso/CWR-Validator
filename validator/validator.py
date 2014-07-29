@@ -1,4 +1,5 @@
 from __future__ import absolute_import
+import codecs
 from validator.domain.document import Document
 from validator.domain.exceptions.regex_error import RegexError
 
@@ -24,11 +25,11 @@ class Validator(object):
 
     def _validate_file(self, file_path, file_name):
         self._document = Document(file_name)
-        with open(file_path) as file_utf8:
+        with codecs.open(file_path, encoding='utf-8') as file_utf8:
             content = file_utf8.readlines()
 
         while content:
-            unicode_line = content.pop(0).decode('utf-8')
+            unicode_line = content.pop(0)
             self._document.add_record(unicode_line)
 
     def _validate_name(self, file_name):

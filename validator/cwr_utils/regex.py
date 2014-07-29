@@ -4,7 +4,7 @@ __author__ = 'Borja'
 class Regex(object):
 
     def __init__(self, regex=None, size=None):
-        self._regex = regex
+        self._regex = regex.encode('utf-8')
         self._size = size
 
     @property
