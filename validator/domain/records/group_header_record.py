@@ -1,4 +1,6 @@
-from validator.domain.exceptions.field_validation_error import FieldValidationError
+from validator.domain.exceptions.group_rejected_error import GroupRejectedError
+from validator.domain.records.group_trailer_record import GroupTrailerRecord
+from validator.domain.records.transaction_header_record import TransactionHeader
 
 __author__ = 'Borja'
 from validator.cwr_utils import regex
@@ -16,6 +18,10 @@ class GroupHeaderRecord(Record):
 
     def __init__(self, record):
         super(GroupHeaderRecord, self).__init__(record)
+        self._transactions = {}
+        self._trailer = None
+        self._transactions_number = 0
+        self._records_number = 0
 
     def format(self):
         self.format_integer_value('Group ID')
@@ -23,9 +29,38 @@ class GroupHeaderRecord(Record):
 
     def validate(self):
         if self.attr_dict['Transaction type'] not in TRANSACTION_VALUES:
-            raise FieldValidationError('Given transaction type: {} not in required ones'.format(self.attr_dict[
-                "Transaction type"]))
+            raise GroupRejectedError('Given transaction type not in required ones', self._record, 'Transaction type')
 
-        if self.attr_dict['Group ID'] > len(TRANSACTION_VALUES):
-            raise FieldValidationError('Given group id: {} bigger than expected (00003)'.format(self.attr_dict[
-                "Group ID"]))
+    def _validate_field(self, field_name):
+        if field_name == 'Transaction type version number':
+            raise GroupRejectedError('Version number must be 02.10', self._record, field_name)
+
+    def add_transaction(self, transaction):
+        if not isinstance(transaction, TransactionHeader):
+            raise ValueError('Expected transaction to be a record object')
+
+        self._transactions[transaction.attr_dict['Record prefix'].transaction_number] = transaction
+
+    def add_trailer(self, trailer):
+        if not isinstance(trailer, GroupTrailerRecord):
+            raise ValueError('Expected trailer to be a record object')
+
+        self._trailer = trailer
+
+    def inc_transactions(self):
+        self._transactions_number += 1
+
+    def inc_records(self):
+        self._records_number += 1
+
+    @property
+    def transactions(self):
+        return self._transactions
+
+    @property
+    def transactions_number(self):
+        return self._transactions_number
+
+    @property
+    def records_number(self):
+        return self._records_number

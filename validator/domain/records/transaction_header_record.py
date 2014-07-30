@@ -25,3 +25,7 @@ class TransactionHeader(Record):
     @abc.abstractmethod
     def add_record(self, record):
         pass
+
+    @abc.abstractmethod
+    def validate_transaction(self):
+        pass

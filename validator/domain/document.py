@@ -1,6 +1,9 @@
 from validator.domain.exceptions.document_validation_error import DocumentValidationError
 from validator.domain.exceptions.field_validation_error import FieldValidationError
+from validator.domain.exceptions.file_rejected_error import FileRejectedError
+from validator.domain.exceptions.group_rejected_error import GroupRejectedError
 from validator.domain.exceptions.regex_error import RegexError
+from validator.domain.exceptions.transaction_rejected_error import TransactionRejectedError
 from validator.domain.records.agreement_record import AgreementRecord
 from validator.domain.records.group_header_record import GroupHeaderRecord
 from validator.domain.records.group_trailer_record import GroupTrailerRecord
@@ -38,28 +41,35 @@ __author__ = 'Borja'
 class Document(object):
     def __init__(self, filename=None):
         self._name = filename
+        self._last_group = None
         self._last_record_type = None
-        self._last_transaction_type = None
+        self._last_transaction = None
 
         self._transmission_header = None
         self._transmission_trailer = None
+        self._groups = {}
         self._group_types = {}
-        self._groups_headers = {}
-        self._groups_trailers = {}
 
         self._transactions = {}
         self._records = {}
         self._errors = {}
 
+        self._groups_number = 0
+        self._transactions_number = 0
         self._records_number = 0
 
     def add_record(self, record=None):
         record_utf8 = record.encode('utf-8')
-        self._records_number += 1
-        if self._last_record_type == 'TRL':
-            raise DocumentValidationError('TRL record must be the last one in the document')
-
         record_type = record_utf8[0:3]
+        self._records_number += 1
+
+        if self._last_record_type == 'GRT' and record_type not in ['GRH', 'TRL']:
+            raise FileRejectedError('Expected a group header or a transmission trailer to be after group trailer',
+                                    record)
+
+        if self._last_record_type == 'TRL':
+            raise FileRejectedError('Transmission trailer expected to be the last record of the document', record)
+
         try:
             if record_type == 'HDR':
                 self._add_transmission_header(record_utf8)
@@ -122,7 +132,7 @@ class Document(object):
             elif record_type == 'ARI':
                 self._add_additional_info_record(record_utf8)
             else:
-                raise FieldValidationError('Unrecognized record type: {}'.format(record_utf8))
+                raise FileRejectedError('Not a valid transaction or detail record type', record, 'Record type')
 
             self._last_record_type = record_type
         except (RegexError, FieldValidationError, DocumentValidationError) as error:
@@ -133,71 +143,113 @@ class Document(object):
                 print '----------------' + str(error)
 
     def _add_transmission_header(self, record):
-        try:
-            self._transmission_header = TransmissionHeaderRecord(record)
-            if self._last_record_type is not None or len(self._errors) != 0:
-                raise DocumentValidationError('HDR expected to be the first record of the document')
-        except (RegexError, FieldValidationError) as error:
-            raise DocumentValidationError('HDR validation error: {}'.format(error))
+        if self._transmission_header is not None:
+            raise FileRejectedError('Expected only one transmission header')
+
+        if self._last_record_type is not None or len(self._errors) != 0:
+            raise FileRejectedError('Transmission header expected to be the first record of the document',
+                                    record, None)
+
+        self._transmission_header = TransmissionHeaderRecord(record)
 
     def _add_transmission_trailer(self, record):
-        try:
-            self._transmission_trailer = TransmissionTrailerRecord(record)
-        except (RegexError, FieldValidationError) as error:
-            raise DocumentValidationError('TRL validation error: {}'.format(error))
+        if self._transmission_trailer is not None:
+            raise FileRejectedError('Expected only one transmission trailer')
+
+        self._transmission_trailer = TransmissionTrailerRecord(record)
+        if self._transmission_trailer.attr_dict['Group count'] != self._groups_number:
+            raise FileRejectedError('Number of groups does not correspond with the processed ones {}'.format(
+                self._groups_number), self._transmission_trailer, 'Group count')
+        elif self._transmission_trailer.attr_dict['Transaction count'] != self._transactions_number:
+            raise FileRejectedError('Number of transactions does not correspond with the processed ones {}'.format(
+                self._transactions_number), self._transmission_trailer, 'Transaction count')
+        elif self._transmission_trailer.attr_dict['Records count'] != self._records_number:
+            raise FileRejectedError('Number of records does not correspond with the processed ones {}'.format(
+                self._records_number), self._transmission_trailer, 'Transaction count')
 
     def _add_group_header_record(self, record):
-        try:
-            group = GroupHeaderRecord(record)
-            if self._last_record_type not in ['HDR', 'GRT']:
-                raise DocumentValidationError('GRH records expected after HDR or GRT, found {}'.format(
-                    self._last_record_type))
-            if group.attr_dict['Transaction type'] in self._group_types.keys():
-                raise DocumentValidationError('Multiple groups for same transaction type: {}'.format(
-                    group.attr_dict['Transaction type']))
-            elif group.attr_dict['Group ID'] in self._groups_headers.keys():
-                raise DocumentValidationError('Multiple groups with same ID: {}'.format(
-                    group.attr_dict['Group ID']))
-            elif len(self._groups_headers) + 1 != group.attr_dict['Group ID']:
-                raise DocumentValidationError('Group ID must start in one and be incremented by one')
-            else:
-                self._group_types[group.attr_dict['Transaction type']] = group.attr_dict['Group ID']
-                self._groups_headers[group.attr_dict['Group ID']] = group
+        self._groups_number += 1
 
-        except (RegexError, FieldValidationError) as error:
-            raise DocumentValidationError('GRP validation error: {}'.format(error))
+        group = GroupHeaderRecord(record)
+        if self._last_record_type == 'HDR' and self._records_number != 2:
+            raise FileRejectedError('Group header expected to be the second record of the document', group)
+        elif self._last_record_type != 'GRT' and self._records_number != 2:
+            raise FileRejectedError('Subsequents group header expected to be preceded by group trailers'.group)
+
+        if self._last_group is not None:
+            raise FileRejectedError('Group header encountered within another group', group)
+
+        if group.attr_dict['Transaction type'] in self._group_types.keys():
+            raise GroupRejectedError(group, 'Multiple groups for same transaction type', group, 'Transaction type')
+        elif group.attr_dict['Group ID'] in self._groups.keys():
+            raise GroupRejectedError(group, 'Multiple groups with same ID', group, 'Group ID')
+        elif len(self._groups) + 1 != group.attr_dict['Group ID']:
+            raise GroupRejectedError('Group ID must start in one and be incremented by one', group, 'Group ID')
+        else:
+            self._last_group = group
 
     def _add_group_trailer_record(self, record):
-        try:
-            group = GroupTrailerRecord(record)
-            if self._groups_headers[group.attr_dict['Group ID']] is None:
-                raise DocumentValidationError('GRT record encountered for non-existent group ID: {}'.format(
-                    group.attr_dict['Group ID']))
-        except (RegexError, FieldValidationError) as error:
-            raise DocumentValidationError('GRT validation error: {}'.format(error))
+        trailer = GroupTrailerRecord(record)
+        if trailer.attr_dict['Group ID'] != self._last_group.attr_dict['Group ID']:
+            raise GroupRejectedError(self._last_group, 'Group trailer does not match the previous header ID',
+                                     trailer, 'Group ID')
+        elif trailer.attr_dict['Transaction count'] != len(self._last_group.transactions()):
+            raise GroupRejectedError(self._last_group,
+                                     'Transaction count does not match the number of transactions: {}'.format(
+                                         len(self._last_group.transactions())),
+                                     trailer)
+        elif trailer.attr_dict['Record count'] != self._last_group.get_records_count():
+            raise GroupRejectedError(self._last_group,
+                                     'Record count does not match the number of records: {}'.format(
+                                         self._last_group.get_records_count()),
+                                     trailer)
+        else:
+            self._last_group.add_trailer(trailer)
+            self._groups[trailer.attr_dict['Group ID']] = self._last_group
+            self._group_types = self._last_group.attr_dict['Transaction type']
+            self._last_group = None
 
     def _add_transaction(self, transaction):
-        if transaction.attr_dict['Record prefix'].record_type not in self._group_types.keys():
-            raise DocumentValidationError('{} transaction record found before container group'.format(
-                transaction.attr_dict['Record prefix'].record_type))
-        elif transaction.attr_dict['Record prefix'].record_type in self._groups_trailers.keys():
-            raise DocumentValidationError('{} record found after closing container group'.format(
-                transaction.attr_dict['Record prefix'].record_type))
-        if len(self._transactions) != transaction.attr_dict['Record prefix'].transaction_number:
-            raise DocumentValidationError('Transaction number must start in zero and be incremented by one')
+        if self._last_transaction is not None:
+            self._last_transaction.validate_transaction()
+            self.transactions[
+                self._last_transaction.attr_dict['Record prefix'].transaction_number] = self._last_transaction
+            self._last_transaction = None
 
-        self._transactions[transaction.attr_dict['Record prefix'].transaction_number] = transaction
-        self._last_transaction_type = transaction.attr_dict['Record prefix'].record_type
+        if transaction.attr_dict['Record prefix'].record_type != self._last_group.attr_dict['Transaction type']:
+            raise GroupRejectedError(self._last_group, 'Transaction record found outside its container group',
+                                     transaction, 'Record prefix')
+
+        if transaction.attr_dict['Record prefix'].record_number != 0:
+            raise FileRejectedError('Record sequence must be zero within a transaction header',
+                                    transaction, 'Record sequence')
+
+        if len(self._transactions) == 0 and transaction.attr_dict['Record prefix'].transaction_number != 0:
+            raise FileRejectedError('The first transaction within a file must have transaction sequence equals to zero',
+                                    transaction, 'Transaction sequence')
+
+        if len(self._transactions) != transaction.attr_dict['Record prefix'].transaction_number:
+            raise TransactionRejectedError('Transaction sequence must be incremented by one',
+                                           transaction, 'Transaction sequence')
+
+        self._last_transaction = transaction
 
     def _add_agreement_record(self, record):
+        self._transactions_number += 1
+
         transaction = AgreementRecord(record)
         self._add_transaction(transaction)
 
     def _add_registration_record(self, record):
+        self._transactions_number += 1
+
         transaction = RegistrationRecord(record)
         self._add_transaction(transaction)
 
     def _add_record_to_transaction(self, record):
+        if self._last_record_type == 'GRT':
+            raise FileRejectedError('Expected a transaction to follow a group header record', record)
+
         if record.attr_dict['Record prefix'].transaction_number not in self._transactions.keys():
             raise DocumentValidationError('Record transaction number {} is not found'.format(
                 record.attr_dict['Record prefix'].transaction_number))
@@ -266,7 +318,7 @@ class Document(object):
         count = 1
         publisher = None
         while territory.attr_dict['Record prefix'].record_number - count in self._records.keys() or \
-                territory.attr_dict['Record prefix'].record_number - count in self._errors.keys():
+                                territory.attr_dict['Record prefix'].record_number - count in self._errors.keys():
             if territory.attr_dict['Record prefix'].record_number - count not in self._errors.keys():
                 publisher = self._records.get(territory.attr_dict['Record prefix'].record_number - count, None)
 
@@ -308,7 +360,7 @@ class Document(object):
         count = 1
         writer = None
         while territory.attr_dict['Record prefix'].record_number - count in self._records.keys() or \
-                territory.attr_dict['Record prefix'].record_number - count in self._errors.keys():
+                                territory.attr_dict['Record prefix'].record_number - count in self._errors.keys():
             if territory.attr_dict['Record prefix'].record_number - count not in self._errors.keys():
                 writer = self._records[territory.attr_dict['Record prefix'].record_number - count]
                 if writer.attr_dict['Record prefix'].record_type == 'SWR':
@@ -339,7 +391,7 @@ class Document(object):
         publisher = None
         count = 1
         while agent.attr_dict['Record prefix'].record_number - count in self._records.keys() or \
-                agent.attr_dict['Record prefix'].record_number - count in self._errors.keys():
+                                agent.attr_dict['Record prefix'].record_number - count in self._errors.keys():
             if agent.attr_dict['Record prefix'].record_number - count not in self._errors.keys():
                 ipa = self._records[agent.attr_dict['Record prefix'].record_number - count]
                 if ipa.attr_dict['Record prefix'].record_type == 'SWR':
@@ -441,6 +493,12 @@ class Document(object):
 
     def _get_last_record(self, record):
         return self._records[record.attr_dict['Record prefix'].record_number - 1]
+
+    def validate(self):
+        if self._transmission_header is None:
+            raise FileRejectedError('Expected to have at least one transmission header')
+        if self._transmission_trailer is None:
+            raise FileRejectedError('expected to have at least one transmission trailer')
 
     @property
     def errors(self):
