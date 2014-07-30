@@ -1,4 +1,4 @@
-from validator.domain.exceptions.field_validation_error import FieldValidationError
+from validator.domain.exceptions.group_rejected_error import GroupRejectedError
 
 __author__ = 'Borja'
 from validator.cwr_utils import regex
@@ -26,5 +26,5 @@ class GroupTrailerRecord(Record):
     def validate(self):
         if self.attr_dict['Total monetary value'] is not None and self.attr_dict['Total monetary value'] > 0:
             if self.attr_dict['Currency indicator'] not in CURRENCY_VALUES:
-                raise FieldValidationError('Given currency indicator: {} not in currency codes'.format(
-                    self.attr_dict['Currency indicator']))
+                raise GroupRejectedError(self._record,
+                                         'Expected currency indicator', self._record, 'Currency indicator')

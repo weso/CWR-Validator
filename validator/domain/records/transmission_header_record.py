@@ -1,6 +1,9 @@
+from validator.domain.exceptions.file_rejected_error import FileRejectedError
+
 __author__ = 'Borja'
 from validator.cwr_utils import regex
 from validator.cwr_utils.value_tables import SENDER_VALUES
+from validator.cwr_utils.value_tables import SOCIETY_CODES
 from validator.domain.records.record import Record
 
 from validator.domain.exceptions.field_validation_error import FieldValidationError
@@ -26,5 +29,19 @@ class TransmissionHeaderRecord(Record):
 
     def validate(self):
         if not self._attr_dict['Sender type'] in SENDER_VALUES:
-            raise FieldValidationError('Given sender type: {} not in required ones'.format(
-                self._attr_dict['Sender type']))
+            raise FileRejectedError('Sender type not in required ones', self._record, 'Sender type')
+        elif self._attr_dict['Sender ID'] is None:
+            raise FileRejectedError('Sender ID must not be none', self._record, 'Sender ID')
+        elif self._attr_dict['Sender type'] == 'SO' and self._attr_dict['Sender ID'] not in SOCIETY_CODES:
+            raise FileRejectedError('Sender ID not in society codes', self._record, 'Sender ID')
+
+        if self.attr_dict['Creation date'] is None:
+            raise FileRejectedError('Creation date must be a valid date', self._record, 'Creation date')
+        if self.attr_dict['Transmission date'] is None:
+            raise FileRejectedError('Transmission date must be a valid date', self._record, 'Transmission date')
+
+    def _validate_field(self, field_name):
+        if field_name == 'Record type':
+            raise FileRejectedError('Record type must be HDR', self._record, field_name)
+        if field_name == 'EDI standard version number':
+            raise FileRejectedError('EDI standard version number must be 01.10', self._record, field_name)

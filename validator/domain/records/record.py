@@ -1,9 +1,9 @@
+from validator.domain.exceptions.record_rejected_error import RecordRejectedError
+
 __author__ = 'Borja'
 import abc
 import datetime
 import re
-
-from validator.domain.exceptions.regex_error import RegexError
 
 
 class Record(object):
@@ -20,14 +20,15 @@ class Record(object):
 
         self._record = record
         self._regex, self._regex_size = self._generate_regex()
-        matcher = re.compile(str(self._regex))
-        if matcher.match(record[0:self._regex_size]):
+        self._rejected = False
+        if len(record) < self._regex_size:
+            raise RecordRejectedError('Record length is less than expected', self._record)
+        else:
             self._build_record(record)
             self._attr_dict = self._build_attr_dict()
+            self._check_regex_fields()
             self.format()
             self.validate()
-        else:
-            self._check_regex_fields()
 
     @property
     def attr_dict(self):
@@ -36,6 +37,10 @@ class Record(object):
     @property
     def record(self):
         return str(self._record)
+
+    @property
+    def rejected(self):
+        return self._rejected
 
     def _build_record(self, record):
         start = 0
@@ -54,6 +59,14 @@ class Record(object):
             object according to it's field validation level"""
         return
 
+    @abc.abstractmethod
+    def _validate_field(self, field_name):
+        """
+        :param field_name: Field that has caused the regex to fail
+        :return:
+        """
+        return
+
     def _build_attr_dict(self):
         return dict(zip(self.FIELD_NAMES, self.FIELD_VALUES))
 
@@ -62,10 +75,8 @@ class Record(object):
         for i, regex in enumerate(self.FIELD_REGEX):
             matcher = re.compile(str(regex))
             if not matcher.match(self._record[start:start + regex.size]):
-                raise RegexError(self.FIELD_NAMES[i], str(regex), self._record[start:start + regex.size])
+                self._validate_field(self.FIELD_NAMES[i])
             else:
-                if self._record[0:3] == 'HDR':
-                    print "matches {} with {}".format(self._record[start:start + regex.size], str(regex))
                 start += regex.size
 
     def _generate_regex(self):
