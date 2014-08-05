@@ -29,3 +29,7 @@ class TransactionHeader(Record):
     @abc.abstractmethod
     def validate_transaction(self):
         pass
+
+    @abc.abstractmethod
+    def _validate_field(self, field_name):
+        pass

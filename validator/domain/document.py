@@ -1,8 +1,6 @@
-from validator.domain.exceptions.document_validation_error import DocumentValidationError
-from validator.domain.exceptions.field_validation_error import FieldValidationError
 from validator.domain.exceptions.file_rejected_error import FileRejectedError
 from validator.domain.exceptions.group_rejected_error import GroupRejectedError
-from validator.domain.exceptions.regex_error import RegexError
+from validator.domain.exceptions.record_rejected_error import RecordRejectedError
 from validator.domain.exceptions.transaction_rejected_error import TransactionRejectedError
 from validator.domain.records.agreement_record import AgreementRecord
 from validator.domain.records.group_header_record import GroupHeaderRecord
@@ -135,12 +133,10 @@ class Document(object):
                 raise FileRejectedError('Not a valid transaction or detail record type', record, 'Record type')
 
             self._last_record_type = record_type
-        except (RegexError, FieldValidationError, DocumentValidationError) as error:
-            try:
-                self._errors[int(record_utf8[11:19])] = (str('{} validation error: {} \n\t{}'.format(
-                    record_type, str(error).replace("'", ""), record_utf8)).encode(encoding='utf-8', errors='replace'))
-            except:
-                print '----------------' + str(error)
+        except RecordRejectedError as error:
+            pass
+        except TransactionRejectedError as error:
+            pass
 
     def _add_transmission_header(self, record):
         if self._transmission_header is not None:
@@ -174,7 +170,7 @@ class Document(object):
         if self._last_record_type == 'HDR' and self._records_number != 2:
             raise FileRejectedError('Group header expected to be the second record of the document', group)
         elif self._last_record_type != 'GRT' and self._records_number != 2:
-            raise FileRejectedError('Subsequents group header expected to be preceded by group trailers'.group)
+            raise FileRejectedError('Subsequents group header expected to be preceded by group trailers', group)
 
         if self._last_group is not None:
             raise FileRejectedError('Group header encountered within another group', group)
@@ -251,74 +247,61 @@ class Document(object):
             raise FileRejectedError('Expected a transaction to follow a group header record', record)
 
         if record.attr_dict['Record prefix'].transaction_number not in self._transactions.keys():
-            raise DocumentValidationError('Record transaction number {} is not found'.format(
-                record.attr_dict['Record prefix'].transaction_number))
+            raise RecordRejectedError('Record transaction number is not found', record, 'Transaction number')
 
         transaction = self._transactions[record.attr_dict['Record prefix'].transaction_number]
+
         if record.attr_dict['Record prefix'].record_number not in self._records.keys() \
                 and record.attr_dict['Record prefix'].record_number not in self._errors.keys():
             transaction.add_record(record)
             self._records[record.attr_dict['Record prefix'].record_number] = record
         else:
-            try:
-                raise DocumentValidationError("Two records have the same number: \n {} \n {}".format(
-                    self._records[record.attr_dict['Record prefix'].record_number], record))
-            except KeyError:
-                raise DocumentValidationError("Two records have the same number: \n {} \n {}".format(
-                    self._errors[record.attr_dict['Record prefix'].record_number], record))
+            raise RecordRejectedError('Duplicated value', record, 'Record number')
 
     def _add_territory_record(self, record):
-        territory = TerritoryRecord(record)
-        if self._last_transaction_type != 'AGR':
-            raise DocumentValidationError('TER record expected within AGR transactions')
+        territory = TerritoryRecord(record, self._last_transaction)
         if self._last_record_type not in ['AGR', 'TER']:
-            raise DocumentValidationError('TER records expected after AGR or TER, found {}'.format(
-                self._last_record_type))
+            raise TransactionRejectedError(self._last_transaction, 'TER records expected after AGR or TER', territory)
 
         self._add_record_to_transaction(territory)
 
     def _add_ipa_record(self, record):
-        ipa = InterestedPartyRecord(record)
-        if self._last_transaction_type != 'AGR':
-            raise DocumentValidationError('IPA record expected within AGR transactions')
+        ipa = InterestedPartyRecord(record, self._last_transaction)
         if self._last_record_type not in ['TER', 'IPA']:
-            raise DocumentValidationError('IPA records expected after TER or IPA, found {}'.format(
-                self._last_record_type))
+            raise TransactionRejectedError(self._last_transaction, 'IPA records expected after TER or IPA', ipa)
 
         self._add_record_to_transaction(ipa)
 
     def _add_npa_record(self, record):
-        npa = NRAgreementPartyNameRecord(record)
-        if self._last_transaction_type != 'AGR':
-            raise DocumentValidationError('NPA record expected within AGR transactions')
+        npa = NRAgreementPartyNameRecord(record, self._last_transaction)
         if self._last_record_type != 'IPA' \
                 and self._get_last_record(npa).attr_dict['Interested party ID'] != npa.attr_dict['Interested party ID']:
-            raise DocumentValidationError('NPA must follow an IPA record and share the Interested party ID')
+            raise RecordRejectedError('NPA must follow an IPA record and share the Interested party ID', npa)
 
         self._add_record_to_transaction(npa)
 
     def _add_publisher_record(self, record):
-        publisher = PublisherControlRecord(record)
+        publisher = PublisherControlRecord(record, self._last_transaction)
 
         self._add_record_to_transaction(publisher)
 
     def _add_npn_record(self, record):
-        npn = NRPublisherNameRecord(record)
+        npn = NRPublisherNameRecord(record, self._last_transaction)
         if self._last_record_type != 'SPU' \
                 and self._get_last_record(npn).attr_dict['Interested party ID'] != npn.attr_dict['Interested party ID']:
-            raise DocumentValidationError('NPN must follow a SPU record and share the Interested party ID')
+            raise RecordRejectedError('NPN must follow a SPU record and share the Interested party ID', record)
 
         self._add_record_to_transaction(npn)
 
     def _add_publisher_territory_record(self, record):
-        territory = PublisherTerritoryRecord(record)
+        territory = PublisherTerritoryRecord(record, self._last_transaction)
         if self._last_record_type not in ['SPU', 'SPT']:
-            raise DocumentValidationError('SPT must follow a SPU or SPT record')
+            raise TransactionRejectedError(self._last_transaction, 'SPT must follow a SPU or SPT record', territory)
 
         count = 1
         publisher = None
         while territory.attr_dict['Record prefix'].record_number - count in self._records.keys() or \
-                                territory.attr_dict['Record prefix'].record_number - count in self._errors.keys():
+                territory.attr_dict['Record prefix'].record_number - count in self._errors.keys():
             if territory.attr_dict['Record prefix'].record_number - count not in self._errors.keys():
                 publisher = self._records.get(territory.attr_dict['Record prefix'].record_number - count, None)
 
@@ -328,39 +311,40 @@ class Document(object):
                     publisher = None
                     count += 1
             else:
-                raise DocumentValidationError('Previous record: {} was incorrect'.format(
-                    self._errors[territory.attr_dict['Record prefix'].record_number - count]))
+                raise RecordRejectedError('Previous record was incorrect', territory)
 
         if publisher is None:
-            raise DocumentValidationError('Expected publisher for SPT record')
+            raise TransactionRejectedError(self._last_transaction, 'Expected publisher for SPT record')
 
         if publisher is not None \
                 and publisher.attr_dict['Interested party ID'] != territory.attr_dict['Interested party ID']:
-            raise DocumentValidationError('Preceding SPU record to SPT must share interested party ID')
+            raise TransactionRejectedError(self._last_transaction,
+                                           'Preceding SPU record to SPT must share interested party ID')
 
         self._add_record_to_transaction(territory)
 
     def _add_writer_control_record(self, record):
-        writer = WriterControlRecord(record)
+        writer = WriterControlRecord(record, self._last_transaction)
         self._add_record_to_transaction(writer)
 
     def _add_nwn_record(self, record):
-        nwn = NRWriterNameRecord(record)
+        nwn = NRWriterNameRecord(record, self._last_transaction)
         if self._last_record_type != 'SWR' \
                 and self._get_last_record(nwn).attr_dict['Interested party ID'] != nwn.attr_dict['Interested party ID']:
-            raise DocumentValidationError('NWN must follow a SWR record and share the Interested party ID')
+            raise RecordRejectedError('NWN must follow a SWR record and share the Interested party ID', nwn,
+                                      'Interested party ID')
 
         self._add_record_to_transaction(nwn)
 
     def _add_writer_territory_record(self, record):
-        territory = WriterTerritoryRecord(record)
+        territory = WriterTerritoryRecord(record, self._last_transaction)
         if self._last_record_type not in ['SWR', 'SWT']:
-            raise DocumentValidationError('SWT must follow a SWR or SWT record')
+            raise TransactionRejectedError(self._last_transaction, 'SWT must follow a SWR or SWT record')
 
         count = 1
         writer = None
         while territory.attr_dict['Record prefix'].record_number - count in self._records.keys() or \
-                                territory.attr_dict['Record prefix'].record_number - count in self._errors.keys():
+                territory.attr_dict['Record prefix'].record_number - count in self._errors.keys():
             if territory.attr_dict['Record prefix'].record_number - count not in self._errors.keys():
                 writer = self._records[territory.attr_dict['Record prefix'].record_number - count]
                 if writer.attr_dict['Record prefix'].record_type == 'SWR':
@@ -369,29 +353,27 @@ class Document(object):
                     writer = None
                     count += 1
             else:
-                raise DocumentValidationError("Previous record: {} was incorrect, so this can't be evaluated".format(
-                    self._errors[territory.attr_dict['Record prefix'].record_number - count]))
+                raise RecordRejectedError('Previous record was incorrect', territory)
 
         if writer is None:
-            raise DocumentValidationError('Expected writer for SWT record')
+            raise TransactionRejectedError(self._last_transaction, 'Expected writer for SWT record', territory)
 
         if writer.attr_dict['Interested party ID'] != territory.attr_dict['Interested party ID']:
-            raise DocumentValidationError('Preceding SWR record to SWT must share interested party ID')
+            raise TransactionRejectedError(self._last_transaction, 'Preceding SWR must share interested party ID',
+                                           territory, 'Interested party ID')
 
         self._add_record_to_transaction(territory)
 
     def _add_agent_record(self, record):
-        agent = WriterAgentRecord(record)
+        agent = WriterAgentRecord(record, self._last_transaction)
         if self._last_record_type not in ['SWR', 'SWT', 'PWR']:
-            raise DocumentValidationError('PWR must follow a SWR or SWT or PWR record')
-        if self._last_transaction_type != 'NWR':
-            raise DocumentValidationError('PWR must be within NWR transaction')
+            raise RecordRejectedError('PWR must follow a SWR or SWT or PWR record', agent)
 
         writer = None
         publisher = None
         count = 1
         while agent.attr_dict['Record prefix'].record_number - count in self._records.keys() or \
-                                agent.attr_dict['Record prefix'].record_number - count in self._errors.keys():
+                agent.attr_dict['Record prefix'].record_number - count in self._errors.keys():
             if agent.attr_dict['Record prefix'].record_number - count not in self._errors.keys():
                 ipa = self._records[agent.attr_dict['Record prefix'].record_number - count]
                 if ipa.attr_dict['Record prefix'].record_type == 'SWR':
@@ -403,91 +385,92 @@ class Document(object):
                 if writer is not None and publisher is not None:
                     break
             else:
-                raise DocumentValidationError("Previous record: {} was incorrect, so this can't be evaluated".format(
-                    self._errors[agent.attr_dict['Record prefix'].record_number - count]))
+                raise RecordRejectedError('Previous record was incorrect', agent)
 
         if publisher is None or writer is None:
-            raise DocumentValidationError('Writer and publisher must be known for a PWT record')
+            raise RecordRejectedError('Writer and publisher must be known for a PWT record', agent)
 
         if publisher is not None \
                 and publisher.attr_dict['Interested party ID'] != agent.attr_dict['Publisher IP ID']:
-            raise DocumentValidationError('PWR publisher ID must match preceding SPU record IP ID')
+            raise RecordRejectedError('PWR publisher ID must match preceding SPU record IP ID', agent,
+                                      'Interested party ID')
 
         if writer is not None \
                 and writer.attr_dict['Interested party ID'] != agent.attr_dict['Writer IP ID']:
-            raise DocumentValidationError('PWR writer ID must match preceding SWR record IP ID')
+            raise RecordRejectedError('PWR publisher ID must match preceding SWR record IP ID', agent,
+                                      'Interested party ID')
 
         self._add_record_to_transaction(agent)
 
     def _add_alternative_title_record(self, record):
-        title = WorkAlternativeTitleRecord(record)
+        title = WorkAlternativeTitleRecord(record, self._last_transaction)
         self._add_record_to_transaction(title)
 
     def _add_nat_record(self, record):
-        title = NRWorkTitleRecord(record)
+        title = NRWorkTitleRecord(record, self._last_transaction)
         self._add_record_to_transaction(title)
 
     def _add_entire_title_record(self, record):
-        title = WorkExcerptTitle(record)
+        title = WorkExcerptTitle(record, self._last_transaction)
         self._add_record_to_transaction(title)
 
     def _add_original_title_record(self, record):
-        title = WorkVersionTitle(record)
+        title = WorkVersionTitle(record, self._last_transaction)
         self._add_record_to_transaction(title)
 
     def _add_performing_artist_record(self, record):
-        artist = PerformingArtistRecord(record)
+        artist = PerformingArtistRecord(record, self._last_transaction)
         self._add_record_to_transaction(artist)
 
     def _add_npr_record(self, record):
-        performance = NRPerformanceDataRecord(record)
+        performance = NRPerformanceDataRecord(record, self._last_transaction)
         self._add_record_to_transaction(performance)
 
     def _add_recording_detail_record(self, record):
-        detail = RecordingDetailRecord(record)
+        detail = RecordingDetailRecord(record, self._last_transaction)
         self._add_record_to_transaction(detail)
 
     def _add_work_origin_record(self, record):
-        work = WorkOriginRecord(record)
+        work = WorkOriginRecord(record, self._last_transaction)
         self._add_record_to_transaction(work)
 
     def _add_instrumentation_summary_record(self, record):
-        summary = InstrumentationSummaryRecord(record)
+        summary = InstrumentationSummaryRecord(record, self._last_transaction)
         self._add_record_to_transaction(summary)
 
     def _add_instrumentation_detail_record(self, record):
-        detail = InstrumentationDetailRecord(record)
+        detail = InstrumentationDetailRecord(record, self._last_transaction)
         if self._last_record_type not in ['INS', 'IND']:
-            raise DocumentValidationError('IND record type must follow an INS or IND record')
+            raise RecordRejectedError('IND record type must follow an INS or IND record', record)
 
         self._add_record_to_transaction(detail)
 
     def _add_component_record(self, record):
-        component = WorkCompositeRecord(record)
+        component = WorkCompositeRecord(record, self._last_transaction)
         self._add_record_to_transaction(component)
 
     def _add_nr_title_record(self, record):
-        title = NRSpecialTitleRecord(record)
+        title = NRSpecialTitleRecord(record, self._last_transaction)
         record_type = record[0:3]
         if record_type == 'NET' and self._last_record_type != 'EWT':
-            raise DocumentValidationError('NET record type must follow an EWT record')
+            raise RecordRejectedError('NET record type must follow an EWT record', record)
         elif record_type == 'NCT' and self._last_record_type != 'COM':
-            raise DocumentValidationError('NCT record type must follow a COM record')
+            raise RecordRejectedError('NCT record type must follow a COM record', record)
         if record_type == 'NVT' and self._last_record_type != 'VET':
-            raise DocumentValidationError('NVT record type must follow a VER record')
+            raise RecordRejectedError('NVT record type must follow a VER record', record)
 
         self._add_record_to_transaction(title)
 
     def _add_now_record(self, record):
-        writer = NROtherWriterRecord(record)
+        writer = NROtherWriterRecord(record, self._last_transaction)
         if self._last_record_type not in ['EWT', 'VER', 'COM', 'NET', 'NCT', 'NVT']:
-            raise DocumentValidationError('NOW record type must follow an {} record'.format(
-                'or'.join(['EWT', 'VER', 'COM', 'NET', 'NCT', 'NVT'])))
+            raise RecordRejectedError('NOW record type must follow an {} record'.format(
+                'or'.join(['EWT', 'VER', 'COM', 'NET', 'NCT', 'NVT'])), record)
 
         self._add_record_to_transaction(writer)
 
     def _add_additional_info_record(self, record):
-        info = WorkAdditionalInfoRecord(record)
+        info = WorkAdditionalInfoRecord(record, self._last_transaction)
 
         self._add_record_to_transaction(info)
 

@@ -131,6 +131,13 @@ class RegistrationRecord(TransactionHeader):
                     'Record prefix'].record_number + 1 != record.attr_dict['Record prefix'].record_number:
             raise TransactionRejectedError(self, 'SPU and OPU record expected to be a chain', record)
 
+        if record.attr_dict['Record prefix'].record_type in ['EWT', 'VER', 'REC'] and \
+                record.attr_dict['Record prefix'].record_type in self._records.keys():
+            raise TransactionRejectedError(self, 'Only one record of this type allowed per transaction', record)
+
+        if record.attr_dict['Record prefix'].record_type == 'COM' and self.attr_dict['Composite type'] is None:
+            raise RecordRejectedError('Expected value', self._record, 'Record prefix')
+
         if record.attr_dict['Record prefix'].record_type not in self._records.keys():
             self._records[record.attr_dict['Record prefix'].record_type] = []
 

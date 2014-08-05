@@ -1,13 +1,15 @@
-from validator.domain.exceptions.field_validation_error import FieldValidationError
+from validator.domain.exceptions.field_rejected_error import FieldRejectedError
+from validator.domain.exceptions.record_rejected_error import RecordRejectedError
+from validator.domain.exceptions.transaction_rejected_error import TransactionRejectedError
+from validator.domain.records.detail_header_record import DetailHeader
 from validator.domain.values.record_prefix import RecordPrefix
 
 __author__ = 'Borja'
 from validator.cwr_utils import regex
 from validator.cwr_utils.value_tables import TIS_CODES
-from validator.domain.records.record import Record
 
 
-class WriterTerritoryRecord(Record):
+class WriterTerritoryRecord(DetailHeader):
     FIELD_NAMES = ['Record prefix', 'Interested party ID', 'PR collection share', 'MR collection share',
                    'SR collection share', 'Inclusion/Exclusion indicator', 'TIS numeric code', 'Shares change',
                    'Sequence ID']
@@ -17,8 +19,8 @@ class WriterTerritoryRecord(Record):
                    regex.get_defined_values_regex(1, False, 'E', 'I'), regex.get_numeric_regex(4),
                    regex.get_boolean_regex(), regex.get_numeric_regex(3)]
 
-    def __init__(self, record):
-        super(WriterTerritoryRecord, self).__init__(record)
+    def __init__(self, record, transaction):
+        super(WriterTerritoryRecord, self).__init__(record, transaction)
 
     def format(self):
         self.attr_dict['Record prefix'] = RecordPrefix(self.attr_dict['Record prefix'])
@@ -30,21 +32,37 @@ class WriterTerritoryRecord(Record):
 
     def validate(self):
         if self.attr_dict['Record prefix'].record_type != 'SWT':
-            raise FieldValidationError('SWT record type expected, obtained: {}'.format(
-                self.attr_dict['Record prefix'].record_type))
+            raise RecordRejectedError('SWT record type expected', self._record, 'Record type')
 
         if self.attr_dict['TIS numeric code'] not in TIS_CODES:
-            raise FieldValidationError('Given TIS numeric code: {} not in table'.format(
-                self.attr_dict['TIS numeric code']))
+            raise TransactionRejectedError(self._transaction, 'Given TIS numeric code not in table', self._record,
+                                           'TIS numeric code')
 
-        if 0 > self.attr_dict['PR collection share'] or self.attr_dict['PR collection share'] > 100:
-            raise FieldValidationError('Expected PR share between 0 and 50, obtained {}'.format(
-                self.attr_dict['PR collection share']))
+        if 0 > self.attr_dict['PR collection share'] or self.attr_dict['PR collection share'] > 50:
+            raise TransactionRejectedError('Expected share between 0 and 50', self._record, 'PR collection share')
 
         if 0 > self.attr_dict['MR collection share'] or self.attr_dict['MR collection share'] > 100:
-            raise FieldValidationError('Expected MR share between 0 and 100, obtained {}'.format(
-                self.attr_dict['MR collection share']))
+            raise TransactionRejectedError('Expected share between 0 and 100', self._record, 'MR collection share')
 
         if 0 > self.attr_dict['SR collection share'] or self.attr_dict['SR collection share'] > 100:
-            raise FieldValidationError('Expected SR share between 0 and 100, obtained {}'.format(
-                self.attr_dict['SR collection share']))
+            raise TransactionRejectedError('Expected share between 0 and 100', self._record, 'SR collection share')
+
+        if self.attr_dict['Inclusion/Exclusion indicator'] == 'I' and \
+                self.attr_dict['PR collection share'] == self.attr_dict['MR collection share'] == self.attr_dict[
+                    'SR collection share'] == 0:
+            raise TransactionRejectedError(self._transaction, 'Expected one share to be greater than zero',
+                                           self._record, 'Inclusion/Exclusion indicator')
+        if self.attr_dict['Inclusion/Exclusion indicator'] == 'E' and not (
+                self.attr_dict['PR collection share'] == self.attr_dict['MR collection share'] == self.attr_dict[
+                    'SR collection share'] == 0):
+            raise TransactionRejectedError(self._transaction, 'Expected all shares to be zero', self._record,
+                                           'Inclusion/Exclusion indicator')
+
+    def _validate_field(self, field_name):
+        if field_name == 'Inclusion/Exclusion indicator':
+            raise TransactionRejectedError(self._transaction, 'Expected valid value', self._record, field_name)
+        elif field_name == 'Shares change':
+            self.attr_dict[field_name] = 'N'
+            raise FieldRejectedError('Expected valid boolean value', self._record, field_name, 'N')
+        elif field_name == 'Sequence number':
+            raise RecordRejectedError('Expected value', self._record, field_name)
