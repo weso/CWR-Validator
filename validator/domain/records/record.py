@@ -21,6 +21,7 @@ class Record(object):
         self._record = record
         self._regex, self._regex_size = self._generate_regex()
         self._rejected = False
+        self._rejected_fields = {}
         if len(record) < self._regex_size:
             raise RecordRejectedError('Record length is less than expected', self._record)
         else:
@@ -28,7 +29,6 @@ class Record(object):
             self._attr_dict = self._build_attr_dict()
             self._check_regex_fields()
             self.format()
-            self.validate()
 
     @property
     def attr_dict(self):
@@ -52,6 +52,9 @@ class Record(object):
     def format(self):
         """ This method must give format to non string values """
         return
+
+    def validate_record(self):
+        self.validate()
 
     @abc.abstractmethod
     def validate(self):

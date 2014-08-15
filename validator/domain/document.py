@@ -35,13 +35,20 @@ from validator.domain.records.writer_territory_record import WriterTerritoryReco
 
 __author__ = 'Borja'
 
+import logging
+
 
 class Document(object):
+    NO_DETAIL_RECORDS = ['HDR', 'TRL', 'GRH', 'GRT', 'AGR', 'NWR', 'REV']
+
     def __init__(self, filename=None):
+        logging.basicConfig(filename='validator.log', filemode="w", level=logging.DEBUG)
+
         self._name = filename
         self._last_group = None
         self._last_record_type = None
         self._last_transaction = None
+        self._last_record = None
 
         self._transmission_header = None
         self._transmission_trailer = None
@@ -50,15 +57,20 @@ class Document(object):
 
         self._transactions = {}
         self._records = {}
-        self._errors = {}
+        self._transaction_errors = {}
+        self._record_errors = {}
 
         self._groups_number = 0
         self._transactions_number = 0
         self._records_number = 0
 
+        self._rejected = False
+        self._rejected_reason = None
+
     def add_record(self, record=None):
         record_utf8 = record.encode('utf-8')
         record_type = record_utf8[0:3]
+        record_number = None
         self._records_number += 1
 
         if self._last_record_type == 'GRT' and record_type not in ['GRH', 'TRL']:
@@ -77,76 +89,111 @@ class Document(object):
                 self._add_group_header_record(record_utf8)
             elif record_type == 'GRT':
                 self._add_group_trailer_record(record_utf8)
-            elif record_type == 'AGR':
-                self._add_agreement_record(record_utf8)
-            elif record_type in ['NWR', 'REV']:
-                self._add_registration_record(record_utf8)
-            elif record_type == 'TER':
-                self._add_territory_record(record_utf8)
-            elif record_type == 'IPA':
-                self._add_ipa_record(record_utf8)
-            elif record_type == 'NPA':
-                self._add_npa_record(record_utf8)
-            elif record_type in ['SPU', 'OPU']:
-                self._add_publisher_record(record_utf8)
-            elif record_type == 'NPN':
-                self._add_npn_record(record_utf8)
-            elif record_type == 'SPT':
-                self._add_publisher_territory_record(record_utf8)
-            elif record_type in ['SWR', 'OWR']:
-                self._add_writer_control_record(record_utf8)
-            elif record_type == 'NWN':
-                self._add_nwn_record(record_utf8)
-            elif record_type == 'SWT':
-                self._add_writer_territory_record(record_utf8)
-            elif record_type == 'PWR':
-                self._add_agent_record(record_utf8)
-            elif record_type == 'ALT':
-                self._add_alternative_title_record(record_utf8)
-            elif record_type == 'NAT':
-                self._add_nat_record(record_utf8)
-            elif record_type == 'EWT':
-                self._add_entire_title_record(record_utf8)
-            elif record_type == 'VER':
-                self._add_original_title_record(record_utf8)
-            elif record_type == 'PER':
-                self._add_performing_artist_record(record_utf8)
-            elif record_type == 'NPR':
-                self._add_npr_record(record_utf8)
-            elif record_type == 'REC':
-                self._add_recording_detail_record(record_utf8)
-            elif record_type == 'ORN':
-                self._add_work_origin_record(record_utf8)
-            elif record_type == 'INS':
-                self._add_instrumentation_summary_record(record_utf8)
-            elif record_type == 'IND':
-                self._add_instrumentation_detail_record(record_utf8)
-            elif record_type == 'COM':
-                self._add_component_record(record_utf8)
-            elif record_type in ['NWT', 'NCT', 'NVT']:
-                self._add_nr_title_record(record_utf8)
-            elif record_type == 'NOW':
-                self._add_now_record(record_utf8)
-            elif record_type == 'ARI':
-                self._add_additional_info_record(record_utf8)
             else:
-                raise FileRejectedError('Not a valid transaction or detail record type', record, 'Record type')
+                record_number = int(record_utf8[3:11])
+                self._last_group.inc_transactions()
+                if record_type == 'AGR':
+                    self._add_agreement_record(record_utf8)
+                elif record_type in ['NWR', 'REV']:
+                    self._add_registration_record(record_utf8)
+                else:
+                    self._last_group.inc_records()
+                    if record_type == 'TER':
+                        self._add_territory_record(record_utf8)
+                    elif record_type == 'IPA':
+                        self._add_ipa_record(record_utf8)
+                    elif record_type == 'NPA':
+                        self._add_npa_record(record_utf8)
+                    elif record_type in ['SPU', 'OPU']:
+                        self._add_publisher_record(record_utf8)
+                    elif record_type == 'NPN':
+                        self._add_npn_record(record_utf8)
+                    elif record_type == 'SPT':
+                        self._add_publisher_territory_record(record_utf8)
+                    elif record_type in ['SWR', 'OWR']:
+                        self._add_writer_control_record(record_utf8)
+                    elif record_type == 'NWN':
+                        self._add_nwn_record(record_utf8)
+                    elif record_type == 'SWT':
+                        self._add_writer_territory_record(record_utf8)
+                    elif record_type == 'PWR':
+                        self._add_agent_record(record_utf8)
+                    elif record_type == 'ALT':
+                        self._add_alternative_title_record(record_utf8)
+                    elif record_type == 'NAT':
+                        self._add_nat_record(record_utf8)
+                    elif record_type == 'EWT':
+                        self._add_entire_title_record(record_utf8)
+                    elif record_type == 'VER':
+                        self._add_original_title_record(record_utf8)
+                    elif record_type == 'PER':
+                        self._add_performing_artist_record(record_utf8)
+                    elif record_type == 'NPR':
+                        self._add_npr_record(record_utf8)
+                    elif record_type == 'REC':
+                        self._add_recording_detail_record(record_utf8)
+                    elif record_type == 'ORN':
+                        self._add_work_origin_record(record_utf8)
+                    elif record_type == 'INS':
+                        self._add_instrumentation_summary_record(record_utf8)
+                    elif record_type == 'IND':
+                        self._add_instrumentation_detail_record(record_utf8)
+                    elif record_type == 'COM':
+                        self._add_component_record(record_utf8)
+                    elif record_type in ['NWT', 'NCT', 'NVT']:
+                        self._add_nr_title_record(record_utf8)
+                    elif record_type == 'NOW':
+                        self._add_now_record(record_utf8)
+                    elif record_type == 'ARI':
+                        self._add_additional_info_record(record_utf8)
+                    else:
+                        raise FileRejectedError('Not a valid transaction or detail record type', record, 'Record type')
 
+                    self._records[record_number] = self._last_record
+
+            self._last_record.validate_record()
             self._last_record_type = record_type
+
         except RecordRejectedError as error:
-            pass
+            self._reject_record(record_number, record_type, error)
         except TransactionRejectedError as error:
-            pass
+            self._reject_transaction(record_number, record_type, error)
+        except GroupRejectedError:
+            self._reject_group(record_type)
+
+        logging.debug(record)
+        logging.debug("Transactions {},  Records {}".format(len(self._transactions), len(self._records)))
+
+    def _reject_group(self, record_type):
+        self._last_group._rejected = True
+        self._last_record_type = record_type
+
+    def _reject_transaction(self, record_number, record_type, error):
+        self._reject_record(record_number, record_type, error)
+        self._last_transaction._rejected = True
+        self.transactions[
+            self._last_transaction.attr_dict['Record prefix'].transaction_number] = self._last_transaction
+        self._transaction_errors[self._last_transaction.attr_dict['Record prefix'].transaction_number] = error
+
+    def _reject_record(self, record_number, record_type, error):
+        self._last_record._rejected = True
+        self._last_record_type = record_type
+
+        if record_type not in self.NO_DETAIL_RECORDS:
+            logging.warning("{}".format(error))
+            self._records[record_number] = self._last_record
+            self._record_errors[record_number] = error
 
     def _add_transmission_header(self, record):
         if self._transmission_header is not None:
             raise FileRejectedError('Expected only one transmission header')
 
-        if self._last_record_type is not None or len(self._errors) != 0:
+        if self._last_record_type is not None or len(self._record_errors) != 0:
             raise FileRejectedError('Transmission header expected to be the first record of the document',
                                     record, None)
 
         self._transmission_header = TransmissionHeaderRecord(record)
+        self._last_record = self._transmission_header
 
     def _add_transmission_trailer(self, record):
         if self._transmission_trailer is not None:
@@ -159,51 +206,56 @@ class Document(object):
         elif self._transmission_trailer.attr_dict['Transaction count'] != self._transactions_number:
             raise FileRejectedError('Number of transactions does not correspond with the processed ones {}'.format(
                 self._transactions_number), self._transmission_trailer, 'Transaction count')
-        elif self._transmission_trailer.attr_dict['Records count'] != self._records_number:
+        elif self._transmission_trailer.attr_dict['Record count'] != self._records_number:
             raise FileRejectedError('Number of records does not correspond with the processed ones {}'.format(
                 self._records_number), self._transmission_trailer, 'Transaction count')
 
-    def _add_group_header_record(self, record):
-        self._groups_number += 1
+        self._last_record = self._transmission_trailer
 
+    def _add_group_header_record(self, record):
+        if self._last_group is not None:
+            self._groups[self._last_group.attr_dict['Group ID']] = self._last_group
+            self._group_types[self._last_group.attr_dict['Transaction type']] = self._last_group
+
+        self._groups_number += 1
         group = GroupHeaderRecord(record)
+
         if self._last_record_type == 'HDR' and self._records_number != 2:
             raise FileRejectedError('Group header expected to be the second record of the document', group)
-        elif self._last_record_type != 'GRT' and self._records_number != 2:
+        elif self._last_record_type != 'GRT' and self._records_number > 2:
             raise FileRejectedError('Subsequents group header expected to be preceded by group trailers', group)
 
-        if self._last_group is not None:
+        if self._last_group is not None and self._last_group.trailer is None:
             raise FileRejectedError('Group header encountered within another group', group)
 
+        self._last_group = group
+        self._last_record = group
         if group.attr_dict['Transaction type'] in self._group_types.keys():
             raise GroupRejectedError(group, 'Multiple groups for same transaction type', group, 'Transaction type')
         elif group.attr_dict['Group ID'] in self._groups.keys():
             raise GroupRejectedError(group, 'Multiple groups with same ID', group, 'Group ID')
         elif len(self._groups) + 1 != group.attr_dict['Group ID']:
             raise GroupRejectedError('Group ID must start in one and be incremented by one', group, 'Group ID')
-        else:
-            self._last_group = group
 
     def _add_group_trailer_record(self, record):
         trailer = GroupTrailerRecord(record)
+        self._last_record = trailer
+
+        self._last_group.add_trailer(trailer)
+
         if trailer.attr_dict['Group ID'] != self._last_group.attr_dict['Group ID']:
             raise GroupRejectedError(self._last_group, 'Group trailer does not match the previous header ID',
                                      trailer, 'Group ID')
-        elif trailer.attr_dict['Transaction count'] != len(self._last_group.transactions()):
+        elif trailer.attr_dict['Transaction count'] != len(self._last_group.transactions):
             raise GroupRejectedError(self._last_group,
                                      'Transaction count does not match the number of transactions: {}'.format(
-                                         len(self._last_group.transactions())),
+                                         len(self._last_group.transactions)),
                                      trailer)
-        elif trailer.attr_dict['Record count'] != self._last_group.get_records_count():
+        elif trailer.attr_dict['Record count'] != self._last_group.records_number:
             raise GroupRejectedError(self._last_group,
                                      'Record count does not match the number of records: {}'.format(
-                                         self._last_group.get_records_count()),
+                                         self._last_group.records_number),
                                      trailer)
-        else:
-            self._last_group.add_trailer(trailer)
-            self._groups[trailer.attr_dict['Group ID']] = self._last_group
-            self._group_types = self._last_group.attr_dict['Transaction type']
-            self._last_group = None
 
     def _add_transaction(self, transaction):
         if self._last_transaction is not None:
@@ -228,7 +280,9 @@ class Document(object):
             raise TransactionRejectedError('Transaction sequence must be incremented by one',
                                            transaction, 'Transaction sequence')
 
+        self._last_record = transaction
         self._last_transaction = transaction
+        self._last_group.add_transaction(transaction)
 
     def _add_agreement_record(self, record):
         self._transactions_number += 1
@@ -246,64 +300,69 @@ class Document(object):
         if self._last_record_type == 'GRT':
             raise FileRejectedError('Expected a transaction to follow a group header record', record)
 
-        if record.attr_dict['Record prefix'].transaction_number not in self._transactions.keys():
+        if record.attr_dict['Record prefix'].transaction_number != self._last_transaction.attr_dict[
+                'Record prefix'].transaction_number:
             raise RecordRejectedError('Record transaction number is not found', record, 'Transaction number')
 
-        transaction = self._transactions[record.attr_dict['Record prefix'].transaction_number]
-
         if record.attr_dict['Record prefix'].record_number not in self._records.keys() \
-                and record.attr_dict['Record prefix'].record_number not in self._errors.keys():
-            transaction.add_record(record)
+                and record.attr_dict['Record prefix'].record_number not in self._record_errors.keys():
+            self._last_transaction.add_record(record)
             self._records[record.attr_dict['Record prefix'].record_number] = record
         else:
             raise RecordRejectedError('Duplicated value', record, 'Record number')
 
     def _add_territory_record(self, record):
-        territory = TerritoryRecord(record, self._last_transaction)
+        self._last_record = TerritoryRecord(record, self._last_transaction)
         if self._last_record_type not in ['AGR', 'TER']:
-            raise TransactionRejectedError(self._last_transaction, 'TER records expected after AGR or TER', territory)
+            raise TransactionRejectedError(self._last_transaction, 'TER records expected after AGR or TER',
+                                           self._last_record)
 
-        self._add_record_to_transaction(territory)
+        self._add_record_to_transaction(self._last_record)
 
     def _add_ipa_record(self, record):
-        ipa = InterestedPartyRecord(record, self._last_transaction)
+        self._last_record = InterestedPartyRecord(record, self._last_transaction)
         if self._last_record_type not in ['TER', 'IPA']:
-            raise TransactionRejectedError(self._last_transaction, 'IPA records expected after TER or IPA', ipa)
+            raise TransactionRejectedError(self._last_transaction, 'IPA records expected after TER or IPA',
+                                           self._last_record)
 
-        self._add_record_to_transaction(ipa)
+        self._add_record_to_transaction(self._last_record)
 
     def _add_npa_record(self, record):
-        npa = NRAgreementPartyNameRecord(record, self._last_transaction)
+        self._last_record = NRAgreementPartyNameRecord(record, self._last_transaction)
         if self._last_record_type != 'IPA' \
-                and self._get_last_record(npa).attr_dict['Interested party ID'] != npa.attr_dict['Interested party ID']:
-            raise RecordRejectedError('NPA must follow an IPA record and share the Interested party ID', npa)
+                and self._get_last_record(self._last_record).attr_dict['Interested party ID'] != \
+                self._last_record.attr_dict['Interested party ID']:
+            raise RecordRejectedError('NPA must follow an IPA record and share the Interested party ID',
+                                      self._last_record)
 
-        self._add_record_to_transaction(npa)
+        self._add_record_to_transaction(self._last_record)
 
     def _add_publisher_record(self, record):
-        publisher = PublisherControlRecord(record, self._last_transaction)
+        self._last_record = PublisherControlRecord(record, self._last_transaction)
 
-        self._add_record_to_transaction(publisher)
+        self._add_record_to_transaction(self._last_record)
 
     def _add_npn_record(self, record):
-        npn = NRPublisherNameRecord(record, self._last_transaction)
+        self._last_record = NRPublisherNameRecord(record, self._last_transaction)
         if self._last_record_type != 'SPU' \
-                and self._get_last_record(npn).attr_dict['Interested party ID'] != npn.attr_dict['Interested party ID']:
+                and self._get_last_record(self._last_record).attr_dict['Interested party ID'] != \
+                self._last_record.attr_dict['Interested party ID']:
             raise RecordRejectedError('NPN must follow a SPU record and share the Interested party ID', record)
 
-        self._add_record_to_transaction(npn)
+        self._add_record_to_transaction(self._last_record)
 
     def _add_publisher_territory_record(self, record):
-        territory = PublisherTerritoryRecord(record, self._last_transaction)
+        self._last_record = PublisherTerritoryRecord(record, self._last_transaction)
         if self._last_record_type not in ['SPU', 'SPT']:
-            raise TransactionRejectedError(self._last_transaction, 'SPT must follow a SPU or SPT record', territory)
+            raise TransactionRejectedError(self._last_transaction, 'SPT must follow a SPU or SPT record',
+                                           self._last_record)
 
         count = 1
         publisher = None
-        while territory.attr_dict['Record prefix'].record_number - count in self._records.keys() or \
-                territory.attr_dict['Record prefix'].record_number - count in self._errors.keys():
-            if territory.attr_dict['Record prefix'].record_number - count not in self._errors.keys():
-                publisher = self._records.get(territory.attr_dict['Record prefix'].record_number - count, None)
+        while self._last_record.attr_dict['Record prefix'].record_number - count in self._records.keys() or \
+                self._last_record.attr_dict['Record prefix'].record_number - count in self._record_errors.keys():
+            if self._last_record.attr_dict['Record prefix'].record_number - count not in self._record_errors.keys():
+                publisher = self._records.get(self._last_record.attr_dict['Record prefix'].record_number - count, None)
 
                 if publisher is not None and publisher.attr_dict['Record prefix'].record_type == 'SPU':
                     break
@@ -311,71 +370,72 @@ class Document(object):
                     publisher = None
                     count += 1
             else:
-                raise RecordRejectedError('Previous record was incorrect', territory)
+                raise RecordRejectedError('Previous record was incorrect', self._last_record)
 
         if publisher is None:
             raise TransactionRejectedError(self._last_transaction, 'Expected publisher for SPT record')
 
         if publisher is not None \
-                and publisher.attr_dict['Interested party ID'] != territory.attr_dict['Interested party ID']:
+                and publisher.attr_dict['Interested party ID'] != self._last_record.attr_dict['Interested party ID']:
             raise TransactionRejectedError(self._last_transaction,
                                            'Preceding SPU record to SPT must share interested party ID')
 
-        self._add_record_to_transaction(territory)
+        self._add_record_to_transaction(self._last_record)
 
     def _add_writer_control_record(self, record):
-        writer = WriterControlRecord(record, self._last_transaction)
-        self._add_record_to_transaction(writer)
+        self._last_record = WriterControlRecord(record, self._last_transaction)
+        self._add_record_to_transaction(self._last_record)
 
     def _add_nwn_record(self, record):
-        nwn = NRWriterNameRecord(record, self._last_transaction)
+        self._last_record = NRWriterNameRecord(record, self._last_transaction)
         if self._last_record_type != 'SWR' \
-                and self._get_last_record(nwn).attr_dict['Interested party ID'] != nwn.attr_dict['Interested party ID']:
-            raise RecordRejectedError('NWN must follow a SWR record and share the Interested party ID', nwn,
-                                      'Interested party ID')
+                and self._get_last_record(self._last_record).attr_dict['Interested party ID'] != \
+                self._last_record.attr_dict['Interested party ID']:
+            raise RecordRejectedError('NWN must follow a SWR record and share the Interested party ID',
+                                      self._last_record, 'Interested party ID')
 
-        self._add_record_to_transaction(nwn)
+        self._add_record_to_transaction(self._last_record)
 
     def _add_writer_territory_record(self, record):
-        territory = WriterTerritoryRecord(record, self._last_transaction)
+        self._last_record = WriterTerritoryRecord(record, self._last_transaction)
         if self._last_record_type not in ['SWR', 'SWT']:
             raise TransactionRejectedError(self._last_transaction, 'SWT must follow a SWR or SWT record')
 
         count = 1
         writer = None
-        while territory.attr_dict['Record prefix'].record_number - count in self._records.keys() or \
-                territory.attr_dict['Record prefix'].record_number - count in self._errors.keys():
-            if territory.attr_dict['Record prefix'].record_number - count not in self._errors.keys():
-                writer = self._records[territory.attr_dict['Record prefix'].record_number - count]
+        while self._last_record.attr_dict['Record prefix'].record_number - count in self._records.keys() or \
+                self._last_record.attr_dict['Record prefix'].record_number - count in self._record_errors.keys():
+            if self._last_record.attr_dict['Record prefix'].record_number - count not in self._record_errors.keys():
+                writer = self._records[self._last_record.attr_dict['Record prefix'].record_number - count]
                 if writer.attr_dict['Record prefix'].record_type == 'SWR':
                     break
                 else:
                     writer = None
                     count += 1
             else:
-                raise RecordRejectedError('Previous record was incorrect', territory)
+                raise RecordRejectedError('Previous record was incorrect', self._last_record)
 
         if writer is None:
-            raise TransactionRejectedError(self._last_transaction, 'Expected writer for SWT record', territory)
+            raise TransactionRejectedError(self._last_transaction, 'Expected writer for SWT record', self._last_record)
 
-        if writer.attr_dict['Interested party ID'] != territory.attr_dict['Interested party ID']:
+        if writer.attr_dict['Interested party ID'] != self._last_record.attr_dict['Interested party ID']:
             raise TransactionRejectedError(self._last_transaction, 'Preceding SWR must share interested party ID',
-                                           territory, 'Interested party ID')
+                                           self._last_record, 'Interested party ID')
 
-        self._add_record_to_transaction(territory)
+        self._add_record_to_transaction(self._last_record)
 
     def _add_agent_record(self, record):
-        agent = WriterAgentRecord(record, self._last_transaction)
+        self._last_record = WriterAgentRecord(record, self._last_transaction)
         if self._last_record_type not in ['SWR', 'SWT', 'PWR']:
-            raise RecordRejectedError('PWR must follow a SWR or SWT or PWR record', agent)
+            raise RecordRejectedError('PWR must follow a SWR or SWT or PWR record', self._last_record)
 
         writer = None
         publisher = None
         count = 1
-        while agent.attr_dict['Record prefix'].record_number - count in self._records.keys() or \
-                agent.attr_dict['Record prefix'].record_number - count in self._errors.keys():
-            if agent.attr_dict['Record prefix'].record_number - count not in self._errors.keys():
-                ipa = self._records[agent.attr_dict['Record prefix'].record_number - count]
+        while self._last_record.attr_dict['Record prefix'].record_number - count in self._records.keys() or \
+                self._last_record.attr_dict['Record prefix'].record_number - count in self._record_errors.keys():
+            if self._last_record.attr_dict['Record prefix'].record_number - count not in self._record_errors.keys():
+                ipa = self._records[self._last_record.attr_dict['Record prefix'].record_number - count]
                 if ipa.attr_dict['Record prefix'].record_type == 'SWR':
                     writer = ipa
                 elif ipa.attr_dict['Record prefix'].record_type == 'SPU':
@@ -385,72 +445,72 @@ class Document(object):
                 if writer is not None and publisher is not None:
                     break
             else:
-                raise RecordRejectedError('Previous record was incorrect', agent)
+                raise RecordRejectedError('Previous record was incorrect', self._last_record)
 
         if publisher is None or writer is None:
-            raise RecordRejectedError('Writer and publisher must be known for a PWT record', agent)
+            raise RecordRejectedError('Writer and publisher must be known for a PWT record', self._last_record)
 
         if publisher is not None \
-                and publisher.attr_dict['Interested party ID'] != agent.attr_dict['Publisher IP ID']:
-            raise RecordRejectedError('PWR publisher ID must match preceding SPU record IP ID', agent,
+                and publisher.attr_dict['Interested party ID'] != self._last_record.attr_dict['Publisher IP ID']:
+            raise RecordRejectedError('PWR publisher ID must match preceding SPU record IP ID', self._last_record,
                                       'Interested party ID')
 
         if writer is not None \
-                and writer.attr_dict['Interested party ID'] != agent.attr_dict['Writer IP ID']:
-            raise RecordRejectedError('PWR publisher ID must match preceding SWR record IP ID', agent,
+                and writer.attr_dict['Interested party ID'] != self._last_record.attr_dict['Writer IP ID']:
+            raise RecordRejectedError('PWR publisher ID must match preceding SWR record IP ID', self._last_record,
                                       'Interested party ID')
 
-        self._add_record_to_transaction(agent)
+        self._add_record_to_transaction(self._last_record)
 
     def _add_alternative_title_record(self, record):
-        title = WorkAlternativeTitleRecord(record, self._last_transaction)
-        self._add_record_to_transaction(title)
+        self._last_record = WorkAlternativeTitleRecord(record, self._last_transaction)
+        self._add_record_to_transaction(self._last_record)
 
     def _add_nat_record(self, record):
-        title = NRWorkTitleRecord(record, self._last_transaction)
-        self._add_record_to_transaction(title)
+        self._last_record = NRWorkTitleRecord(record, self._last_transaction)
+        self._add_record_to_transaction(self._last_record)
 
     def _add_entire_title_record(self, record):
-        title = WorkExcerptTitle(record, self._last_transaction)
-        self._add_record_to_transaction(title)
+        self._last_record = WorkExcerptTitle(record, self._last_transaction)
+        self._add_record_to_transaction(self._last_record)
 
     def _add_original_title_record(self, record):
-        title = WorkVersionTitle(record, self._last_transaction)
-        self._add_record_to_transaction(title)
+        self._last_record = WorkVersionTitle(record, self._last_transaction)
+        self._add_record_to_transaction(self._last_record)
 
     def _add_performing_artist_record(self, record):
-        artist = PerformingArtistRecord(record, self._last_transaction)
-        self._add_record_to_transaction(artist)
+        self._last_record = PerformingArtistRecord(record, self._last_transaction)
+        self._add_record_to_transaction(self._last_record)
 
     def _add_npr_record(self, record):
-        performance = NRPerformanceDataRecord(record, self._last_transaction)
-        self._add_record_to_transaction(performance)
+        self._last_record = NRPerformanceDataRecord(record, self._last_transaction)
+        self._add_record_to_transaction(self._last_record)
 
     def _add_recording_detail_record(self, record):
-        detail = RecordingDetailRecord(record, self._last_transaction)
-        self._add_record_to_transaction(detail)
+        self._last_record = RecordingDetailRecord(record, self._last_transaction)
+        self._add_record_to_transaction(self._last_record)
 
     def _add_work_origin_record(self, record):
-        work = WorkOriginRecord(record, self._last_transaction)
-        self._add_record_to_transaction(work)
+        self._last_record = WorkOriginRecord(record, self._last_transaction)
+        self._add_record_to_transaction(self._last_record)
 
     def _add_instrumentation_summary_record(self, record):
-        summary = InstrumentationSummaryRecord(record, self._last_transaction)
-        self._add_record_to_transaction(summary)
+        self._last_record = InstrumentationSummaryRecord(record, self._last_transaction)
+        self._add_record_to_transaction(self._last_record)
 
     def _add_instrumentation_detail_record(self, record):
-        detail = InstrumentationDetailRecord(record, self._last_transaction)
+        self._last_record = InstrumentationDetailRecord(record, self._last_transaction)
         if self._last_record_type not in ['INS', 'IND']:
             raise RecordRejectedError('IND record type must follow an INS or IND record', record)
 
-        self._add_record_to_transaction(detail)
+        self._add_record_to_transaction(self._last_record)
 
     def _add_component_record(self, record):
-        component = WorkCompositeRecord(record, self._last_transaction)
-        self._add_record_to_transaction(component)
+        self._last_record = WorkCompositeRecord(record, self._last_transaction)
+        self._add_record_to_transaction(self._last_record)
 
     def _add_nr_title_record(self, record):
-        title = NRSpecialTitleRecord(record, self._last_transaction)
+        self._last_record = NRSpecialTitleRecord(record, self._last_transaction)
         record_type = record[0:3]
         if record_type == 'NET' and self._last_record_type != 'EWT':
             raise RecordRejectedError('NET record type must follow an EWT record', record)
@@ -459,20 +519,20 @@ class Document(object):
         if record_type == 'NVT' and self._last_record_type != 'VET':
             raise RecordRejectedError('NVT record type must follow a VER record', record)
 
-        self._add_record_to_transaction(title)
+        self._add_record_to_transaction(self._last_record)
 
     def _add_now_record(self, record):
-        writer = NROtherWriterRecord(record, self._last_transaction)
+        self._last_record = NROtherWriterRecord(record, self._last_transaction)
         if self._last_record_type not in ['EWT', 'VER', 'COM', 'NET', 'NCT', 'NVT']:
             raise RecordRejectedError('NOW record type must follow an {} record'.format(
                 'or'.join(['EWT', 'VER', 'COM', 'NET', 'NCT', 'NVT'])), record)
 
-        self._add_record_to_transaction(writer)
+        self._add_record_to_transaction(self._last_record)
 
     def _add_additional_info_record(self, record):
-        info = WorkAdditionalInfoRecord(record, self._last_transaction)
+        self._last_record = WorkAdditionalInfoRecord(record, self._last_transaction)
 
-        self._add_record_to_transaction(info)
+        self._add_record_to_transaction(self._last_record)
 
     def _get_last_record(self, record):
         return self._records[record.attr_dict['Record prefix'].record_number - 1]
@@ -483,9 +543,13 @@ class Document(object):
         if self._transmission_trailer is None:
             raise FileRejectedError('expected to have at least one transmission trailer')
 
+    def reject(self, error):
+        self._rejected = True
+        self._rejected_reason = error
+
     @property
     def errors(self):
-        return self._errors
+        return self._record_errors
 
     @property
     def transactions(self):

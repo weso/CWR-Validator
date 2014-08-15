@@ -23,7 +23,8 @@ class NRAgreementPartyNameRecord(DetailHeader):
 
     def validate(self):
         if self.attr_dict['Language code'] is not None and self.attr_dict['Language code'] not in LANGUAGE_CODES:
-            raise FieldRejectedError('Given language code not in table', self._record, 'Language code')
+            self._rejected_fields['Language code'] = FieldRejectedError('Given language code not in table',
+                                                                        self._record, 'Language code')
 
     def _validate_field(self, field_name):
         if field_name == 'Interested party name':

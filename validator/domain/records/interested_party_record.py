@@ -47,9 +47,9 @@ class InterestedPartyRecord(DetailHeader):
 
         if self.attr_dict['Interested party writer first name'] is not None:
             if self.attr_dict['Agreement role code'] != 'AS' or \
-                    self._transaction.attr_dict['Agreement role code'] not in ['OS', 'OG']:
-                raise FieldRejectedError('Not expected writer first name', self._record,
-                                         'Interested party writer first name')
+                    self._transaction.attr_dict['Agreement type'] not in ['OS', 'OG']:
+                self._rejected_fields['Interested party writer first name'] = FieldRejectedError(
+                    'Not expected writer first name', self._record, 'Interested party writer first name')
 
         if self.attr_dict['PR affiliation society'] is not None and \
                 self.attr_dict['PR affiliation society'] not in SOCIETY_CODES:

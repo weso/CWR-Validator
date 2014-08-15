@@ -26,11 +26,13 @@ class NROtherWriterRecord(DetailHeader):
             raise RecordRejectedError('NOW record type expected', self._record)
 
         if self.attr_dict['Language code'] is not None and self.attr_dict['Language code'] not in LANGUAGE_CODES:
-            raise FieldRejectedError('Given language code not in table', self._record, 'Language code')
+            self._rejected_fields['Language code'] = FieldRejectedError('Given language code not in table',
+                                                                        self._record, 'Language code')
 
         if self.attr_dict['Writer position'] is not None and self.attr_dict['Writer position'] not in [1, 2]:
             self.attr_dict['Writer position'] = 1
-            raise FieldRejectedError('Given writer position must be 1 or 2', self._record, 'Writer position', 1)
+            self._rejected_fields['Writer position'] = FieldRejectedError('Given writer position must be 1 or 2',
+                                                                          self._record, 'Writer position', 1)
 
     def _validate_field(self, field_name):
         if field_name == 'Writer name':

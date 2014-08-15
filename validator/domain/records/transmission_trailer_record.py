@@ -19,3 +19,6 @@ class TransmissionTrailerRecord(Record):
 
     def validate(self):
         pass
+
+    def _validate_field(self, field_name):
+        pass

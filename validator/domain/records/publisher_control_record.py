@@ -70,8 +70,9 @@ class PublisherControlRecord(DetailHeader):
             if self.attr_dict['Publisher unknown indicator'] == 'Y' and \
                     self.attr_dict['Publisher name'] is not None:
                 self.attr_dict['Publisher unknown indicator'] = 'N'
-                raise FieldRejectedError('Expected blank publisher name for publisher unknown indicator Y', self._record,
-                                         'Publisher unknown indicator', 'N')
+                self._rejected_fields['Publisher unknown indicator'] = FieldRejectedError(
+                    'Expected blank publisher name for publisher unknown indicator Y', self._record,
+                    'Publisher unknown indicator', 'N')
             if self.attr_dict['Publisher type'] not in PUBLISHER_TYPES:
                 self.attr_dict['Publisher type'] = 'E'
 
@@ -119,12 +120,15 @@ class PublisherControlRecord(DetailHeader):
 
         if self.attr_dict['Agreement type'] is not None:
             if self.attr_dict['Agreement type'] not in AGREEMENT_TYPE_VALUES:
-                raise FieldRejectedError('Given agreement type not in table', self._record, 'Agreement type')
+                self._rejected_fields['Agreement type'] = FieldRejectedError('Given agreement type not in table',
+                                                                             self._record, 'Agreement type')
 
         if self.attr_dict['USA license indicator'] not in [None, 'A', 'B', 'S']:
-            raise FieldRejectedError('Given USA license indicator not in table', self._record, 'USA license indicator')
+            self._rejected_fields['USA license indicator'] = FieldRejectedError(
+                'Given USA license indicator not in table', self._record, 'USA license indicator')
 
     def _validate_field(self, field_name):
         if field_name == 'Publisher unknown indicator':
             self.attr_dict[field_name] = 'N'
-            raise FieldRejectedError('Expected valid boolean value', self._record, field_name, 'N')
+            self._rejected_fields[field_name] = FieldRejectedError('Expected valid boolean value', self._record,
+                                                                   field_name, 'N')

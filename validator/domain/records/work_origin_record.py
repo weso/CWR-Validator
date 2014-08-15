@@ -41,10 +41,10 @@ class WorkOriginRecord(DetailHeader):
         if self.attr_dict['CD identifier'] != self.attr_dict['Cut number']:
             self.attr_dict['CD identifier'] = None
             self.attr_dict['Cut number'] = None
-            raise FieldRejectedError('CD identifier and Cut number must be both blank or vice versa', self._record,
-                                     'CD identifier')
-            raise FieldRejectedError('CD identifier and Cut number must be both blank or vice versa', self._record,
-                                     'Cut number')
+            self._rejected_fields['CD identifier'] = FieldRejectedError(
+                'CD identifier and Cut number must be both blank or vice versa', self._record, 'CD identifier')
+            self._rejected_fields['Cut number'] = FieldRejectedError(
+                'CD identifier and Cut number must be both blank or vice versa', self._record, 'Cut number')
 
         if self.attr_dict['Intended purpose'] == 'LIB' and self.attr_dict['CD identifier'] is None:
                 raise RecordRejectedError('Expected CD identifier for LIB intended purpose', self._record,

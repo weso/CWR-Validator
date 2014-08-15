@@ -112,10 +112,10 @@ class AgreementRecord(TransactionHeader):
             raise TransactionRejectedError(self, 'Expected a valid status', self._record, field_name)
         if field_name == 'Date of signature agreement':
             self.attr_dict[field_name] = None
-            raise FieldRejectedError('Expected a valid date', self._record, field_name)
+            self._rejected_fields[field_name] = FieldRejectedError('Expected a valid date', self._record, field_name)
         if field_name in ['Shared change', 'Advance given']:
             self.attr_dict[field_name] = 'N'
-            raise FieldRejectedError('Expected a valid boolean value', self._record, field_name, 'N')
+            self._rejected_fields[field_name] = FieldRejectedError('Expected a valid boolean value', self._record, field_name, 'N')
 
     def validate_transaction(self):
         if 'TER' not in self._records.keys():

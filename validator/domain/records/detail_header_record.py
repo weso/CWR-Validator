@@ -10,9 +10,8 @@ class DetailHeader(Record):
     def __init__(self, record, transaction):
         if transaction is None:
             raise RecordRejectedError('Transaction must be valid', record)
-
-        super(DetailHeader, self).__init__(record)
         self._transaction = transaction
+        super(DetailHeader, self).__init__(record)
 
     @property
     def transaction(self):
