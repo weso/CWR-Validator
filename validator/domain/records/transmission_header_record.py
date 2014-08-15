@@ -6,8 +6,6 @@ from validator.cwr_utils.value_tables import SENDER_VALUES
 from validator.cwr_utils.value_tables import SOCIETY_CODES
 from validator.domain.records.record import Record
 
-from validator.domain.exceptions.field_validation_error import FieldValidationError
-
 
 class TransmissionHeaderRecord(Record):
     FIELD_NAMES = ['Record type', 'Sender type', 'Sender ID', 'Sender name', 'EDI Standard version number',

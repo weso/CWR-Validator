@@ -4,7 +4,7 @@ from validator.domain.records.detail_header_record import DetailHeader
 from validator.domain.values.record_prefix import RecordPrefix
 
 __author__ = 'Borja'
-from barcode.ean import EAN13
+# from barcode.ean import EAN13
 
 from validator.cwr_utils import regex
 from validator.cwr_utils.value_tables import MEDIA_TYPES
@@ -35,26 +35,29 @@ class RecordingDetailRecord(DetailHeader):
         if self.attr_dict['Record prefix'].record_type != 'REC':
             raise RecordRejectedError('SRC record type expected', self._record)
 
-        if self.attr_dict['EAN'] is not None:
+        '''if self.attr_dict['EAN'] is not None:
             try:
                 EAN13(self.attr_dict['EAN']).to_ascii()
             except ValueError as msg:
                 self.attr_dict['EAN'] = None
-                raise FieldRejectedError(msg, self._record, 'EAN')
+                self._rejected_fields['EAN'] = FieldRejectedError(msg, self._record, 'EAN')'''
 
         if self.attr_dict['Recording format'] is not None and \
                 self.attr_dict['Recording format'] not in RECORDING_FORMAT:
             self.attr_dict['Recording format'] = 'A'
-            raise FieldRejectedError('Given recording format not in table', self._record, 'Recording format', 'A')
+            self._rejected_fields['Recording format'] = FieldRejectedError('Given recording format not in table',
+                                                                           self._record, 'Recording format', 'A')
 
         if self.attr_dict['Recording technique'] is not None and \
                 self.attr_dict['Recording technique'] not in RECORDING_TECHNIQUE:
             self.attr_dict['Recording technique'] = 'U'
-            raise FieldRejectedError('Given recording technique not in table', self._record, 'Recording technique', 'U')
+            self._rejected_fields['Recording technique'] = FieldRejectedError('Given recording technique not in table',
+                                                                              self._record, 'Recording technique', 'U')
 
         if self.attr_dict['Media type'] is not None and self.attr_dict['Media type'] not in MEDIA_TYPES:
             self.attr_dict['Media type'] = None
-            raise FieldRejectedError('Given media type not in table', self._record, 'Media type')
+            self._rejected_fields['Media type'] = FieldRejectedError('Given media type not in table', self._record,
+                                                                     'Media type')
 
     def _validate_field(self, field_name):
         pass

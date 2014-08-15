@@ -33,10 +33,10 @@ class WorkCompositeRecord(DetailHeader):
         if self.attr_dict['Writer two first name'] is not None and self.attr_dict['Writer two last name'] is None:
             self.attr_dict['Writer two first name'] = None
             self.attr_dict['Writer two last name'] = None
-            raise FieldRejectedError('Expected writer two last name as first name is entered', self._record,
-                                     'Writer two first name')
-            raise FieldRejectedError('Expected writer two last name as first name is entered', self._record,
-                                     'Writer two last name')
+            self._rejected_fields['Writer two first name'] = FieldRejectedError(
+                'Expected writer two last name as first name is entered', self._record, 'Writer two first name')
+            self._rejected_fields['Writer two last name'] = FieldRejectedError(
+                'Expected writer two last name as first name is entered', self._record, 'Writer two last name')
 
     def _validate_field(self, field_name):
         if field_name == 'Title':

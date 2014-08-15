@@ -27,7 +27,8 @@ class NRWorkTitleRecord(DetailHeader):
 
         if self.attr_dict['Title type'] not in TITLE_TYPES:
             self.attr_dict['Title type'] = 'AT'
-            raise FieldRejectedError('Title type not in table', self._record, 'Title type', 'AT')
+            self._rejected_fields['Title type'] = FieldRejectedError('Title type not in table', self._record,
+                                                                     'Title type', 'AT')
 
         if self.attr_dict['Language code'] is not None and self.attr_dict['Language code'] not in LANGUAGE_CODES:
             raise RecordRejectedError('Given language code not in table', self._record, 'Language code')

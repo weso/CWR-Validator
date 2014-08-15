@@ -30,12 +30,14 @@ class NRPerformanceDataRecord(DetailHeader):
 
         if self.attr_dict['Language code'] is not None and self.attr_dict['Language code'] not in LANGUAGE_CODES:
             self.attr_dict['Language code'] = None
-            raise FieldRejectedError('Given language code not in table', self._record, 'Language code')
+            self._rejected_fields['Language code'] = FieldRejectedError('Given language code not in table',
+                                                                        self._record, 'Language code')
 
         if self.attr_dict['Performance language'] is not None and \
                 self.attr_dict['Performance language'] not in LANGUAGE_CODES:
             self.attr_dict['Performance language'] = None
-            raise FieldRejectedError('Given language code not in table', self._record, 'Performance language')
+            self._rejected_fields['Performance language'] = FieldRejectedError('Given language code not in table',
+                                                                               self._record, 'Performance language')
 
         if self.attr_dict['Performing artist name'] is None and self.attr_dict['Performance language'] is None and \
                 self.attr_dict['Performance dialect'] is None:

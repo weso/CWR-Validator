@@ -28,3 +28,6 @@ class GroupTrailerRecord(Record):
             if self.attr_dict['Currency indicator'] not in CURRENCY_VALUES:
                 raise GroupRejectedError(self._record,
                                          'Expected currency indicator', self._record, 'Currency indicator')
+
+    def _validate_field(self, field_name):
+        pass

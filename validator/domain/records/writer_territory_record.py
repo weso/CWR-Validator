@@ -63,6 +63,7 @@ class WriterTerritoryRecord(DetailHeader):
             raise TransactionRejectedError(self._transaction, 'Expected valid value', self._record, field_name)
         elif field_name == 'Shares change':
             self.attr_dict[field_name] = 'N'
-            raise FieldRejectedError('Expected valid boolean value', self._record, field_name, 'N')
+            self._rejected_fields[field_name] = FieldRejectedError('Expected valid boolean value', self._record,
+                                                                   field_name, 'N')
         elif field_name == 'Sequence number':
-            raise RecordRejectedError('Expected value', self._record, field_name)
+            self._rejected_fields[field_name] = RecordRejectedError('Expected value', self._record, field_name)

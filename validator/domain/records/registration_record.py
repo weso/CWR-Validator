@@ -68,23 +68,25 @@ class RegistrationRecord(TransactionHeader):
 
         if self.attr_dict['Text music relationship'] is not None and \
                 self.attr_dict['Text music relationship'] not in TEXT_MUSIC_TABLE:
-            raise FieldRejectedError('Given text music relationship not in table', self._record,
-                                     'Text music relationship')
+            self._rejected_fields['Text music relationship'] = FieldRejectedError(
+                'Given text music relationship not in table', self._record,'Text music relationship')
 
         if self.attr_dict['Composite type'] is not None:
             if self.attr_dict['Composite type'] not in COMPOSITE_TYPE:
-                raise FieldRejectedError('Given composite type not in table', self._record, 'Composite type')
+                self._rejected_fields['Composite type'] = FieldRejectedError('Given composite type not in table',
+                                                                             self._record, 'Composite type')
             if self.attr_dict['Composite component count'] is None or self.attr_dict['Composite component count'] <= 1:
                 raise TransactionRejectedError(self, 'Expected component count', self._record,
                                                'Composite component count')
-        elif self.attr_dict['Composite component count'] is not None:
+        elif self.attr_dict['Composite component count'] > 0:
             raise TransactionRejectedError(self, 'Expected composite type', self._record, 'Composite type')
 
         if self.attr_dict['Version type'] not in VERSION_TYPES:
             raise TransactionRejectedError(self, 'Given version type not in table', self._record, 'Version type')
 
         if self.attr_dict['Excerpt type'] is not None and self.attr_dict['Excerpt type'] not in EXCERPT_TYPE:
-            raise FieldRejectedError('Given excerpt type not in table', self._record, 'Excerpt type')
+            self._rejected_fields['Excerpt type'] = FieldRejectedError('Given excerpt type not in table', self._record,
+                                                                       'Excerpt type')
 
         if self.attr_dict['Version type'] == 'MOD':
             if self.attr_dict['Music arrangement'] is not None:
@@ -105,7 +107,8 @@ class RegistrationRecord(TransactionHeader):
 
         if self.attr_dict['CWR work type'] is not None and self.attr_dict['CWR work type'] not in WORK_TYPES:
             self.attr_dict['CWR work type'] = None
-            raise FieldRejectedError('Expected a valid number', self._record, 'CWR work type')
+            self._rejected_fields['CWR work type'] = FieldRejectedError('Expected a valid number', self._record,
+                                                                        'CWR work type')
 
     def add_record(self, record):
         if not isinstance(record, Record):
@@ -148,21 +151,21 @@ class RegistrationRecord(TransactionHeader):
             raise TransactionRejectedError(self, 'Work title must be entered', self._record, field_name)
         elif field_name in ['Copyright date', 'Date of publication of printed version']:
             self.attr_dict[field_name] = None
-            raise FieldRejectedError('Expected a valid date', self._record, field_name)
+            self._rejected_fields[field_name] = FieldRejectedError('Expected a valid date', self._record, field_name)
         elif field_name == 'ISWC':
             self.attr_dict[field_name] = None
-            raise FieldRejectedError('Expected a valid ISWC', self._record, field_name)
+            self._rejected_fields[field_name] = FieldRejectedError('Expected a valid ISWC', self._record, field_name)
         elif field_name == 'Duration':
             raise TransactionRejectedError('Expected a valid duration', self._record, field_name)
         elif field_name == 'Recorded indicator':
             self.attr_dict[field_name] = 'U'
-            raise FieldRejectedError('Expected a valid flag', self._record, field_name)
+            self._rejected_fields[field_name] = FieldRejectedError('Expected a valid flag', self._record, field_name)
         elif field_name == 'Grand rights':
             self.attr_dict[field_name] = None
-            raise FieldRejectedError('Expected a valid boolean', self._record, field_name)
+            self._rejected_fields[field_name] = FieldRejectedError('Expected a valid boolean', self._record, field_name)
         elif field_name == 'CWR work type':
             self.attr_dict[field_name] = None
-            raise FieldRejectedError('Expected a valid number', self._record, field_name)
+            self._rejected_fields[field_name] = FieldRejectedError('Expected a valid number', self._record, field_name)
 
     def validate_transaction(self):
         if self.attr_dict['Musical work distribution category'] == 'SER' and 'INS' not in self._records.keys():

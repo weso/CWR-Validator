@@ -101,4 +101,5 @@ class WriterControlRecord(DetailHeader):
 
     def _validate_field(self, field_name):
         if field_name in ['Reversionary indicator', 'First recording refusal indicator', 'Work for hire indicator']:
-            raise FieldRejectedError('Expected valid flag value', self._record, field_name)
+            self._rejected_fields[field_name] = FieldRejectedError('Expected valid flag value', self._record,
+                                                                   field_name)

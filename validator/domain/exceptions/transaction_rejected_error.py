@@ -12,7 +12,7 @@ class TransactionRejectedError(Exception):
 
     def __str__(self):
         if self.record is None and self.field is None:
-            error = '''Transaction {} has been ejected, cause is {}'''.format(self.transaction, self.error)
+            error = '''Transaction {} has been rejected, cause is {}'''.format(self.transaction, self.error)
         elif self.record is not None:
             error = '''The record: {} has caused the transaction {} to be rejected.
                        The cause is {}'''.format(self.record, self.transaction, self.error)

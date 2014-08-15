@@ -54,6 +54,10 @@ class GroupHeaderRecord(Record):
         self._records_number += 1
 
     @property
+    def trailer(self):
+        return self._trailer
+
+    @property
     def transactions(self):
         return self._transactions
 

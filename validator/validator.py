@@ -2,7 +2,6 @@ from __future__ import absolute_import
 import codecs
 from validator.domain.document import Document
 from validator.domain.exceptions.file_rejected_error import FileRejectedError
-from validator.domain.exceptions.regex_error import RegexError
 
 import re
 __author__ = 'Borja'
@@ -20,19 +19,19 @@ class Validator(object):
         if self._validate_name(file_name):
             self._validate_file(file_path, file_name)
         else:
-            raise RegexError('File name', self.NAME_REGEX, file_name)
+            raise FileRejectedError('File name does not validate', 'File name', file_name)
 
     def _validate_file(self, file_path, file_name):
+        self._document = Document(file_name)
         try:
-            self._document = Document(file_name)
             with codecs.open(file_path, encoding='utf-8') as file_utf8:
                 content = file_utf8.readlines()
 
             while content:
                 unicode_line = content.pop(0)
                 self._document.add_record(unicode_line)
-        except Exception:
-            raise FileRejectedError(file_name, 'Content', 'The file is unreadable')
+        except FileRejectedError as error:
+            self._document.reject(error)
 
     def _validate_name(self, file_name):
         if file_name is None:
@@ -42,7 +41,6 @@ class Validator(object):
         if not matcher.match(file_name.upper()):
             matcher = re.compile(self.PREV_VERSION_NAME_REGEX)
             if matcher.match(file_name.upper()):
-                print 'CWR file is in a previous file name convention'
                 return True
             return False
 
