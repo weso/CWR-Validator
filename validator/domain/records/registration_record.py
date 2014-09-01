@@ -49,6 +49,7 @@ class RegistrationRecord(TransactionHeader):
         self.format_time_value('Duration')
         self.format_integer_value('Composite component count')
         self.format_date_value('Date of publication of printed edition')
+        self.format_boolean_value('Grand rights indicator')
 
     def validate(self):
         if self.attr_dict['Record prefix'].record_type not in ['NWR', 'REV']:

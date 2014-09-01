@@ -86,6 +86,10 @@ class Record(object):
         return '^' + "".join(str(regex) for regex in self.FIELD_REGEX) + '$', \
                sum(regex.size for regex in self.FIELD_REGEX)
 
+    def format_boolean_value(self, field):
+        value = self._attr_dict[field]
+        self._attr_dict[field] = value == 'Y'
+
     def format_date_value(self, field):
         value = self._attr_dict[field]
         try:
@@ -129,4 +133,4 @@ class Record(object):
         return str(self._attr_dict)
 
     def __repr__(self):
-        return self
+        return self.__str__()

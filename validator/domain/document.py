@@ -196,6 +196,10 @@ class Document(object):
         self._last_record = self._transmission_header
 
     def _add_transmission_trailer(self, record):
+        if self._last_group is not None:
+            self._groups[self._last_group.attr_dict['Group ID']] = self._last_group
+            self._group_types[self._last_group.attr_dict['Transaction type']] = self._last_group.attr_dict['Group ID']
+
         if self._transmission_trailer is not None:
             raise FileRejectedError('Expected only one transmission trailer')
 
@@ -215,7 +219,7 @@ class Document(object):
     def _add_group_header_record(self, record):
         if self._last_group is not None:
             self._groups[self._last_group.attr_dict['Group ID']] = self._last_group
-            self._group_types[self._last_group.attr_dict['Transaction type']] = self._last_group
+            self._group_types[self._last_group.attr_dict['Transaction type']] = self._last_group.attr_dict['Group ID']
 
         self._groups_number += 1
         group = GroupHeaderRecord(record)

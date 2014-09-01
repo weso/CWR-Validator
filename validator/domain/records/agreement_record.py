@@ -39,6 +39,8 @@ class AgreementRecord(TransactionHeader):
         self.format_date_value('Post-term collection end date')
         self.format_date_value('Date of signature agreement')
         self.format_integer_value('Number of works')
+        self.format_boolean_value('Advance given')
+        self.format_boolean_value('Shares change')
 
     def validate(self):
         if self.attr_dict['Record prefix'].record_type != 'AGR':
