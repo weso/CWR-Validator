@@ -70,6 +70,7 @@
                     <dd> {{ document._transmission_trailer._record }} </dd>
                   </dl>
                   <p><a class="btn btn-primary disabled" role="button" href="#">Download generated response</a></p>
+                  <p><a class="btn btn-primary" role="button" href="/submit/{{ filename }}">Submit results</a></p>
                 </div>
                 <div class="tab-pane" id="agreements">
                   {% for transaction in document._transactions.values() %}
