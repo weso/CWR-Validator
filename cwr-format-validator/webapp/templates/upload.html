@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload file</title>
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}">
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/style.css') }}">
+    <script
+	  src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
+  </head>
+  <body>
+    <div id="wrapper" class="container">
+        <div id="header">
+			<div class="page-header">
+	            <h1>Validator <small>CWR document validator</small></h1>
+            </div>
+		</div>
+		<div id="header_menu">
+            <div class="navbar navbar-inverse" role="navigation">
+	            <div class="navbar-header">
+		            <button type="button" class="navbar-toggle" data-toggle="collapse"
+			            data-target="#bs-example-navbar-collapse-1">
+			            <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span>
+			            <span class="icon-bar"></span> <span class="icon-bar"></span>
+		            </button>
+		            <a class="navbar-brand" href="/">Home</a>
+	               </div>
+	            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+		            <ul class="nav navbar-nav">
+			            <li><a href="#">Upload file</a></li>
+				        <!-- <li><a href="/results">View results</a></li> -->
+		            </ul>
+	            </div>
+            </div>
+		</div>
+        <div id="content">
+            <div class="jumbotron">
+              <h2>How this works</h2>
+              <p>There will be two phases, the first one is direct validation, you will receive the ackowledgement file when finished.</p>
+              <p>The second one is dumping the file information into the database, when finished an ackowledgement file will be sent to the specified mail with the results.</p>
+            </div>
+            <form class="form-horizontal" role="form" action="/upload" method="post" enctype="multipart/form-data">
+              <div class="form-group">
+                <label for="inputEntity" class="col-sm-2 control-label">Sender</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" id="inputEntity" placeholder="Sender email">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="exampleInputFile" class="col-sm-2 control-label">File input</label>
+                <div class="col-sm-10">
+                  <input type="file" id="exampleInputFile" class="btn btn-default" name="file">
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary pull-right">Submit</button>
+            </form>
+        </div>
+    </div>
+  </body>
+</html>
