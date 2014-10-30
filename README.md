@@ -1,4 +1,4 @@
-CWR-Service
-===========
+CWR-validator
+=============
 
-Service for parsing and processing data from Common Works Registration (CWR) standard formats
+A complete refactorization of the CWR validator developed for WESO team. This repository is to be merged with the one they already have when finished.
