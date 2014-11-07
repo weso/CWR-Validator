@@ -2,7 +2,7 @@ import codecs
 import json
 import urllib2
 
-from flask import render_template, request, send_file
+from flask import render_template, request, send_file, session
 
 from webapp import app
 from utils.file_manager import FileManager
@@ -12,6 +12,7 @@ from utils.json_converter import JsonConverter
 __author__ = 'Borja'
 
 API_ENDPOINT = 'http://127.0.0.1:5000'
+DATABASE_ENDPOINT = 'http://127.0.0.1:5002'
 
 fileManager = FileManager()
 jsonConverter = JsonConverter()
@@ -50,6 +51,7 @@ def manage_uploaded_file():
         with open(FileManager.get_validations_path('CWROutput.V21'), "w") as output_file:
             for record in response_json["records"]:
                 output_file.write((record + "\n").encode('utf-8'))
+        session['document'] = response_json['document']
 
         return render_template('results.html', filename='CWROutput.V21', document=response_json["document"])
 
@@ -60,3 +62,14 @@ def download_file(file_name):
                      as_attachment=True,
                      attachment_filename="validation-result.V21")
 
+
+@app.route('/submit', methods=['POST'])
+def submit_file():
+    if session['document'] is not None:
+        json_document = session['document']
+        req = urllib2.Request(DATABASE_ENDPOINT + '/persist-document')
+        req.add_header('Content-Type', 'application/json')
+
+        urllib2.urlopen(req, json_document)
+
+    session.pop('document', None)
