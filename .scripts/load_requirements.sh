@@ -2,7 +2,7 @@
 
 v_python = python --version
 
-if [ v_python == "2.6.9" ]; then
+if [ $v_python == "2.6.9" ]; then
 
    pip install -r requirements_2.6.txt
 
