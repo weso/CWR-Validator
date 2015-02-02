@@ -2,7 +2,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 import codecs
 import unittest
-import os
+
 from tests.test_files import test_files_config
 
 from validator import Validator
@@ -12,7 +12,6 @@ __author__ = 'Borja'
 
 
 class TestRecords(unittest.TestCase):
-
     def test_wrong_records(self):
         validator = Validator()
 
@@ -26,6 +25,7 @@ class TestRecords(unittest.TestCase):
 
         self.assertEqual(0, len(valid_record))
         self.assertEqual(len(records), len(invalid_records))
+
 
 class TestFile(unittest.TestCase):
     def setUp(self):
