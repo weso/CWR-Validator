@@ -34,8 +34,6 @@ class TestFile(unittest.TestCase):
     def test_file(self):
         validator = Validator()
 
-        print test_files_config.cwr_test_file()
-
         with codecs.open(self.file_path, encoding='utf-8') as file_utf8:
             document_content = file_utf8.readlines()
 
