@@ -1,7 +1,6 @@
 import codecs
-import json
-import requests
 
+import requests
 from flask import render_template, request, send_file, session
 
 from webapp import app
