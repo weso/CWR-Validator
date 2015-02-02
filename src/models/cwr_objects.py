@@ -121,7 +121,7 @@ class CWRMessage(object):
 
     def __str__(self):
         return self._transaction_type + self._msg_type + self._original_record + self._record_type + self._msg_level + \
-            self._validation_number + self._msg_text
+               self._validation_number + self._msg_text
 
     def __repr__(self):
         return self.__str__()
@@ -313,8 +313,9 @@ class Agreement(CWRObject):
             self.transaction_reject('Expected at least one territory record')
 
         if len(self._interested_parties) < 2 and not any(
-                str(ipa.agreement_role_code.value) == 'AC' for ipa in self._interested_parties.values()) and not any(
-                str(ipa.agreement_role_code.value) == 'AS' for ipa in self._interested_parties.values()):
+                        str(ipa.agreement_role_code.value) == 'AC' for ipa in
+                        self._interested_parties.values()) and not any(
+                        str(ipa.agreement_role_code.value) == 'AS' for ipa in self._interested_parties.values()):
             self.transaction_reject('Expected two interested parties, one as assignor and one as acquirer')
 
         if sum(ipa.pr_share.value for ipa in self._interested_parties.values()) != 100:
@@ -348,12 +349,12 @@ class Agreement(CWRObject):
                 and self.post_term_collection_end_date.value <= self.end_date.value:
             self.transaction_reject('Post term collection end date must be after end date')
         elif self.post_term_collection_end_date.value is not None and \
-                self.post_term_collection_end_date.value <= self.start_date.value:
+                        self.post_term_collection_end_date.value <= self.start_date.value:
             self.transaction_reject('Post term collection end date must be after start date')
         if self.post_term_collection_status.value == 'D' and self.post_term_collection_end_date.value is None:
             self.transaction_reject('Expected post term collection end date')
         elif self.post_term_collection_status.value in ['N', 'O'] and \
-                self.post_term_collection_end_date.value is not None:
+                        self.post_term_collection_end_date.value is not None:
             self.transaction_reject('Not expected post term end date')
 
         if self.type.value in ['OS', 'PS'] and self.sales_manufacture_clause.value is None:
@@ -634,7 +635,7 @@ class InterestedParty(CWRObject):
 
     def transaction_level_validation(self, transaction):
         if self.agreement_role_code.value == 'AC' and \
-                self.pr_share.value == self.mr_share.value == self.sr_share.value == 0:
+                                        self.pr_share.value == self.mr_share.value == self.sr_share.value == 0:
             transaction.transaction_reject('Expected one of the shares greater than 0', self)
 
         if self.pr_share.value is not None and self.pr_share.value > 0 and self.pr_society.value is None:
@@ -1367,7 +1368,6 @@ class Registration(CWRObject):
 
         self.records = records
 
-
         return records
 
     def format_fields(self):
@@ -1441,14 +1441,14 @@ class Registration(CWRObject):
             self.transaction_reject('Expected at least one writer within the transaction')
         else:
             if self.version_type.value == 'MOD' and not any(
-                    wri.designation_code.value in ['AR', 'AD', 'SR', 'SA', 'TR'] for wri in self._writers):
+                            wri.designation_code.value in ['AR', 'AD', 'SR', 'SA', 'TR'] for wri in self._writers):
                 self.transaction_reject('Not writers designation code required for MOD version type')
 
             if not any(wri.designation_code.value in ['CA', 'A', 'C'] for wri in self._writers):
                 self.transaction_reject('Not writer designation code required for work registration')
 
             if self.version_type.value == 'ORI' and any(
-                    wri.designation_code.value in ['AD', 'AR', 'SD'] for wri in self._writers):
+                            wri.designation_code.value in ['AD', 'AR', 'SD'] for wri in self._writers):
                 self.transaction_reject('Invalid writer designation code for ORI version type')
 
         if self.musical_distribution_category.check(DISTRIBUTION_CATEGORY_TABLE):
@@ -2112,7 +2112,7 @@ class WriterTerritory(CWRObject):
 
     def transaction_level_validation(self, transaction):
         if self.inclusion_exclusion_indicator.value == 'I' and \
-                self.pr_share.value == self.mr_share.value == self.sr_share.value == 0:
+                                        self.pr_share.value == self.mr_share.value == self.sr_share.value == 0:
             transaction.transaction_reject('Expected at least one share to be greater than 0', self)
 
         if self.pr_share.value > 100:

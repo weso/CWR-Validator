@@ -1,219 +1,240 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Validation results</title>
     <link rel=stylesheet type=text/css href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}">
     <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/style.css') }}">
     <script
-	  src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+            src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/cwr.js') }}"></script>
-  </head>
-  <body>
-    <div id="wrapper" class="container">
-        <div id="header">
-			<div class="page-header">
-	            <h1>Validator <small>CWR document validator</small></h1>
+</head>
+<body>
+<div id="wrapper" class="container">
+    <div id="header">
+        <div class="page-header">
+            <h1>Validator
+                <small>CWR document validator</small>
+            </h1>
+        </div>
+    </div>
+    <div id="header_menu">
+        <div class="navbar navbar-inverse" role="navigation">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse"
+                        data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span>
+                    <span class="icon-bar"></span> <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">Home</a>
             </div>
-		</div>
-		<div id="header_menu">
-            <div class="navbar navbar-inverse" role="navigation">
-	            <div class="navbar-header">
-		            <button type="button" class="navbar-toggle" data-toggle="collapse"
-			            data-target="#bs-example-navbar-collapse-1">
-			            <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span>
-			            <span class="icon-bar"></span> <span class="icon-bar"></span>
-		            </button>
-		            <a class="navbar-brand" href="/">Home</a>
-	               </div>
-	            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-		            <ul class="nav navbar-nav">
-			            <li><a href="/upload">Upload file</a></li>
-				        <!-- <li><a href="#">View results</a></li> -->
-		            </ul>
-	            </div>
-                </div>
-		</div>
-        <div id="content">
-          {% if document.rejected %}
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li><a href="/upload">Upload file</a></li>
+                    <!-- <li><a href="#">View results</a></li> -->
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div id="content">
+        {% if document.rejected %}
             <h2>Document has been rejected</h2>
             <p>Reason: {{ document.messages }}</p>
-          {% else %}
+        {% else %}
             <div class="row" id="quick-link">
                 <div class="col-lg-offset-10 col-lg-2">
-                <div class="input-group">
-                  <input id="quick-search" type="text" class="form-control" onkeyup="loadQuickLinks(this)">
-                  <div class="input-group-btn">
-                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">Go to <span class="caret"></span></button>
-                    <ul class="dropdown-menu dropdown-menu-right" role="menu">
-                      <li><a id="trans-quick-search" href="">Transaction</a></li>
-                      <li><a id="rec-quick-search" href="">Record</a></li>
-                    </ul>
-                  </div><!-- /btn-group -->
-                </div><!-- /input-group -->
-              </div><!-- /.col-lg-6 -->
+                    <div class="input-group">
+                        <input id="quick-search" type="text" class="form-control" onkeyup="loadQuickLinks(this)">
+
+                        <div class="input-group-btn">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">Go to
+                                <span class="caret"></span></button>
+                            <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                                <li><a id="trans-quick-search" href="">Transaction</a></li>
+                                <li><a id="rec-quick-search" href="">Record</a></li>
+                            </ul>
+                        </div>
+                        <!-- /btn-group -->
+                    </div>
+                    <!-- /input-group -->
+                </div>
+                <!-- /.col-lg-6 -->
             </div>
             <ul class="nav nav-tabs nav-justified" role="tablist">
-              <li class="active"><a href="#summary" data-toggle="tab">Summary</a></li>
-              <li><a href="#agreements" data-toggle="tab">Agreements</a></li>
-              <li><a href="#new-works" data-toggle="tab">New registrations</a></li>
-              <li><a href="#rev-works" data-toggle="tab">Revisions</a></li>
+                <li class="active"><a href="#summary" data-toggle="tab">Summary</a></li>
+                <li><a href="#agreements" data-toggle="tab">Agreements</a></li>
+                <li><a href="#new-works" data-toggle="tab">New registrations</a></li>
+                <li><a href="#rev-works" data-toggle="tab">Revisions</a></li>
             </ul>
             <div class="tab-content">
                 <div class="tab-pane active" id="summary">
-                  <dl>
-                    <dt>Records found</dt>
-                    <dd> {{ document._records_number}} </dd>
-                    <dt>Transactions found</dt>
-                    <dd>{{ document._transactions_number }}</dd>
-                    <dt>Document header</dt>
-                    <dd> {{ document._header._record }} </dd>
-                    <dt>Document trailer</dt>
-                    <dd> {{ document._trailer._record }} </dd>
-                  </dl>
-                  <p><a class="btn btn-primary" role="button" href="/download/{{ filename }}">Download generated response</a></p>
-                  <p><a class="btn btn-primary" role="button" href="/submit">Submit results</a></p>
+                    <dl>
+                        <dt>Records found</dt>
+                        <dd> {{ document._records_number }} </dd>
+                        <dt>Transactions found</dt>
+                        <dd>{{ document._transactions_number }}</dd>
+                        <dt>Document header</dt>
+                        <dd> {{ document._header._record }} </dd>
+                        <dt>Document trailer</dt>
+                        <dd> {{ document._trailer._record }} </dd>
+                    </dl>
+                    <p><a class="btn btn-primary" role="button" href="/download/{{ filename }}">Download generated
+                        response</a></p>
+
+                    <p><a class="btn btn-primary" role="button" href="/submit">Submit results</a></p>
                 </div>
                 <div class="tab-pane" id="agreements">
-                  {% if 'AGR' in document._group_types.keys() %}
-                      {% if document._groups[document._group_types['AGR']]._rejected %}
-                        <p>This group has been rejected</p>
-                        <p>{{document._groups[document._group_types['AGR']]._messages}}</p>
-                      {% else %}
-                      {% for transaction in document._groups[document._group_types['AGR']]._transactions %}
-                          {% if transaction._rejected %}
-                            <div class="panel-heading bg-danger" id="trans_{{ transaction.transaction_number }}">
-                            {{ transaction._record }}
-                            </div>
-                            <div class="panel-body">
-                                <ul class="list-group">
-                                    {% for message in transaction._messages %}
-                                        <li class="list-group-item">{{ str(message) }}</li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                          {% else %}
-                            <div class="panel-heading bg-success" id="trans_{{ transaction.transaction_number }}">
-                            {{ transaction._record }}
-                            </div>
-                          {% endif %}
-                          <ul class="list-group">
-                              {% for record in transaction.records|sort(attribute='record_number') %}
-                                {% if record._rejected %}
-                                    <li class="list-group-item bg-danger" id="rec_{{ record.record_number }}">{{ record._record }}</li>
-                                    <li class="list-group-item">
+                    {% if 'AGR' in document._group_types.keys() %}
+                        {% if document._groups[document._group_types['AGR']]._rejected %}
+                            <p>This group has been rejected</p>
+                            <p>{{ document._groups[document._group_types['AGR']]._messages }}</p>
+                        {% else %}
+                            {% for transaction in document._groups[document._group_types['AGR']]._transactions %}
+                                {% if transaction._rejected %}
+                                    <div class="panel-heading bg-danger"
+                                         id="trans_{{ transaction.transaction_number }}">
+                                        {{ transaction._record }}
+                                    </div>
+                                    <div class="panel-body">
                                         <ul class="list-group">
-                                            {% for message in record._messages %}
+                                            {% for message in transaction._messages %}
                                                 <li class="list-group-item">{{ str(message) }}</li>
                                             {% endfor %}
                                         </ul>
-                                    </li>
+                                    </div>
                                 {% else %}
-                                    <li class="list-group-item bg-success" id="rec_{{ record.record_number }}">{{ record._record }}</li>
+                                    <div class="panel-heading bg-success"
+                                         id="trans_{{ transaction.transaction_number }}">
+                                        {{ transaction._record }}
+                                    </div>
                                 {% endif %}
-                              {% endfor %}
-                          </ul>
-                      {% endfor %}
-                      {% endif %}
+                                <ul class="list-group">
+                                    {% for record in transaction.records|sort(attribute='record_number') %}
+                                        {% if record._rejected %}
+                                            <li class="list-group-item bg-danger"
+                                                id="rec_{{ record.record_number }}">{{ record._record }}</li>
+                                            <li class="list-group-item">
+                                                <ul class="list-group">
+                                                    {% for message in record._messages %}
+                                                        <li class="list-group-item">{{ str(message) }}</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </li>
+                                        {% else %}
+                                            <li class="list-group-item bg-success"
+                                                id="rec_{{ record.record_number }}">{{ record._record }}</li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                            {% endfor %}
+                        {% endif %}
                     {% else %}
                         <p>This group was not present in the document</p>
                     {% endif %}
                 </div>
                 <div class="tab-pane" id="new-works">
                     {% if 'NWR' in document._group_types.keys() %}
-                      {% if document._groups[document._group_types['NWR']]._rejected %}
-                        <p>This group has been rejected</p>
-                        <p>{{document._groups[document._group_types['NWR']]._messages}}</p>
-                      {% else %}
-                      {% for transaction in document._groups[document._group_types['NWR']]._transactions %}
-                          {% if transaction._rejected %}
-                            <div class="panel-heading bg-danger" id="trans_{{ transaction.transaction_number }}">
-                            {{ transaction._record }}
-                            </div>
-                            <div class="panel-body">
-                                <ul class="list-group">
-                                    {% for message in transaction._messages %}
-                                        <li class="list-group-item">{{ str(message) }}</li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                          {% else %}
-                            <div class="panel-heading bg-success" id="trans_{{ transaction.transaction_number }}">
-                            {{ transaction._record }}
-                            </div>
-                          {% endif %}
-                          <ul class="list-group">
-                              {% for record in transaction.records|sort(attribute='record_number') %}
-                                {% if record._rejected %}
-                                    <li class="list-group-item bg-danger" id="rec_{{ record.record_number }}">{{ record._record }}</li>
-                                    <li class="list-group-item">
+                        {% if document._groups[document._group_types['NWR']]._rejected %}
+                            <p>This group has been rejected</p>
+                            <p>{{ document._groups[document._group_types['NWR']]._messages }}</p>
+                        {% else %}
+                            {% for transaction in document._groups[document._group_types['NWR']]._transactions %}
+                                {% if transaction._rejected %}
+                                    <div class="panel-heading bg-danger"
+                                         id="trans_{{ transaction.transaction_number }}">
+                                        {{ transaction._record }}
+                                    </div>
+                                    <div class="panel-body">
                                         <ul class="list-group">
-                                            {% for message in record._messages %}
+                                            {% for message in transaction._messages %}
                                                 <li class="list-group-item">{{ str(message) }}</li>
                                             {% endfor %}
                                         </ul>
-                                    </li>
+                                    </div>
                                 {% else %}
-                                    <li class="list-group-item bg-success" id="rec_{{ record.record_number }}">{{ record._record }}</li>
+                                    <div class="panel-heading bg-success"
+                                         id="trans_{{ transaction.transaction_number }}">
+                                        {{ transaction._record }}
+                                    </div>
                                 {% endif %}
-                              {% endfor %}
-                          </ul>
-                      {% endfor %}
-                      {% endif %}
+                                <ul class="list-group">
+                                    {% for record in transaction.records|sort(attribute='record_number') %}
+                                        {% if record._rejected %}
+                                            <li class="list-group-item bg-danger"
+                                                id="rec_{{ record.record_number }}">{{ record._record }}</li>
+                                            <li class="list-group-item">
+                                                <ul class="list-group">
+                                                    {% for message in record._messages %}
+                                                        <li class="list-group-item">{{ str(message) }}</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </li>
+                                        {% else %}
+                                            <li class="list-group-item bg-success"
+                                                id="rec_{{ record.record_number }}">{{ record._record }}</li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                            {% endfor %}
+                        {% endif %}
                     {% else %}
                         <p>This group was not present in the document</p>
                     {% endif %}
                 </div>
                 <div class="tab-pane" id="rev-works">
                     {% if 'REV' in document._group_types.keys() %}
-                      {% if document._groups[document._group_types['REV']]._rejected %}
-                        <p>This group has been rejected</p>
-                        <p>{{document._groups[document._group_types['REV']]._messages}}</p>
-                      {% else %}
-                      {% for transaction in document._groups[document._group_types['REV']]._transactions %}
-                          {% if transaction._rejected %}
-                            <div class="panel-heading bg-danger" id="trans_{{ transaction.transaction_number }}">
-                            {{ transaction._record }}
-                            </div>
-                            <div class="panel-body">
-                                <ul class="list-group">
-                                    {% for message in transaction._messages %}
-                                        <li class="list-group-item">{{ str(message) }}</li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                          {% else %}
-                            <div class="panel-heading bg-success" id="trans_{{ transaction.transaction_number }}">
-                            {{ transaction._record }}
-                            </div>
-                          {% endif %}
-                          <ul class="list-group">
-                              {% for record in transaction.records|sort(attribute='record_number') %}
-                                {% if record._rejected %}
-                                    <li class="list-group-item bg-danger" id="rec_{{ record.record_number }}">{{ record._record }}</li>
-                                    <li class="list-group-item">
+                        {% if document._groups[document._group_types['REV']]._rejected %}
+                            <p>This group has been rejected</p>
+                            <p>{{ document._groups[document._group_types['REV']]._messages }}</p>
+                        {% else %}
+                            {% for transaction in document._groups[document._group_types['REV']]._transactions %}
+                                {% if transaction._rejected %}
+                                    <div class="panel-heading bg-danger"
+                                         id="trans_{{ transaction.transaction_number }}">
+                                        {{ transaction._record }}
+                                    </div>
+                                    <div class="panel-body">
                                         <ul class="list-group">
-                                            {% for message in record._messages %}
+                                            {% for message in transaction._messages %}
                                                 <li class="list-group-item">{{ str(message) }}</li>
                                             {% endfor %}
                                         </ul>
-                                    </li>
+                                    </div>
                                 {% else %}
-                                    <li class="list-group-item bg-success" id="rec_{{ record.record_number }}">{{ record._record }}</li>
+                                    <div class="panel-heading bg-success"
+                                         id="trans_{{ transaction.transaction_number }}">
+                                        {{ transaction._record }}
+                                    </div>
                                 {% endif %}
-                              {% endfor %}
-                          </ul>
-                      {% endfor %}
-                      {% endif %}
+                                <ul class="list-group">
+                                    {% for record in transaction.records|sort(attribute='record_number') %}
+                                        {% if record._rejected %}
+                                            <li class="list-group-item bg-danger"
+                                                id="rec_{{ record.record_number }}">{{ record._record }}</li>
+                                            <li class="list-group-item">
+                                                <ul class="list-group">
+                                                    {% for message in record._messages %}
+                                                        <li class="list-group-item">{{ str(message) }}</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </li>
+                                        {% else %}
+                                            <li class="list-group-item bg-success"
+                                                id="rec_{{ record.record_number }}">{{ record._record }}</li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                            {% endfor %}
+                        {% endif %}
                     {% else %}
                         <p>This group was not present in the document</p>
                     {% endif %}
-                 </div>
+                </div>
             </div>
-          {% endif %}
-        </div>
+        {% endif %}
     </div>
-  </body>
+</div>
+</body>
 </html>

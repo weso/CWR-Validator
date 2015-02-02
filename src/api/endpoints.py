@@ -1,6 +1,6 @@
 from flask import request, Response
-
 from flask.ext.restful import Api, Resource
+
 from api import api_app
 from utils.json_converter import JsonConverter
 from validator import Validator

@@ -47,3 +47,7 @@ class TestDocumentRegex(unittest.TestCase):
                 for message in record.messages:
                     print str(message)
                     output_file.write(str(message) + "\n")
+
+
+if __name__ == '__main__':
+    unittest.main()

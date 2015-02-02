@@ -13,6 +13,6 @@ function togglePanels(panelType) {
 }
 
 function loadQuickLinks(textinput) {
-    $("#trans-quick-search").attr("href", "#trans_"+$(textinput).val());
-    $("#rec-quick-search").attr("href", "#rec_"+$(textinput).val());
+    $("#trans-quick-search").attr("href", "#trans_" + $(textinput).val());
+    $("#rec-quick-search").attr("href", "#rec_" + $(textinput).val());
 }

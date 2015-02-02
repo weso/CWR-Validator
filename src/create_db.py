@@ -1,6 +1,7 @@
 import os
 
 import xlrd
+
 from files import __data__
 
 
@@ -182,6 +183,7 @@ def _initialize_database():
     _add_text_music_relationships()
     _add_version_types()
     _add_work_types()
+
 
 if __name__ == '__main__':
     db.drop_all()
