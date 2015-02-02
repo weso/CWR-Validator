@@ -12,7 +12,7 @@ class TestSimple(unittest.TestCase):
         field = CWRField('Title', regex.get_ascii_regex(60))
         field.value = None
 
-        self.assertIsNone(field.value)
+        self.assertTrue(field.value is None)
 
 
 if __name__ == '__main__':
