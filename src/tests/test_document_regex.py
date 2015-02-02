@@ -11,9 +11,7 @@ from validator import Validator
 __author__ = 'Borja'
 
 
-class TestDocumentRegex(unittest.TestCase):
-    def setUp(self):
-        self.file_path = test_files_config.cwr_test_file()
+class TestRecords(unittest.TestCase):
 
     def test_wrong_records(self):
         validator = Validator()
@@ -28,6 +26,10 @@ class TestDocumentRegex(unittest.TestCase):
 
         self.assertEqual(0, len(valid_record))
         self.assertEqual(len(records), len(invalid_records))
+
+class TestFile(unittest.TestCase):
+    def setUp(self):
+        self.file_path = test_files_config.cwr_test_file()
 
     def test_file(self):
         validator = Validator()

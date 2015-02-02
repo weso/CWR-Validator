@@ -31,9 +31,9 @@ class Validator(object):
 
     def validate_document(self, document_json):
         """
-        Validates a CWR document recived as a JSON dictionary
+        Applies full validation on a document.
 
-        :param document_json: JSON dictionary to validate
+        :param document_json: An array representing the document records
         :return: the validated document
         """
         self._document = Document()
@@ -46,9 +46,11 @@ class Validator(object):
 
     def validate_document_format(self, document_json):
         """
-        Validate an entire document record by record, checking if they are well formed.
+        Validates an entire document record by record, checking if they are well formed.
+
         Also prepares the validator for the next step in a complete document validation.
-        :param document_json: Expected an array representing the document records
+
+        :param document_json: An array representing the document records
         :return: Both arrays, first one containing the valid records and second one with the failures
         """
         valid_records = []
@@ -67,6 +69,9 @@ class Validator(object):
         return valid_records, invalid_records
 
     def validate_document_structure(self):
+        """
+        Validates the document full structure.
+        """
 
         while self._records:
 
