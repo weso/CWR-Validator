@@ -2,6 +2,8 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 import codecs
 import unittest
+import os
+from tests.test_files import test_files_config
 
 from validator import Validator
 
@@ -11,7 +13,7 @@ __author__ = 'Borja'
 
 class TestDocumentRegex(unittest.TestCase):
     def setUp(self):
-        self.file_path = 'test-files/CW1328EMI_059.V21'
+        self.file_path = test_files_config.cwr_test_file()
 
     def test_wrong_records(self):
         validator = Validator()
@@ -29,6 +31,8 @@ class TestDocumentRegex(unittest.TestCase):
 
     def test_file(self):
         validator = Validator()
+
+        print test_files_config.cwr_test_file()
 
         with codecs.open(self.file_path, encoding='utf-8') as file_utf8:
             document_content = file_utf8.readlines()

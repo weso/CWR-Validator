@@ -1,10 +1,24 @@
+# -*- encoding: utf-8 -*-
 from models.document import Document
 from models.records import Record
 
-__author__ = 'Borja'
+"""
+CWR validator module. The validator makes sure a CWR file follows the Ver 2-1 Rev 3 CWR specification.
+"""
+
+__author__ = 'Borja Garrido Bear'
+__license__ = 'MIT'
+__version__ = '0.0.0'
+__status__ = 'Development'
 
 
 class Validator(object):
+    """
+    CWR validator for the Ver 2-1 Rev 3 CWR specification.
+
+    The validation is done from a JSON dictionary.
+    """
+
     def __init__(self):
         self._document = Document()
 
@@ -16,6 +30,12 @@ class Validator(object):
         return self._document
 
     def validate_document(self, document_json):
+        """
+        Validates a CWR document recived as a JSON dictionary
+
+        :param document_json: JSON dictionary to validate
+        :return: the validated document
+        """
         self._document = Document()
 
         self.validate_document_format(document_json)
