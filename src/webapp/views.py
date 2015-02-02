@@ -51,7 +51,7 @@ def manage_uploaded_file():
         with open(FileManager.get_validations_path('CWROutput.V21'), "w") as output_file:
             for record in response_json["records"]:
                 output_file.write((record + "\n").encode('utf-8'))
-        session['document'] = response_json['document']
+        # session['document'] = response_json['document']
 
         return render_template('results.html', filename='CWROutput.V21', document=response_json["document"])
 
