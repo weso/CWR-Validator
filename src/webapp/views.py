@@ -1,6 +1,6 @@
 import codecs
 import json
-import urllib3
+import requests
 
 from flask import render_template, request, send_file, session
 
@@ -41,12 +41,12 @@ def manage_uploaded_file():
             document_content = file_utf8.readlines()
 
             json_document = jsonConverter.parse_object(document_content)
-        req = urllib3.Request(API_ENDPOINT + '/document/validation')
-        req.add_header('Content-Type', 'application/json')
 
-        response = urllib3.urlopen(req, json_document)
+        url = API_ENDPOINT + '/document/validation'
+        headers = {'Content-type': 'application/json'}
+        req = requests.post(url, data=json_document, headers=headers)
 
-        response_json = json.loads(response.read())
+        response_json = req.json()
 
         with open(FileManager.get_validations_path('CWROutput.V21'), "w") as output_file:
             for record in response_json["records"]:
@@ -67,9 +67,9 @@ def download_file(file_name):
 def submit_file():
     if session['document'] is not None:
         json_document = session['document']
-        req = urllib3.Request(DATABASE_ENDPOINT + '/persist-document')
+        req = requests.Request(DATABASE_ENDPOINT + '/persist-document')
         req.add_header('Content-Type', 'application/json')
 
-        urllib3.urlopen(req, json_document)
+        requests.urlopen(req, json_document)
 
     session.pop('document', None)
