@@ -9,7 +9,7 @@ from validator import Validator
 __author__ = 'Borja'
 
 
-class DocumentRegexTest(unittest.TestCase):
+class TestDocumentRegex(unittest.TestCase):
     def setUp(self):
         self.file_path = 'test-files/CW1328EMI_059.V21'
 

@@ -4,7 +4,7 @@ from models import regex
 from models.cwr_objects import CWRField
 
 
-class DocumentRegexTest(unittest.TestCase):
+class TestSimple(unittest.TestCase):
 
     def setUp(self):
         self.file_path = 'test-files/CW1328EMI_059.V21'
