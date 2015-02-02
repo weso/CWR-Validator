@@ -5,7 +5,6 @@ from models.cwr_objects import CWRField
 
 
 class TestSimple(unittest.TestCase):
-
     def setUp(self):
         self.file_path = 'test-files/CW1328EMI_059.V21'
 
@@ -14,3 +13,7 @@ class TestSimple(unittest.TestCase):
         field.value = None
 
         self.assertIsNone(field.value)
+
+
+if __name__ == '__main__':
+    unittest.main()

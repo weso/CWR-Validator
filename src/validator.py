@@ -5,7 +5,6 @@ __author__ = 'Borja'
 
 
 class Validator(object):
-
     def __init__(self):
         self._document = Document()
 
@@ -157,7 +156,6 @@ class Validator(object):
 
             if record_type in ['SPU', 'OPU']:
                 if self._records[0].sequence_id.value != publisher.sequence_id.value:
-
                     # This means the chain has been changed
                     return publisher
 
