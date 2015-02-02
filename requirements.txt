@@ -11,3 +11,4 @@ pytz==2014.10
 six==1.9.0
 wsgiref==0.1.2
 xlrd==0.9.3
+urllib3==1.10

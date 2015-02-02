@@ -8,5 +8,6 @@ Werkzeug==0.10
 aniso8601==0.92
 itsdangerous==0.24
 pytz==2014.10
+regex==2014.12.24
 six==1.9.0
 xlrd==0.9.3
