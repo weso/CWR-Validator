@@ -9,7 +9,7 @@ from files import __data__
 
 __author__ = 'Borja'
 
-AGREEMENT_TYPE_VALUES = {'OG', 'OS', 'PG', 'PS'}
+AGREEMENT_TYPE_VALUES = {'OG': None, 'OS': None, 'PG': None, 'PS': None}
 
 COMPOSITE_TYPE = ['COS', 'MED', 'POT', 'UCO']
 
@@ -119,7 +119,7 @@ RECORDING_TECHNIQUE = ['A', 'D', 'U']
 
 RIGHT_TYPES = ['ALL', 'MEC', 'PER', 'SYN']
 
-SENDER_VALUES = {'PB', 'SO', 'AA', 'WR'}
+SENDER_VALUES = {'PB': None, 'SO': None, 'AA': None, 'WR': None}
 
 
 def _load_societies_codes():
@@ -161,7 +161,7 @@ TITLE_TYPES = ['AT', 'TE', 'FT', 'IT', 'OT', 'TT', 'PT', 'RT', 'ET', 'OL', 'AL']
 
 TIS_CODES = _load_tis_codes()
 
-TRANSACTION_VALUES = {'AGR', 'NWR', 'REV'}
+TRANSACTION_VALUES = {'AGR': None, 'NWR': None, 'REV': None}
 
 VERSION_TYPES = ['MOD', 'ORI']
 
