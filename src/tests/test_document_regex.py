@@ -49,7 +49,6 @@ class TestFile(unittest.TestCase):
             for record in sorted(validator.document.extract_records(), key=lambda item: item.number):
                 output_file.write((record._record + "\n").encode('utf-8'))
                 for message in record.messages:
-                    print str(message)
                     output_file.write(str(message) + "\n")
 
 
