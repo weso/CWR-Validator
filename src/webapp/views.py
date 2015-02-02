@@ -1,7 +1,8 @@
 import codecs
 
 import requests
-from flask import render_template, request, send_file, session
+import json
+from flask import render_template, request, send_file, session, redirect, url_for
 
 from webapp import app
 from utils.file_manager import FileManager
@@ -33,6 +34,7 @@ def manage_uploaded_file():
     sent_file = request.files['file']
 
     if sent_file:
+        filename = 'CWROutput.V21'
         file_path = fileManager.save_file(sent_file, 'uploads')
 
         # Open the uploaded file in utf-8 format and validate it
@@ -47,12 +49,14 @@ def manage_uploaded_file():
 
         response_json = req.json()
 
-        with open(FileManager.get_validations_path('CWROutput.V21'), "w") as output_file:
+        with open(FileManager.get_validations_path(filename), "w") as output_file:
             for record in response_json["records"]:
                 output_file.write((record + "\n").encode('utf-8'))
-        session['document'] = response_json['document']
+        session['document_name'] = filename
+        with open(FileManager.get_validations_path(filename+ '.json'), "w") as output_file:
+            json.dump(response_json["document"], output_file)
 
-        return render_template('results.html', filename='CWROutput.V21', document=response_json["document"])
+        return render_template('results.html', filename=filename, document=response_json["document"])
 
 
 @app.route('/download/<file_name>', methods=['GET'])
@@ -65,10 +69,12 @@ def download_file(file_name):
 @app.route('/submit', methods=['POST'])
 def submit_file():
     if session['document'] is not None:
-        json_document = session['document']
-        req = requests.Request(DATABASE_ENDPOINT + '/persist-document')
-        req.add_header('Content-Type', 'application/json')
+        filename = session['document_name']
+        with open(FileManager.get_validations_path(filename+'.json'), "w") as input_file:
+            json_document = json.load(input_file)
+        url = DATABASE_ENDPOINT + '/persist-document'
+        headers = {'Content-type': 'application/json'}
+        requests.post(url, data=json_document, headers=headers)
 
-        requests.urlopen(req, json_document)
-
-    session.pop('document', None)
+    session.pop('document_name', None)
+    return redirect(url_for('index'))

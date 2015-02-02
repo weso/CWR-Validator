@@ -83,7 +83,10 @@
                     <p><a class="btn btn-primary" role="button" href="/download/{{ filename }}">Download generated
                         response</a></p>
 
-                    <p><a class="btn btn-primary" role="button" href="/submit">Submit results</a></p>
+                    <p>
+                    <form action="/submit" method="post">
+                        <button type="submit" class="btn btn-primary">Submit results</button>
+                    </form>
                 </div>
                 <div class="tab-pane" id="agreements">
                     {% if 'AGR' in document._group_types.keys() %}
