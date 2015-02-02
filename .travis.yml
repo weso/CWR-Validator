@@ -6,6 +6,7 @@ python:
   - "3.3"
   - "3.4"
 install:
+  - chmod +x ./.scripts/load_requirements.sh
   - ./.scripts/load_requirements.sh
 script:
   - nosetests
