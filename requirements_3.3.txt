@@ -12,5 +12,4 @@ regex==2014.12.24
 six==1.9.0
 xlrd==0.9.3
 mod_wsgi==4.4.7
-xlrd==0.9.3
 requests==2.5.1
