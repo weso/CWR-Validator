@@ -2,7 +2,7 @@ __author__ = 'Borja'
 import re
 
 import regex
-from cwr_objects import CWRField, Agreement, WorkAlternativeTitle, WorkAdditionalInfo, WorkComponent, \
+from models.cwr_objects import CWRField, Agreement, WorkAlternativeTitle, WorkAdditionalInfo, WorkComponent, \
     WorkExcerptTitle, Group, GroupTrailer, Header, InstrumentationDetails, InstrumentationSummary, InterestedParty, \
     NRWorkTitle, NRSpecialTitle, NROtherWriterName, NRPartyName, NRPublisherName, NRPerformanceData, NRWriterName, \
     Registration, WorkOrigin, PerformingArtist, WriterAgent, RecordingDetail, PublisherTerritory, PublisherControl, \

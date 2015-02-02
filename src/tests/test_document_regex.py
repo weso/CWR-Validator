@@ -4,7 +4,6 @@ import codecs
 import unittest
 
 from tests.test_files import test_files_config
-
 from validator import Validator
 
 
