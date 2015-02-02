@@ -1,11 +1,9 @@
 #!/bin/sh
 
-v_python = python --version
-
-if [ $v_python == "2.6.9" ]; then
-
-   pip install -r requirements_2.6.txt
-
-fi
+case "$(python --version 2>&1)" in
+    *" 2.6."*)
+        pip install -r requirements_2.6.txt
+        ;;
+esac
 
 pip install -r requirements.txt
