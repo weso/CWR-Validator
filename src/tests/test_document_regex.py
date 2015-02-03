@@ -4,7 +4,7 @@ import codecs
 import unittest
 
 from validator import Validator
-from utils.file_manager import FileManager
+from tests.utils.test_file_manager import FileManager
 
 
 __author__ = 'Borja'
