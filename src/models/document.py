@@ -1,4 +1,13 @@
-__author__ = 'Borja'
+# -*- encoding: utf-8 -*-
+
+"""
+Represents the CWR document being validated.
+"""
+
+__author__ = 'Borja Garrido Bear'
+__license__ = 'MIT'
+__version__ = '0.0.0'
+__status__ = 'Development'
 
 
 class Document(object):

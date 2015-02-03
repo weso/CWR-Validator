@@ -1,14 +1,20 @@
+# -*- encoding: utf-8 -*-
 import os
 
 import xlrd
 
 from files import __data__
-
-
-__author__ = 'Borja'
-
 from api.persistence.services import *
 from api.persistence.domain import *
+
+"""
+Creates a test database for the CWR Validator API.
+"""
+
+__author__ = 'Borja Garrido Bear'
+__license__ = 'MIT'
+__version__ = '0.0.0'
+__status__ = 'Development'
 
 
 def _add_agreement_roles():

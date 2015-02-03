@@ -1,3 +1,4 @@
+# -*- encoding: utf-8 -*-
 from __future__ import absolute_import
 import csv
 import os
@@ -7,7 +8,14 @@ import xlrd
 from files import __data__
 
 
-__author__ = 'Borja'
+"""
+Defines several CWR data types.
+"""
+
+__author__ = 'Borja Garrido Bear'
+__license__ = 'MIT'
+__version__ = '0.0.0'
+__status__ = 'Development'
 
 AGREEMENT_TYPE_VALUES = {'OG': None, 'OS': None, 'PG': None, 'PS': None}
 

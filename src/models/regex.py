@@ -1,4 +1,12 @@
-__author__ = 'Borja'
+# -*- encoding: utf-8 -*-
+"""
+Builds regular expressions for matching during the validation process.
+"""
+
+__author__ = 'Borja Garrido Bear'
+__license__ = 'MIT'
+__version__ = '0.0.0'
+__status__ = 'Development'
 
 
 class Regex(object):

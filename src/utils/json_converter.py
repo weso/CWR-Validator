@@ -1,13 +1,25 @@
+# -*- encoding: utf-8 -*-
 import datetime
 import json
 
 from models.cwr_objects import CWRField
 
 
-__author__ = 'Borja'
+"""
+JSON converter to handle coding objects into JSON strings collections.
+"""
+
+__author__ = 'Borja Garrido Bear'
+__license__ = 'MIT'
+__version__ = '0.0.0'
+__status__ = 'Development'
 
 
 class JsonConverter():
+    """
+    JSON converter to handle datetime objects.
+    """
+
     def __init__(self):
         self._dt_handler = lambda obj: (
             obj.isoformat()

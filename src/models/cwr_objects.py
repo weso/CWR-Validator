@@ -1,4 +1,7 @@
+# -*- encoding: utf-8 -*-
+
 from datetime import datetime
+import abc
 
 from utils import functions
 from utils.value_tables import AGREEMENT_TYPE_VALUES, TRANSACTION_VALUES, TIS_CODES, SOCIETY_CODES, \
@@ -8,8 +11,14 @@ from utils.value_tables import AGREEMENT_TYPE_VALUES, TRANSACTION_VALUES, TIS_CO
     RIGHT_TYPES, SUBJECT_CODES
 
 
-__author__ = 'Borja'
-import abc
+"""
+CWR model classes.
+"""
+
+__author__ = 'Borja Garrido Bear'
+__license__ = 'MIT'
+__version__ = '0.0.0'
+__status__ = 'Development'
 
 
 class CWRField(object):

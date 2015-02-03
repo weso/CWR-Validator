@@ -1,3 +1,4 @@
+# -*- encoding: utf-8 -*-
 import os
 
 from werkzeug.utils import secure_filename
@@ -6,10 +7,25 @@ from webapp.uploads import __uploads__
 from webapp.validations import __validations__
 from tests.test_files import __test_files__
 
-__author__ = 'Borja'
+"""
+Offers classes to handle the access to files in the project paths.
+"""
+
+__author__ = 'Borja Garrido Bear'
+__license__ = 'MIT'
+__version__ = '0.0.0'
+__status__ = 'Development'
 
 
 class FileManager(object):
+    """
+    Manages files in the project class path.
+
+    Allows acquiring files from several directories, avoiding relative path issues.
+
+    Also can save files to the uploads or validations folders.
+    """
+
     @staticmethod
     def allowed_file(filename):
         return '.' in filename and filename.rsplit('.', 1)[1] in ['V21']
