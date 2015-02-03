@@ -5,7 +5,6 @@ from werkzeug.utils import secure_filename
 
 from webapp.uploads import __uploads__
 from webapp.validations import __validations__
-from tests.test_files import __test_files__
 
 """
 Offers classes to handle the access to files in the project paths.
@@ -52,7 +51,3 @@ class FileManager(object):
     @staticmethod
     def get_validations_path(file_name):
         return os.path.join(__validations__.path(), file_name)
-
-    @staticmethod
-    def get_test_file(file_name):
-        return os.path.join(__test_files__.path(), file_name)
