@@ -53,7 +53,7 @@ def manage_uploaded_file():
             for record in response_json["records"]:
                 output_file.write((record + "\n").encode('utf-8'))
         session['document_name'] = filename
-        with open(FileManager.get_validations_path(filename+ '.json'), "w") as output_file:
+        with open(FileManager.get_validations_path(filename + '.json'), "w") as output_file:
             json.dump(response_json["document"], output_file)
 
         return render_template('results.html', filename=filename, document=response_json["document"])
@@ -70,7 +70,7 @@ def download_file(file_name):
 def submit_file():
     if session['document'] is not None:
         filename = session['document_name']
-        with open(FileManager.get_validations_path(filename+'.json'), "w") as input_file:
+        with open(FileManager.get_validations_path(filename + '.json'), "w") as input_file:
             json_document = json.load(input_file)
         url = DATABASE_ENDPOINT + '/persist-document'
         headers = {'Content-type': 'application/json'}

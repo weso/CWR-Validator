@@ -1,4 +1,5 @@
-__author__ = 'Borja'
+# -*- encoding: utf-8 -*-
+
 import re
 
 import regex
@@ -7,6 +8,15 @@ from models.cwr_objects import CWRField, Agreement, WorkAlternativeTitle, WorkAd
     NRWorkTitle, NRSpecialTitle, NROtherWriterName, NRPartyName, NRPublisherName, NRPerformanceData, NRWriterName, \
     Registration, WorkOrigin, PerformingArtist, WriterAgent, RecordingDetail, PublisherTerritory, PublisherControl, \
     WriterControl, WriterTerritory, Territory, Trailer, WorkVersionTitle
+
+"""
+Matchers for validating record entries.
+"""
+
+__author__ = 'Borja Garrido Bear'
+__license__ = 'MIT'
+__version__ = '0.0.0'
+__status__ = 'Development'
 
 
 class Record(object):
