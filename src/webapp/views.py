@@ -1,7 +1,7 @@
 import codecs
+import json
 
 import requests
-import json
 from flask import render_template, request, send_file, session, redirect, url_for
 
 from webapp import app

@@ -3,8 +3,8 @@ from __future__ import unicode_literals
 import codecs
 import unittest
 
-from tests.test_files import test_files_config
 from validator import Validator
+from utils.file_manager import FileManager
 
 
 __author__ = 'Borja'
@@ -28,7 +28,8 @@ class TestRecords(unittest.TestCase):
 
 class TestFile(unittest.TestCase):
     def setUp(self):
-        self.file_path = test_files_config.cwr_test_file()
+        file_manager = FileManager()
+        self.file_path = file_manager.get_test_file("CW1328EMI_059.V21")
 
     def test_file(self):
         validator = Validator()
