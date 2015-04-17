@@ -54,6 +54,12 @@ setup(
                  'Programming Language :: Python :: Implementation :: PyPy'],
     long_description=long_description,
     install_requires=[
+        'Flask',
+        'Flask-RESTful',
+        'Flask-SQLAlchemy',
+        'SQLAlchemy',
+        'requests',
+        'CWR-API',
     ],
     tests_require=_tests_require,
     extras_require={'test': _tests_require},
