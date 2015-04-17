@@ -12,3 +12,5 @@ six==1.9.0
 wsgiref==0.1.2
 xlrd==0.9.3
 requests==2.5.1
+pyparsing==2.0.3
+CWR-API==0.0.8

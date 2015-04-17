@@ -1,37 +1,60 @@
-# CWR-validator
+CWR Data Model Validator
+========================
 
-CWR file validator. To be used with the CWR data API.
+Validator service for CWR files. It receives a file following the CISAC CWR
+standard v2.1 and returns a JSON containing the data from that same file.
 
-### Status
+It uses the `CWR Data Model`_ API, and it is recommended using that same library
+to read the JSON created by the service.
+
+Documentation
+-------------
+
+The current version is under development. No public documentation is still offered.
+
+Status
+------
+
 The project is still in the development phase.
 
-#### Issues management
-Issues are managed at the GitHub [project issues page][].
+Issues management
+~~~~~~~~~~~~~~~~~
 
-## Building the code
-The application is coded in Python 2, dependencies are indicated on requirements.txt.
+Issues are managed at the GitHub `project issues page`_.
 
-### Prerequisites
-Requires Python 2.6, 2.7, 3.2, 3.3 or 3.4.
+Building the code
+-----------------
 
-The dependencies can be acquired using the list on requirements.txt, with the command:
+The application has been coded in Python, without using any particular framework.
 
-`pip install -r requirements.txt`
+Prerequisites
+~~~~~~~~~~~~~
 
-### Getting the code
-The code can be found at the GitHub [project page][].
+The project has been tested in the following versions of the interpreter:
 
-To acquire it through Git use the following clone URI:
+- Python 2.6
+- Python 2.7
+- Python 3.2
+- Python 3.3
+- Python 3.4
+- Pypy
+- Pypy 3
 
-`git clone https://github.com/Bernardo-MG/CWR-Validator.git`
+Al other dependencies are indicated on requirements.txt, which can be installed with the command:
 
-## Continuous integration
-The continuous integration information can be found at the [project CI page][] based on Travis CI.
+``pip install -r requirements.txt``
 
-## License
-The project is released under the [MIT License][].
+Getting the code
+~~~~~~~~~~~~~~~~
 
-[MIT License]: http://www.opensource.org/licenses/mit-license.php
-[project CI page]: https://travis-ci.org/Bernardo-MG/CWR-Validator
-[project issues page]: https://travis-ci.org/weso/CWR-Validator/issues
-[project page]: https://github.com/Bernardo-MG/CWR-Validator
+The code can be found at the `GitHub project page`_.
+
+License
+-------
+
+The project has been released under the `MIT License`_.
+
+.. _CWR Data Model: https://github.com/weso/CWR-DataApi
+.. _project issues page: https://github.com/weso/CWR-Validator/issues
+.. _GitHub project page: https://github.com/weso/CWR-Validator
+.. _MIT License: http://www.opensource.org/licenses/mit-license.php
