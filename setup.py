@@ -24,7 +24,7 @@ here = path.abspath(path.dirname(__file__))
 with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
-with open('cwr/validator/__init__.py', 'rb', encoding='utf-8') as f:
+with open('cwr_validator/__init__.py', 'rb', encoding='utf-8') as f:
     version = f.read()
     version = _version_re.search(version).group(1)
     version = str(ast.literal_eval(version.rstrip()))
