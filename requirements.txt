@@ -3,5 +3,5 @@ Flask-RESTful==0.3.2
 Flask-SQLAlchemy==2.0
 SQLAlchemy==1.0.0
 requests==2.6.0
-CWR-API==0.0.8
+CWR-API==0.0.9
 pymongo==3.0
