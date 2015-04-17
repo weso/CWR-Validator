@@ -1,4 +1,4 @@
-from cwr.validator.api.persistence.daos import *
+from cwr.validator.service.persistence.daos import *
 
 
 class GenericService(object):
