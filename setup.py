@@ -30,7 +30,7 @@ with open('cwr/validator/__init__.py', 'rb', encoding='utf-8') as f:
     version = str(ast.literal_eval(version.rstrip()))
 
 setup(
-    name='CWR-API-Validator-WS',
+    name='CWR-Validator-WS',
     packages=find_packages(),
     include_package_data=True,
     package_data={

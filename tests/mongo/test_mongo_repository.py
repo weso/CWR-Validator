@@ -4,7 +4,7 @@ import unittest
 import re
 
 from tests.mongo.mongo_test_conf import host, port, db_name, MongoGenericRepository
-from cwr.table_value import TableValue
+from cwr_validator.table_value import TableValue
 
 
 """

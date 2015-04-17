@@ -2,12 +2,12 @@
 import unittest
 import datetime
 
-from cwr.agreement import AgreementRecord, InterestedPartyForAgreementRecord
-from cwr.interested_party import Publisher
-from cwr.table_value import TableValue
-from cwr.work import AlternateTitleRecord, AuthoredWorkRecord, \
+from cwr_validator.agreement import AgreementRecord, InterestedPartyForAgreementRecord
+from cwr_validator.interested_party import Publisher
+from cwr_validator.table_value import TableValue
+from cwr_validator.work import AlternateTitleRecord, AuthoredWorkRecord, \
     PerformingArtistRecord, WorkOriginRecord, WorkRecord, RecordingDetailRecord
-from cwr.other import ISWCCode, VISAN
+from cwr_validator.other import ISWCCode, VISAN
 
 from tests.mongo.mongo_test_conf import host, port, db_name, MongoGenericRepository
 
