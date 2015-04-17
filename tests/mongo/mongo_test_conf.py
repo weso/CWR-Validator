@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 
-from pymongo import Connection
+from pymongo import MongoClient
 
 from cwr.validator.data.repository import Repository
 from cwr.utils.mongo_encoder import MongoDictionaryEncoder
@@ -27,7 +27,7 @@ class MongoGenericRepository(Repository):
     ELEMENTS_PER_PAGE = 15
 
     def __init__(self, repo_host, repo_port, repo_db_name, collection):
-        connection = Connection(repo_host, repo_port)
+        connection = MongoClient(repo_host, repo_port)
         self._db = connection[repo_db_name]
 
         self._encoder = MongoDictionaryEncoder()
