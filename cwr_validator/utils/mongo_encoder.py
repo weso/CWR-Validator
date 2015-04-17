@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from cwr.parser.dictionary import CWRDictionaryEncoder
+from cwr.parser.cwrjson import JSONEncoder
 
 """
 Offers classes to create Mongo dictionaries from model objects.
@@ -10,7 +10,7 @@ __license__ = 'MIT'
 __status__ = 'Development'
 
 
-class MongoDictionaryEncoder(CWRDictionaryEncoder):
+class MongoDictionaryEncoder(JSONEncoder):
     """
     Encodes CWR model classes into Mongo dictionaries.
     """

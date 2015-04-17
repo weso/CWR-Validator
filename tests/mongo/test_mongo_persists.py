@@ -9,7 +9,7 @@ from cwr.work import AlternateTitleRecord, AuthoredWorkRecord, \
     PerformingArtistRecord, WorkOriginRecord, WorkRecord, RecordingDetailRecord
 from cwr.other import ISWCCode, VISAN
 
-from tests.mongo.mongo_test_conf import host, port, db_name, MongoGenericRepository
+from tests.utils.mongo_test_conf import host, port, db_name, MongoGenericRepository
 
 
 """
