@@ -1,13 +1,13 @@
 from flask import request, Response
 from flask.ext.restful import Api, Resource
 
-from cwr.validator.api import api_app
+from cwr.validator.api import app
 
 
 __author__ = 'Borja'
 
 # Api object to serve endpoints created
-api = Api(api_app)
+api = Api(app)
 
 # Utils class to work with json
 jsonConverter = None
