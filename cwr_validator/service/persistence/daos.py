@@ -2,7 +2,7 @@ import logging
 
 from sqlalchemy.exc import IntegrityError
 
-from cwr.validator.service.persistence.domain import *
+from cwr_validator.validator.service.persistence.domain import *
 
 
 logging.basicConfig(filename='cwr.log', level=logging.DEBUG)

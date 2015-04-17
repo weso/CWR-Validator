@@ -1,7 +1,9 @@
-from flask import request, Response
+from flask import request, Response, session
 from flask.ext.restful import Api, Resource
+import flask as f
 
-from cwr.validator.service import app
+from cwr_validator.validator.service import app
+from cwr_validator.utils.file_manager import  FileManager
 
 
 __author__ = 'Borja'
@@ -15,6 +17,18 @@ jsonConverter = None
 # Main class of the webapp, in charge of the validation
 validator = None
 
+fileManager = FileManager()
+
+@app.route('/upload/cwr', methods=['POST'])
+def upload_cwr_handler():
+    # Get the name of the uploaded file
+    sent_file = request.files['file']
+
+    if sent_file:
+        fileManager.save_file_cwr(sent_file)
+        session['cwr_file_name'] = sent_file.filename
+        ctx = app.app_context()
+        f.cwr = fileManager.read_cwr(sent_file.filename)
 
 class ValidateDocumentAPI(Resource):
     @staticmethod

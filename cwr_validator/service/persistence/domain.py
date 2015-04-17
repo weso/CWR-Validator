@@ -3,7 +3,7 @@ __author__ = 'Borja'
 from sqlalchemy.sql.schema import Column
 from sqlalchemy.sql.sqltypes import Integer, String
 
-from cwr.validator.service import db
+from cwr_validator.validator.service import db
 
 
 class AgreementRole(db.Model):
