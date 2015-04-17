@@ -2,8 +2,8 @@
 
 from pymongo import Connection
 
-from commonworks.data.repository import Repository
-from commonworks.utils.mongo_encoder import MongoDictionaryEncoder
+from cwr.validator.data.repository import Repository
+from cwr.utils.mongo_encoder import MongoDictionaryEncoder
 
 
 """
