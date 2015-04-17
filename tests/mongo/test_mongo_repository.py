@@ -3,8 +3,9 @@
 import unittest
 import re
 
-from tests.mongo.mongo_test_conf import host, port, db_name, MongoGenericRepository
 from cwr.table_value import TableValue
+
+from tests.utils.mongo_test_conf import host, port, db_name, MongoGenericRepository
 
 
 """
