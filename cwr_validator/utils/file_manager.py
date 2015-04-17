@@ -3,10 +3,10 @@ import os
 import codecs
 
 from werkzeug.utils import secure_filename
-from cwr_validator.parser.file import CWRFileDecoder
+from cwr.parser.file import CWRFileDecoder
 import chardet
 
-from webapp.uploads import __uploads__
+from cwr_validator.uploads import __uploads__
 
 
 """

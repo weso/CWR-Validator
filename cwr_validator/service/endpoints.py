@@ -2,7 +2,7 @@ from flask import request, Response, session
 from flask.ext.restful import Api, Resource
 import flask as f
 
-from cwr_validator.validator.service import app
+from cwr_validator.service import app
 from cwr_validator.utils.file_manager import  FileManager
 
 
