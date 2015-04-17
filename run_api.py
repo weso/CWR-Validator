@@ -2,7 +2,7 @@
 import os
 import logging
 
-from cwr.validator.api import app
+from cwr.validator.service import app
 
 
 """

@@ -1,9 +1,9 @@
 # -*- encoding: utf-8 -*-
 
 from pymongo import MongoClient
-
-from cwr.validator.data.repository import Repository
 from cwr.utils.mongo_encoder import MongoDictionaryEncoder
+
+from cwr.utils.repository import Repository
 
 
 """

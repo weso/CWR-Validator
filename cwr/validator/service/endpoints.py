@@ -1,7 +1,7 @@
 from flask import request, Response
 from flask.ext.restful import Api, Resource
 
-from cwr.validator.api import app
+from cwr.validator.service import app
 
 
 __author__ = 'Borja'

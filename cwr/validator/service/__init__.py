@@ -12,4 +12,4 @@ app.config['TRACK_USAGE_USE_FREEGEOIP'] = False
 app.config['DEBUG'] = True
 db = SQLAlchemy(app)
 
-from cwr.validator.api import endpoints
+from cwr.validator.service import endpoints
