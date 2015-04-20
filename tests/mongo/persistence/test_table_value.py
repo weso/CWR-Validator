@@ -18,13 +18,13 @@ class TestTableValue(unittest.TestCase):
     """
 
     def setUp(self):
-        self.entity = TableValue(1, 'name', 'desc')
-        self.repo = MongoGenericRepository(host, port, db_name, 'value_entities')
+        self._entity = TableValue(1, 'name', 'desc')
+        self._repo = MongoGenericRepository(host, port, db_name, 'value_entities')
 
     def tearDown(self):
-        self.repo.clear()
+        self._repo.clear()
 
     def test_add(self):
-        self.assertEqual(len(self.repo.get(lambda e: True)), 0)
-        self.repo.add(self.entity)
-        self.assertEqual(len(self.repo.get(lambda e: True)), 1)
+        self.assertEqual(len(self._repo.get(lambda e: True)), 0)
+        self._repo.add(self._entity)
+        self.assertEqual(len(self._repo.get(lambda e: True)), 1)
