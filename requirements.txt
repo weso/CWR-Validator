@@ -5,3 +5,4 @@ Flask-SQLAlchemy==2.0
 SQLAlchemy==1.0.0
 requests==2.6.0
 pymongo==3.0
+ordereddict==1.1
