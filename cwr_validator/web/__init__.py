@@ -5,4 +5,4 @@ __author__ = 'Borja'
 
 app = Flask(__name__)
 
-from cwr_validator.service import endpoints
+from cwr_validator.web import endpoints

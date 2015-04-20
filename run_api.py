@@ -2,7 +2,7 @@
 import os
 import logging
 
-from cwr_validator.service import app
+from cwr_validator.web import app
 from flask.ext.sqlalchemy import SQLAlchemy
 
 
