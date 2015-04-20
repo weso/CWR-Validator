@@ -4,7 +4,7 @@ import unittest
 
 from cwr.table_value import TableValue
 
-from tests.utils.mongo_test_conf import host, port, db_name, MongoGenericRepository
+from tests.mongo.utils.mongo_test_conf import host, port, db_name, MongoGenericRepository
 
 
 __author__ = 'Bernardo Martínez Garrido,Borja Garrido Bear'

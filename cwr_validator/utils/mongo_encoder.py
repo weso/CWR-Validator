@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from cwr.parser.cwrjson import JSONEncoder
+import datetime
+
+from cwr.parser.dictionary import CWRDictionaryEncoder
+
 
 """
 Offers classes to create Mongo dictionaries from model objects.
@@ -11,7 +14,7 @@ __license__ = 'MIT'
 __status__ = 'Development'
 
 
-class MongoDictionaryEncoder(JSONEncoder):
+class MongoDictionaryEncoder(CWRDictionaryEncoder):
     """
     Encodes CWR model classes into Mongo dictionaries.
     """
@@ -21,6 +24,10 @@ class MongoDictionaryEncoder(JSONEncoder):
 
     def encode(self, d):
         encoded = super(MongoDictionaryEncoder, self).encode(d)
+
+        for key, value in encoded.iteritems():
+            if isinstance(value, datetime.date):
+                encoded[key] = value.isoformat()
 
         return encoded
 

@@ -3,7 +3,7 @@ from flask.ext.restful import Api, Resource
 import flask as f
 
 from cwr_validator.service import app
-from cwr_validator.utils.file_manager import  FileManager
+from cwr_validator.utils.file_manager import FileManager
 
 
 __author__ = 'Borja'
@@ -19,6 +19,7 @@ validator = None
 
 fileManager = FileManager()
 
+
 @app.route('/upload/cwr', methods=['POST'])
 def upload_cwr_handler():
     # Get the name of the uploaded file
@@ -29,6 +30,7 @@ def upload_cwr_handler():
         session['cwr_file_name'] = sent_file.filename
         ctx = app.app_context()
         f.cwr = fileManager.read_cwr(sent_file.filename)
+
 
 class ValidateDocumentAPI(Resource):
     @staticmethod
