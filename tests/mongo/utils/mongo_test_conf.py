@@ -35,7 +35,8 @@ class MongoGenericRepository(Repository):
         self._collection = collection
 
     def add(self, entity):
-        self._db[self._collection].insert(self.encoder.encode(entity))
+        encoded = self.encoder.encode(entity)
+        self._db[self._collection].insert(encoded)
 
     def get(self, predicate):
         # In Python 3 filter() returns an iterator
