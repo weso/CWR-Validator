@@ -2,25 +2,24 @@
 
 import unittest
 import datetime
-from cwr_validator.utils.mongo_encoder import MongoDictionaryEncoder
+
 from cwr.agreement import AgreementRecord
 
-"""
-Configuration to be used on the Mongo tests.
-"""
+from tests.utils.mongo_test_conf import host, port, db_name, MongoGenericRepository
 
-__author__ = 'Bernardo Martínez Garrido'
+
+__author__ = 'Bernardo Martínez Garrido,Borja Garrido Bear'
 __license__ = 'MIT'
-__version__ = '0.0.0'
 __status__ = 'Development'
 
 
-class TestMongoDictionaryEncoder(unittest.TestCase):
-    def setUp(self):
-        self._encoder = MongoDictionaryEncoder()
+class TestAgreement(unittest.TestCase):
+    """
+    Tests the Agreement API against a Mongo database.
+    """
 
-    def test_agreement(self):
-        entity = AgreementRecord(record_type='ACK',
+    def setUp(self):
+        self.entity = AgreementRecord(record_type='ACK',
                                       transaction_sequence_n=3,
                                       record_sequence_n=15,
                                       submitter_agreement_n='AB12',
@@ -40,5 +39,12 @@ class TestMongoDictionaryEncoder(unittest.TestCase):
                                                                                                '%Y%m%d').date(),
                                       shares_change=True,
                                       advance_given=True)
+        self.repo = MongoGenericRepository(host, port, db_name, 'agreements')
 
-        self._encoder.encode(entity)
+    def tearDown(self):
+        self.repo.clear()
+
+    def test_add(self):
+        self.assertEqual(len(self.repo.get(lambda e: True)), 0)
+        self.repo.add(self.entity)
+        self.assertEqual(len(self.repo.get(lambda e: True)), 1)
