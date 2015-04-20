@@ -1,0 +1,4 @@
+# Miscellany files
+include LICENSE
+include README.rst
+prune tests

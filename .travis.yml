@@ -1,0 +1,16 @@
+language: python
+python:
+  - "2.6"
+  - "2.7"
+  - "pypy"
+
+services:
+  - mongodb
+
+install:
+  - pip install tox
+before_script:
+  # To avoid the problems with mongodb taking long to start
+  - sleep 15
+script:
+  - tox -e $(echo py$TRAVIS_PYTHON_VERSION | tr -d . | sed -e 's/pypypy/pypy/')
