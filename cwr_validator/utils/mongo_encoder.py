@@ -3,6 +3,7 @@
 import datetime
 
 from cwr.parser.dictionary import CWRDictionaryEncoder
+from cwr.other import *
 
 
 """
@@ -28,6 +29,16 @@ class MongoDictionaryEncoder(CWRDictionaryEncoder):
         for key, value in encoded.iteritems():
             if isinstance(value, datetime.date):
                 encoded[key] = value.isoformat()
+            elif isinstance(value, datetime.time):
+                encoded[key] = value.isoformat()
+            elif isinstance(value, datetime.datetime):
+                encoded[key] = value.isoformat()
+            elif isinstance(value, ISWCCode):
+                # TODO: This should be transformed into a dict by the parser
+                encoded[key] = str(value)
+            elif isinstance(value, VISAN):
+                # TODO: This should be transformed into a dict by the parser
+                encoded[key] = str(value)
 
         return encoded
 
