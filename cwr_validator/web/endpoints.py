@@ -1,9 +1,8 @@
-from flask import request, Response, session
-from flask.ext.restful import Api, Resource
-import flask as f
+from flask import request, Response
+from flask.ext.restful import Api
 
 from cwr_validator.web import app
-from cwr_validator.utils.file_manager import FileManager
+from cwr_validator.service.file import LocalCWRFileService
 
 
 __author__ = 'Borja'
@@ -14,10 +13,7 @@ api = Api(app)
 # Utils class to work with json
 jsonConverter = None
 
-# Main class of the webapp, in charge of the validation
-validator = None
-
-fileManager = FileManager()
+file_service = LocalCWRFileService()
 
 
 @app.route('/upload/cwr', methods=['POST'])
@@ -26,53 +22,8 @@ def upload_cwr_handler():
     sent_file = request.files['file']
 
     if sent_file:
-        fileManager.save_file_cwr(sent_file)
-        session['cwr_file_name'] = sent_file.filename
-        ctx = app.app_context()
-        f.cwr = fileManager.read_cwr(sent_file.filename)
-
-
-class ValidateDocumentAPI(Resource):
-    @staticmethod
-    def get():
-
-        return 'Please, use this endpoint by post method.'
-
-    @staticmethod
-    def post():
-
-        if request.json is None:
-            result = {
-                'success': False,
-                'error': 'Expected json content'
-            }
-
-            return response_json_item(result)
-        else:
-            # Get json document from the request
-            json_document = request.json
-
-            # Validate the regex
-            document = validator.validate_document(json_document)
-
-            records = []
-            for record in sorted(document.extract_records(), key=lambda item: item.number):
-                records.append(record.record.encode('utf-8'))
-                for message in record.messages:
-                    records.append(str(message).encode('utf-8'))
-
-            jsonConverter.print_object(document)
-
-            result = {
-                'success': True,
-                'document': document,
-                'records': records
-            }
-
-            return response_json_item(result)
-
-
-api.add_resource(ValidateDocumentAPI, '/cwr/validation', endpoint='validation')
+        id = file_service.save_file(sent_file)
+        file_service.process_file(id)
 
 
 def response_json_list(app_request, collection):

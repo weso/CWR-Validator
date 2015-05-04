@@ -1,4 +1,4 @@
-CWR-API==0.0.12
+CWR-API==0.0.13
 Flask==0.10.1
 Flask-RESTful==0.3.2
 Flask-SQLAlchemy==2.0
