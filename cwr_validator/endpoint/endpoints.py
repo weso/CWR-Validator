@@ -1,6 +1,8 @@
+# -*- coding: utf-8 -*-
+
 from flask import request, Response
 
-from cwr_validator.service.file import LocalCWRFileService
+from cwr_validator.service.file import LocalFileService
 
 
 __author__ = 'Borja'
@@ -9,7 +11,7 @@ __author__ = 'Borja'
 # Utils class to work with json
 jsonConverter = None
 
-file_service = LocalCWRFileService()
+file_service = LocalFileService()
 
 
 def response_json_list(app_request, collection):

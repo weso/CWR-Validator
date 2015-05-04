@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from cwr_validator.validator.service.persistence.daos import *
 
 

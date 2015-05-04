@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 __author__ = 'Borja'
 
 from sqlalchemy.sql.schema import Column
