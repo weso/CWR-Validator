@@ -6,7 +6,8 @@ import datetime
 from cwr.work import WorkRecord
 from cwr.other import ISWCCode
 
-from tests.mongo.utils.mongo_test_conf import host, port, db_name, MongoGenericRepository
+from tests.mongo.utils.mongo_test_conf import host, port, db_name
+from cwr_validator.persistence.repository import MongoGenericRepository
 
 
 __author__ = 'Bernardo Martínez Garrido,Borja Garrido Bear'

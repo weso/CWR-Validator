@@ -5,8 +5,8 @@ import re
 
 from cwr.table_value import TableValue
 
-from tests.mongo.utils.mongo_test_conf import host, port, db_name, MongoGenericRepository
-
+from tests.mongo.utils.mongo_test_conf import host, port, db_name
+from cwr_validator.persistence.repository import MongoGenericRepository
 
 """
 Unit tests to check if the Repository API can be made to work correctly with Mongo.
