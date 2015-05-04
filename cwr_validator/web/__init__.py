@@ -1,1 +1,0 @@
-from cwr_validator.web import endpoints

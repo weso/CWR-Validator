@@ -8,7 +8,7 @@ from cwr_validator import create_app
 Runs the CWR Validator web API.
 """
 
-__author__ = 'Bernardo Martínez Garrido, Borja Garrido Bear'
+__author__ = 'Bernardo Martínez Garrido'
 __license__ = 'MIT'
 __version__ = '0.0.0'
 

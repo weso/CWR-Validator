@@ -19,17 +19,24 @@ def create_app():
     from werkzeug.contrib.fixers import ProxyFix
     from flask.ext.sqlalchemy import SQLAlchemy
 
+    from cwr_validator.endpoint import upload_blueprint
+
+    from cwr_validator.service.file import LocalFileService
+
     debug = bool(os.environ.get('CWR_VALIDATOR_DEBUG', True))
     secret = os.environ.get('CWR_VALIDATOR_SECRET_KEY', os.urandom(24))
     upload = os.environ.get('UPLOAD_FOLDER', './files')
 
     app = Flask(__name__)
+    app.register_blueprint(upload_blueprint, url_prefix='/upload')
 
     app.wsgi_app = ProxyFix(app.wsgi_app)
 
     app.config['DEBUG'] = debug
     app.config['SECRET_KEY'] = secret
     app.config['UPLOAD_FOLDER'] = upload
+
+    app.config['FILE_SERVICE'] = LocalFileService(app.config['UPLOAD_FOLDER'])
 
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///commonworks.db'
     app.config['TRACK_USAGE_USE_FREEGEOIP'] = False

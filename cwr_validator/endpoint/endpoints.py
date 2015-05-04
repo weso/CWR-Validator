@@ -1,29 +1,15 @@
 from flask import request, Response
-from flask.ext.restful import Api
 
-from cwr_validator.web import app
 from cwr_validator.service.file import LocalCWRFileService
 
 
 __author__ = 'Borja'
 
-# Api object to serve endpoints created
-api = Api(app)
 
 # Utils class to work with json
 jsonConverter = None
 
 file_service = LocalCWRFileService()
-
-
-@app.route('/upload/cwr', methods=['POST'])
-def upload_cwr_handler():
-    # Get the name of the uploaded file
-    sent_file = request.files['file']
-
-    if sent_file:
-        id = file_service.save_file(sent_file)
-        file_service.process_file(id)
 
 
 def response_json_list(app_request, collection):
