@@ -2,8 +2,9 @@
 
 import datetime
 
-from cwr.parser.dictionary import CWRDictionaryEncoder
 from cwr.other import *
+
+from cwr.parser.dictionary import CWRDictionaryEncoder
 
 
 """

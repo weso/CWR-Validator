@@ -4,8 +4,8 @@ from abc import ABCMeta, abstractmethod
 import os
 
 from werkzeug.utils import secure_filename
-from cwr.parser.file import CWRFileDecoder
-from cwr.parser.cwrjson import JSONEncoder
+from cwr.parser.decoder.file import default_file_decoder
+from cwr.parser.encoder.cwrjson import JSONEncoder
 
 
 __author__ = 'Bernardo Martínez Garrido'
@@ -41,7 +41,7 @@ class LocalFileService(FileService):
         super(FileService, self).__init__()
         self._files_data = {}
         self._path = path
-        self._decoder = CWRFileDecoder()
+        self._decoder = default_file_decoder()
         self._encoder_json = JSONEncoder()
 
     def get_file(self, file_id):

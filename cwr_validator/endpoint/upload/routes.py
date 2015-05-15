@@ -1,5 +1,5 @@
 # -*- encoding: utf-8 -*-
-from flask import request, Blueprint, render_template, current_app
+from flask import request, Blueprint, render_template, current_app, jsonify, Response
 
 
 __author__ = 'Bernardo Martínez Garrido'
@@ -14,12 +14,17 @@ upload_blueprint = Blueprint('upload', __name__,
 @upload_blueprint.route('/', methods=['POST'])
 def upload_cwr_handler():
     # Get the name of the uploaded file
-    sent_file = request.files['file']
+    if 'file' in request.files:
+        sent_file = request.files['file']
 
-    if sent_file:
-        file_service = current_app.config['FILE_SERVICE']
+        if sent_file:
+            file_service = current_app.config['FILE_SERVICE']
 
-        file_id = file_service.save_file(sent_file, current_app.config['UPLOAD_FOLDER'])
+            file_id = file_service.save_file(sent_file, current_app.config['UPLOAD_FOLDER'])
+
+            jsonify({'file_id': file_id})
+    else:
+        return Response(status=405)
 
 
 @upload_blueprint.route('/', methods=['GET'])
