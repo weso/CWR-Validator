@@ -16,7 +16,7 @@ __license__ = 'MIT'
 __version__ = '0.0.0'
 
 _version_re = re.compile(r'__version__\s+=\s+(.*)')
-_tests_require = ['pymongo']
+_tests_require = ['Flask-Testing']
 
 here = path.abspath(path.dirname(__file__))
 
@@ -56,9 +56,6 @@ setup(
     install_requires=[
         'Flask',
         'Flask-RESTful',
-        'Flask-SQLAlchemy',
-        'SQLAlchemy',
-        'requests',
         'CWR-API',
     ],
     tests_require=_tests_require,

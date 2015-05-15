@@ -1,2 +1,3 @@
-CWR-API==0.0.17
+CWR-API==0.0.19
 Flask==0.10.1
+Flask-Testing==0.4.2
