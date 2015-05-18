@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 """
     CWR Data API Validator WS
     ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -19,11 +20,13 @@ def create_app():
     from logging import Formatter
 
     from flask import Flask
+    from flask.ext import restful
+
     from werkzeug.contrib.fixers import ProxyFix
 
     from cwr_validator.uploads import __uploads__
 
-    from cwr_validator.endpoint import upload_blueprint
+    from cwr_validator.endpoint import UploadFileResource
 
     from cwr_validator.service.file import LocalFileService
 
@@ -44,7 +47,9 @@ def create_app():
         log = 'cwr_webapp.log'
 
     app = Flask(__name__)
-    app.register_blueprint(upload_blueprint, url_prefix='/upload')
+    api = restful.Api(app)
+
+    api.add_resource(UploadFileResource, '/upload')
 
     app.wsgi_app = ProxyFix(app.wsgi_app)
 

@@ -21,13 +21,13 @@ class TestUpload(unittest.TestCase):
     def test_get(self):
         client = self._app.test_client()
 
-        response = client.get('/upload/')
+        response = client.get('/upload')
         self.assertEqual(response.status_code, 200)
 
     def test_post_no_file(self):
         client = self._app.test_client()
 
-        response = client.post('/upload/')
+        response = client.post('/upload')
         self.assertEqual(response.status_code, 405)
 
     def test_post_no_file_with_data(self):
@@ -36,7 +36,7 @@ class TestUpload(unittest.TestCase):
         data = {
             'file': (StringIO('my file contents'), 'hello_world.txt'),
         }
-        response = client.post('/upload/', data=data)
+        response = client.post('/upload', data=data)
         self.assertEqual(response.status_code, 405)
 
     def test_post_wrong_id(self):
@@ -45,7 +45,7 @@ class TestUpload(unittest.TestCase):
         data = {
             'file_data': (StringIO(_file_contents_cwr()), 'hello_world.txt'),
         }
-        response = client.post('/upload/', data=data)
+        response = client.post('/upload', data=data)
         self.assertEqual(response.status_code, 405)
 
 

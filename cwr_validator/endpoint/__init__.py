@@ -1,1 +1,1 @@
-from cwr_validator.endpoint.upload.routes import upload_blueprint
+from cwr_validator.endpoint.upload.resources import UploadFileResource
