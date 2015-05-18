@@ -16,7 +16,7 @@ __license__ = 'MIT'
 __version__ = '0.0.0'
 
 _version_re = re.compile(r'__version__\s+=\s+(.*)')
-_tests_require = ['Flask-Testing']
+_tests_require = ['pytest','nose','Flask-Testing']
 
 here = path.abspath(path.dirname(__file__))
 

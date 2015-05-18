@@ -18,28 +18,34 @@ class TestUpload(unittest.TestCase):
         self._app.config['DEBUG'] = False
         self._app.config['TESTING'] = True
 
-        self._client = self._app.test_client()
-
     def test_get(self):
-        response = self._client.get('/upload/')
+        client = self._app.test_client()
+
+        response = client.get('/upload/')
         self.assertEqual(response.status_code, 200)
 
     def test_post_no_file(self):
-        response = self._client.post('/upload/')
+        client = self._app.test_client()
+
+        response = client.post('/upload/')
         self.assertEqual(response.status_code, 405)
 
     def test_post_no_file_with_data(self):
+        client = self._app.test_client()
+
         data = {
             'file': (StringIO('my file contents'), 'hello_world.txt'),
         }
-        response = self._client.post('/upload/', data=data)
+        response = client.post('/upload/', data=data)
         self.assertEqual(response.status_code, 405)
 
     def test_post_wrong_id(self):
+        client = self._app.test_client()
+
         data = {
             'file_data': (StringIO(_file_contents_cwr()), 'hello_world.txt'),
         }
-        response = self._client.post('/upload/', data=data)
+        response = client.post('/upload/', data=data)
         self.assertEqual(response.status_code, 405)
 
 
