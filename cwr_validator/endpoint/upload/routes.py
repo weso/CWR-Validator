@@ -22,7 +22,10 @@ def upload_cwr_handler():
 
             file_id = file_service.save_file(sent_file, current_app.config['UPLOAD_FOLDER'])
 
-            jsonify({'file_id': file_id})
+            if file_id:
+                jsonify({'file_id': file_id})
+            else:
+                return Response(status=405)
     else:
         return Response(status=405)
 

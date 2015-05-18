@@ -2,6 +2,7 @@
 
 from abc import ABCMeta, abstractmethod
 import os
+import codecs
 
 from werkzeug.utils import secure_filename
 from cwr.parser.decoder.file import default_file_decoder
@@ -67,14 +68,27 @@ class LocalFileService(FileService):
         file.save(os.path.join(path, filename))
 
         data = self._read_cwr(filename, self._path)
-        index = len(self._files_data)
-        self._files_data[index] = data
+        if data:
+            index = len(self._files_data)
+            self._files_data[index] = data
+        else:
+            index = None
 
         return index
 
     def _read_cwr(self, filename, path):
         file_path = os.path.join(path, filename)
-        return self._decoder.decode(file_path)
+        data = {}
+
+        data['filename'] = filename
+        data['contents'] = codecs.open(file_path, 'r', 'latin-1').read()
+
+        try:
+            result = self._decoder.decode(data)
+        except:
+            result = None
+
+        return result
 
     def generate_json(self, data):
         return self._encoder_json.encode(data)
