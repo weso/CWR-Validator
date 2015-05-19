@@ -1,3 +1,4 @@
 CWR-API==0.0.20
 Flask==0.10.1
 Flask-RESTful==0.3.2
+ordereddict==1.1
