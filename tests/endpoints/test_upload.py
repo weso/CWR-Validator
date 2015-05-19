@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 
 import unittest
+
 try:
     from StringIO import StringIO
+
     IOModule = StringIO
     _python2 = True
 except ImportError:
     from io import BytesIO
+
     IOModule = BytesIO
     _python2 = False
 
@@ -25,6 +28,7 @@ def _prepare_file(text):
         result = IOModule(b'my file contents')
 
     return result
+
 
 class TestUpload(unittest.TestCase):
     def setUp(self):
@@ -45,23 +49,32 @@ class TestUpload(unittest.TestCase):
         response = client.post('/upload')
         self.assertEqual(response.status_code, 405)
 
-    def test_post_no_file_with_data(self):
+    def test_post_file_with_invalid_data(self):
         client = self._app.test_client()
 
         data = {
             'file': (_prepare_file('my file contents'), 'hello_world.txt'),
         }
         response = client.post('/upload', data=data)
-        self.assertEqual(response.status_code, 405)
+        self.assertEqual(response.status_code, 200)
 
-    def test_post_wrong_id(self):
+    def test_post_file_with_valid_data(self):
+        client = self._app.test_client()
+
+        data = {
+            'file': (_prepare_file(_file_contents_cwr()), 'hello_world.txt'),
+        }
+        response = client.post('/upload', data=data)
+        self.assertEqual(response.status_code, 200)
+
+    def test_post_file_with_valid_data_alternate_id(self):
         client = self._app.test_client()
 
         data = {
             'file_data': (_prepare_file(_file_contents_cwr()), 'hello_world.txt'),
         }
         response = client.post('/upload', data=data)
-        self.assertEqual(response.status_code, 405)
+        self.assertEqual(response.status_code, 200)
 
 
 def _file_contents_cwr():
