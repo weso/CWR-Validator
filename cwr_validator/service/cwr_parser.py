@@ -5,21 +5,20 @@ import os
 import codecs
 from random import randint
 import uuid
-
-try:
-    import thread
-
-    _python2 = True
-except ImportError:
-    from threading import Thread
-
-    _python2 = False
 import logging
 
 from werkzeug.utils import secure_filename
 from cwr.parser.decoder.file import default_file_decoder
 from cwr.parser.encoder.cwrjson import JSONEncoder
 
+from cwr_validator.util.parallel import threaded
+
+
+"""
+Services for parsing CWR files.
+
+These allow creating the model graph from a CWR file, but also transforming it to and from JSON messages.
+"""
 
 __author__ = 'Bernardo Martínez Garrido'
 __license__ = 'MIT'
@@ -28,13 +27,7 @@ __status__ = 'Development'
 _logger = logging.getLogger(__name__)
 
 
-def _parallelize(filename, file_path, decoder):
-    if _python2:
-        thread.start_new_thread(_parse_cwr, (filename, file_path, decoder))
-    else:
-        Thread(target=_parse_cwr, args=(filename, file_path, decoder)).start()
-
-
+@threaded
 def _parse_cwr(filename, file_path, decoder):
     data = {}
 
@@ -66,7 +59,7 @@ class CWRParserService(object):
         raise NotImplementedError('The generate_json method must be implemented')
 
 
-class DefaultCWRParserService(CWRParserService):
+class ThreadingCWRParserService(CWRParserService):
     def __init__(self, path):
         super(CWRParserService, self).__init__()
         self._path = path
@@ -84,10 +77,11 @@ class DefaultCWRParserService(CWRParserService):
         # The file is temporarily saved
         file.save(file_path)
 
-        try:
-            _parallelize(filename, file_path, self._decoder)
-        except:
-            _logger.error('Error with CWR parsing thread for id %s' % cwr_id)
+        _parse_cwr(filename, file_path, self._decoder)
+        # try:
+        #    _parse_cwr(filename, file_path, self._decoder)
+        #except:
+        #    _logger.error('Error with CWR parsing thread for id %s' % cwr_id)
 
         return cwr_id
 

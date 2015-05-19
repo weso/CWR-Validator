@@ -28,7 +28,7 @@ def create_app():
 
     from cwr_validator.endpoint import UploadFileResource
 
-    from cwr_validator.service.cwr_parser import DefaultCWRParserService
+    from cwr_validator.service.cwr_parser import ThreadingCWRParserService
 
     from data_validator.accessor import CWRValidatorConfiguration
 
@@ -57,7 +57,7 @@ def create_app():
     app.config['SECRET_KEY'] = secret
     app.config['UPLOAD_FOLDER'] = upload
 
-    app.config['FILE_SERVICE'] = DefaultCWRParserService(app.config['UPLOAD_FOLDER'])
+    app.config['FILE_SERVICE'] = ThreadingCWRParserService(app.config['UPLOAD_FOLDER'])
 
     if debug:
         handler = RotatingFileHandler(log, maxBytes=10000, backupCount=1)
