@@ -85,7 +85,7 @@ class DefaultCWRParserService(CWRParserService):
         file.save(file_path)
 
         try:
-            _paralelize(filename, file_path, self._decoder)
+            _parallelize(filename, file_path, self._decoder)
         except:
             _logger.error('Error with CWR parsing thread for id %s' % cwr_id)
 
