@@ -1,7 +1,14 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-from StringIO import StringIO
+try:
+    from StringIO import StringIO
+    IOModule = StringIO
+    _python2 = True
+except ImportError:
+    from io import BytesIO
+    IOModule = BytesIO
+    _python2 = False
 
 from cwr_validator import create_app
 
@@ -10,6 +17,14 @@ __author__ = 'Bernardo Martínez Garrido'
 __license__ = 'MIT'
 __status__ = 'Development'
 
+
+def _prepare_file(text):
+    if _python2:
+        result = IOModule('my file contents')
+    else:
+        result = IOModule(b'my file contents')
+
+    return result
 
 class TestUpload(unittest.TestCase):
     def setUp(self):
@@ -34,7 +49,7 @@ class TestUpload(unittest.TestCase):
         client = self._app.test_client()
 
         data = {
-            'file': (StringIO('my file contents'), 'hello_world.txt'),
+            'file': (_prepare_file('my file contents'), 'hello_world.txt'),
         }
         response = client.post('/upload', data=data)
         self.assertEqual(response.status_code, 405)
@@ -43,7 +58,7 @@ class TestUpload(unittest.TestCase):
         client = self._app.test_client()
 
         data = {
-            'file_data': (StringIO(_file_contents_cwr()), 'hello_world.txt'),
+            'file_data': (_prepare_file(_file_contents_cwr()), 'hello_world.txt'),
         }
         response = client.post('/upload', data=data)
         self.assertEqual(response.status_code, 405)
