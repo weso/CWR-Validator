@@ -8,8 +8,6 @@ __author__ = 'Bernardo Martínez Garrido'
 __license__ = 'MIT'
 __status__ = 'Development'
 
-_logger = logging.getLogger(__name__)
-
 
 class IdentifierService(object):
     __metaclass__ = ABCMeta
@@ -23,6 +21,8 @@ class IdentifierService(object):
 
 
 class UUIDIdentifierService(IdentifierService):
+    _logger = logging.getLogger(__name__)
+
     def __init__(self):
         super(UUIDIdentifierService, self).__init__()
 

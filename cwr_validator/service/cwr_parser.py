@@ -23,8 +23,6 @@ __author__ = 'Bernardo Martínez Garrido'
 __license__ = 'MIT'
 __status__ = 'Development'
 
-_logger = logging.getLogger(__name__)
-
 
 class CWRParserService(object):
     """
@@ -70,25 +68,26 @@ class ThreadingCWRParserService(CWRParserService):
     This will generate a thread for each CWR parsing procedure, so these don't block the web service.
     """
 
-    def __init__(self, path, id_service):
+    _logger = logging.getLogger(__name__)
+
+    def __init__(self, path, data_service, id_service):
         super(CWRParserService, self).__init__()
         self._path = path
         self._decoder = default_file_decoder()
         self._encoder_json = JSONEncoder()
 
-        self._files_data = {}
+        self._data_service = data_service
         self._id_service = id_service
 
     def process_cwr(self, file):
-        filename = '%s%s' % (secure_filename(file.filename), randint(0, 10000))
-        file_path = os.path.join(self._path, filename)
-
         cwr_id = self._id_service.generate_id()
+
+        file_path = os.path.join(self._path, str(cwr_id))
 
         # The file is temporarily saved
         file.save(file_path)
 
-        self._parse_cwr(filename, file_path, self._decoder)
+        self._parse_cwr(cwr_id, file.filename, file_path, self._decoder)
 
         return cwr_id
 
@@ -96,7 +95,7 @@ class ThreadingCWRParserService(CWRParserService):
         return self._encoder_json.encode(data)
 
     @threaded
-    def _parse_cwr(self, filename, file_path, decoder):
+    def _parse_cwr(self, cwr_id, filename, file_path, decoder):
         data = {}
 
         data['filename'] = filename
@@ -106,6 +105,9 @@ class ThreadingCWRParserService(CWRParserService):
             result = decoder.decode(data)
         except:
             result = None
+
+        if result:
+            self._data_service.store_cwr(cwr_id, result)
 
         os.remove(file_path)
 

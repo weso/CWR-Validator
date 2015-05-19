@@ -30,6 +30,7 @@ def create_app():
 
     from cwr_validator.service.cwr_parser import ThreadingCWRParserService
     from cwr_validator.service.identifier import UUIDIdentifierService
+    from cwr_validator.service.data import MemoryDataStoreService
 
     from data_validator.accessor import CWRValidatorConfiguration
 
@@ -58,8 +59,10 @@ def create_app():
     app.config['SECRET_KEY'] = secret
     app.config['UPLOAD_FOLDER'] = upload
 
+    app.config['DATA_SERVICE'] = MemoryDataStoreService()
     app.config['ID_SERVICE'] = UUIDIdentifierService()
-    app.config['FILE_SERVICE'] = ThreadingCWRParserService(app.config['UPLOAD_FOLDER'], app.config['ID_SERVICE'])
+    app.config['FILE_SERVICE'] = ThreadingCWRParserService(app.config['UPLOAD_FOLDER'], app.config['DATA_SERVICE'],
+                                                           app.config['ID_SERVICE'])
 
     if debug:
         handler = RotatingFileHandler(log, maxBytes=10000, backupCount=1)
@@ -70,8 +73,6 @@ def create_app():
         logging.getLogger('').addHandler(handler)
 
         app.logger.addHandler(handler)
-
-    logging.info('Debug mode is set to %r' % debug)
 
     return app
 
