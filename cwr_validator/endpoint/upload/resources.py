@@ -47,7 +47,7 @@ class UploadFileResource(restful.Resource):
             if sent_file:
                 file_service = current_app.config['FILE_SERVICE']
 
-                file_id = file_service.process_cwr(sent_file, current_app.config['UPLOAD_FOLDER'])
+                file_id = file_service.process_cwr(sent_file)
 
                 jsonify({'file_id': file_id})
         else:
