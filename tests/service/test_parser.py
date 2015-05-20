@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 
 import unittest
+import codecs
 
 from cwr_validator.service.cwr_parser import ThreadingCWRParserService
 from cwr_validator.service.data import MemoryDataStoreService
@@ -22,15 +23,11 @@ class TestUpload(unittest.TestCase):
         identifier = UUIDIdentifierService()
         self._parser = ThreadingCWRParserService(path, data, identifier)
 
-
     def test_parse_invalid(self):
         file_path = '%s/test_parse_invalid' % self._path_test
 
-        file = open(file_path, 'wb')
-        try:
-            file.write('')
-        except TypeError:
-            file.write(b'')
+        file = codecs.open(file_path, 'w')
+        file.write('')
         file.close()
 
         result = self._parser.parse_cwr(0, 'empty.txt', file_path)

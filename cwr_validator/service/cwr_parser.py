@@ -4,6 +4,7 @@ from abc import ABCMeta, abstractmethod
 import os
 import codecs
 import logging
+import sys
 
 from cwr.parser.decoder.file import default_file_decoder
 from cwr.parser.encoder.cwrjson import JSONEncoder
@@ -84,7 +85,13 @@ class ThreadingCWRParserService(CWRParserService):
 
         # The file is temporarily saved
         with open(file_path, 'w') as f:
-            f.write(file.read())
+            contents = file.read()
+
+            if sys.version_info[0] > 2:
+                # For Python 3
+                contents = str(contents)
+
+            f.write(contents)
 
         self._parse_cwr_threaded(cwr_id, file.filename, file_path)
 
