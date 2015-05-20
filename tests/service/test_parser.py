@@ -27,7 +27,10 @@ class TestUpload(unittest.TestCase):
         file_path = '%s/test_parse_invalid' % self._path_test
 
         file = open(file_path, 'wb')
-        file.write('')
+        try:
+            file.write('')
+        except TypeError:
+            file.write(b'')
         file.close()
 
         result = self._parser.parse_cwr(0, 'empty.txt', file_path)
