@@ -1,1 +1,1 @@
-from cwr_validator.resources.upload.resources import UploadFileResource
+from cwr_validator.resources.upload import UploadFileResource
