@@ -3,10 +3,8 @@
 from abc import ABCMeta, abstractmethod
 import os
 import codecs
-from random import randint
 import logging
 
-from werkzeug.utils import secure_filename
 from cwr.parser.decoder.file import default_file_decoder
 from cwr.parser.encoder.cwrjson import JSONEncoder
 
@@ -85,9 +83,10 @@ class ThreadingCWRParserService(CWRParserService):
         file_path = os.path.join(self._path, str(cwr_id))
 
         # The file is temporarily saved
-        file.save(file_path)
+        with open(file_path, 'w') as f:
+            f.write(file.read())
 
-        self._parse_cwr(cwr_id, file.filename, file_path, self._decoder)
+        self._parse_cwr_threaded(cwr_id, file.filename, file_path)
 
         return cwr_id
 
@@ -95,14 +94,17 @@ class ThreadingCWRParserService(CWRParserService):
         return self._encoder_json.encode(data)
 
     @threaded
-    def _parse_cwr(self, cwr_id, filename, file_path, decoder):
+    def _parse_cwr_threaded(self, cwr_id, filename, file_path):
+        self.parse_cwr(cwr_id, filename, file_path)
+
+    def parse_cwr(self, cwr_id, filename, file_path):
         data = {}
 
         data['filename'] = filename
         data['contents'] = codecs.open(file_path, 'r', 'latin-1').read()
 
         try:
-            result = decoder.decode(data)
+            result = self._decoder.decode(data)
         except:
             result = None
 
