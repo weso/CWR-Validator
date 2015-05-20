@@ -1,1 +1,0 @@
-from cwr_validator.endpoint.upload.resources import UploadFileResource
