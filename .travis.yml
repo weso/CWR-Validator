@@ -2,15 +2,12 @@ language: python
 python:
   - "2.6"
   - "2.7"
+  - "3.3"
+  - "3.4"
   - "pypy"
-
-services:
-  - mongodb
+  - "pypy3"
 
 install:
   - pip install tox
-before_script:
-  # To avoid the problems with mongodb taking long to start
-  - sleep 15
 script:
   - tox -e $(echo py$TRAVIS_PYTHON_VERSION | tr -d . | sed -e 's/pypypy/pypy/')
