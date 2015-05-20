@@ -26,7 +26,7 @@ def create_app():
 
     from cwr_validator.uploads import __uploads__
 
-    from cwr_validator.endpoint import UploadFileResource
+    from cwr_validator.resources import UploadFileResource
 
     from cwr_validator.service.cwr_parser import ThreadingCWRParserService
     from cwr_validator.service.identifier import UUIDIdentifierService
