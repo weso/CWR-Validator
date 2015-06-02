@@ -14,5 +14,5 @@ matrix:
 install:
   - pip install tox
 script:
-  - if [ -z "$DOCS" ]; then tox -e $(echo py$TRAVIS_PYTHON_VERSION | tr -d . | sed -e 's/pypypy/pypy/')-$REQUIREMENTS; fi
+  - if [ -z "$DOCS" ]; then tox -e $(echo py$TRAVIS_PYTHON_VERSION | tr -d . | sed -e 's/pypypy/pypy/'); fi
   - if [ ! -z "$COVERAGE" ]; then tox -e coverage; fi
