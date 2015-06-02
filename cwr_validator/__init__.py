@@ -20,7 +20,7 @@ def create_app():
     from logging import Formatter
 
     from flask import Flask
-    from flask.ext import restful
+    from flask.ext.restful import Api
 
     from werkzeug.contrib.fixers import ProxyFix
 
@@ -49,7 +49,7 @@ def create_app():
         log = 'cwr_webapp.log'
 
     app = Flask(__name__)
-    api = restful.Api(app)
+    api = Api(app)
 
     api.add_resource(UploadFileResource, '/upload')
 

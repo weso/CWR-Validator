@@ -1,4 +1,9 @@
-CWR-API==0.0.20
+# Flask
 Flask==0.10.1
 Flask-RESTful==0.3.2
+
+# CWR API
+CWR-API==0.0.23
+
+# Compatibility libraries
 ordereddict==1.1

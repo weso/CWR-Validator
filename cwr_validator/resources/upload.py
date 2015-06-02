@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
-from flask import request, current_app, jsonify, Response
-from flask.ext import restful
+from flask import request, current_app, jsonify
+from flask.ext.restful import abort, Resource
 
 """
 Flask RESTful resources for the file uploading endpoints.
@@ -13,7 +13,7 @@ __license__ = 'MIT'
 __status__ = 'Development'
 
 
-class UploadFileResource(restful.Resource):
+class UploadFileResource(Resource):
     """
     Resource for building an endpoint where files are received.
 
@@ -51,4 +51,4 @@ class UploadFileResource(restful.Resource):
 
                 jsonify({'file_id': file_id})
         else:
-            return Response(status=405)
+            abort(405, message='No files received')
