@@ -85,7 +85,7 @@ class ThreadingCWRParserService(CWRParserService):
 
         # The file is temporarily saved
         with open(file_path, 'w') as f:
-            contents = file.read()
+            contents = file['contents']
 
             if sys.version_info[0] > 2:
                 # For Python 3

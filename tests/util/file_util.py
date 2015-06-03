@@ -17,8 +17,8 @@ __status__ = 'Development'
 
 def prepare_file(text):
     if _python2:
-        result = IOModule('my file contents')
+        result = IOModule(text)
     else:
-        result = IOModule(b'my file contents')
+        result = IOModule(bin(text))
 
     return result

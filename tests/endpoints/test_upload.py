@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import unittest
+import json
 
 from cwr_validator import create_app
-from tests.util.file_util import prepare_file
+from StringIO import StringIO
+from json import JSONEncoder
 
 __author__ = 'Bernardo Martínez Garrido'
 __license__ = 'MIT'
@@ -17,44 +19,44 @@ class TestUpload(unittest.TestCase):
         self._app.config['DEBUG'] = False
         self._app.config['TESTING'] = True
 
-    def test_get(self):
-        client = self._app.test_client()
+        self._client = self._app.test_client()
 
-        response = client.get('/upload')
+    def test_get(self):
+        response = self._client.get('/upload/')
         self.assertEqual(response.status_code, 200)
 
     def test_post_no_file(self):
-        client = self._app.test_client()
-
-        response = client.post('/upload')
-        self.assertEqual(response.status_code, 405)
+        response = self._client.post('/upload/',
+                                    headers={
+                                        'content-type': 'application/json'})
+        self.assertEqual(response.status_code, 400)
 
     def test_post_file_with_invalid_data(self):
-        client = self._app.test_client()
+        json_data = JSONEncoder().encode(
+            {
+                'filename': 'hello_world.txt',
+                'contents': 'my file contents'
+            }
+        )
 
-        data = {
-            'file': (prepare_file('my file contents'), 'hello_world.txt'),
-        }
-        response = client.post('/upload', data=data)
+        response = self._client.post('/upload/', data=json_data,
+                                     headers={
+                                         'content-type': 'application/json'})
+
         self.assertEqual(response.status_code, 200)
 
     def test_post_file_with_valid_data(self):
-        client = self._app.test_client()
+        json_data = JSONEncoder().encode(
+            {
+                'filename': 'hello_world.txt',
+                'contents': _file_contents_cwr()
+            }
+        )
 
-        data = {
-            'file': (prepare_file(_file_contents_cwr()), 'hello_world.txt'),
-        }
-        response = client.post('/upload', data=data)
-        self.assertEqual(response.status_code, 200)
+        response = self._client.post('/upload/', data=json_data,
+                                     headers={
+                                         'content-type': 'application/json'})
 
-    def test_post_file_with_valid_data_alternate_id(self):
-        client = self._app.test_client()
-
-        data = {
-            'file_data': (
-            prepare_file(_file_contents_cwr()), 'hello_world.txt'),
-        }
-        response = client.post('/upload', data=data)
         self.assertEqual(response.status_code, 200)
 
 

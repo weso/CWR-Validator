@@ -10,7 +10,6 @@ from logging import Formatter
 
 from flask import Flask
 from werkzeug.contrib.fixers import ProxyFix
-
 from flask.ext.restful import Api
 
 from cwr_validator.config import DevConfig
@@ -26,7 +25,7 @@ __status__ = 'Development'
 
 
 def _register_resources(api):
-    api.add_resource(UploadFileResource, '/upload')
+    api.add_resource(UploadFileResource, '/upload/', endpoint='cwr_upload')
 
 
 def _load_services(app, config):
