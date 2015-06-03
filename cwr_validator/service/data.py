@@ -3,7 +3,6 @@
 from abc import ABCMeta, abstractmethod
 import logging
 
-
 """
 Services for storing CWR files data.
 """

@@ -5,7 +5,6 @@ import unittest
 from cwr_validator import create_app
 from tests.util.file_util import prepare_file
 
-
 __author__ = 'Bernardo Martínez Garrido'
 __license__ = 'MIT'
 __status__ = 'Development'
@@ -52,7 +51,8 @@ class TestUpload(unittest.TestCase):
         client = self._app.test_client()
 
         data = {
-            'file_data': (prepare_file(_file_contents_cwr()), 'hello_world.txt'),
+            'file_data': (
+            prepare_file(_file_contents_cwr()), 'hello_world.txt'),
         }
         response = client.post('/upload', data=data)
         self.assertEqual(response.status_code, 200)

@@ -9,7 +9,6 @@ from cwr_validator.service.identifier import UUIDIdentifierService
 from cwr_validator.uploads import __uploads__
 from tests.data import __data_test__
 
-
 __author__ = 'Bernardo Martínez Garrido'
 __license__ = 'MIT'
 __status__ = 'Development'

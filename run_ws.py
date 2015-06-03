@@ -3,7 +3,6 @@ import os
 
 from cwr_validator import create_app
 
-
 """
 Runs the CWR Validator web API.
 """

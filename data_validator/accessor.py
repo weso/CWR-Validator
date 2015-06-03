@@ -2,7 +2,6 @@
 
 import os
 
-
 """
 Facades for accessing the configuration data.
 """
@@ -35,12 +34,14 @@ class _FileReader(object):
 
     def read_properties(self, file_name):
         config = {}
-        with open(os.path.join(self.__path(), os.path.basename(file_name)), 'rt') as f:
+        with open(os.path.join(self.__path(), os.path.basename(file_name)),
+                  'rt') as f:
             for line in f:
                 line = line.rstrip()  # removes trailing whitespace and '\n' chars
 
                 if "=" not in line: continue  # skips blanks and comments w/o =
-                if line.startswith("#"): continue  # skips comments which contain =
+                if line.startswith(
+                    "#"): continue  # skips comments which contain =
 
                 k, v = line.split("=", 1)
                 config[k] = v

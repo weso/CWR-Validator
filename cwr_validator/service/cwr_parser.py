@@ -11,7 +11,6 @@ from cwr.parser.encoder.cwrjson import JSONEncoder
 
 from cwr_validator.util.parallel import threaded
 
-
 """
 Services for parsing CWR files.
 
@@ -57,7 +56,8 @@ class CWRParserService(object):
         :param data: CWR model graph to generate the JSON from
         :return: a JSON generated from the CWR model graph
         """
-        raise NotImplementedError('The generate_json method must be implemented')
+        raise NotImplementedError(
+            'The generate_json method must be implemented')
 
 
 class ThreadingCWRParserService(CWRParserService):
