@@ -49,6 +49,6 @@ class UploadFileResource(Resource):
 
                 file_id = file_service.process_cwr(sent_file)
 
-                jsonify({'file_id': file_id})
+                return {'file_id': file_id}
         else:
             abort(405, message='No files received')
