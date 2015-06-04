@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-import json
+from json import JSONEncoder
 
 from cwr_validator import create_app
-from StringIO import StringIO
-from json import JSONEncoder
 
 __author__ = 'Bernardo Martínez Garrido'
 __license__ = 'MIT'
@@ -27,8 +25,8 @@ class TestUpload(unittest.TestCase):
 
     def test_post_no_file(self):
         response = self._client.post('/upload/',
-                                    headers={
-                                        'content-type': 'application/json'})
+                                     headers={
+                                         'content-type': 'application/json'})
         self.assertEqual(response.status_code, 400)
 
     def test_post_file_with_invalid_data(self):
