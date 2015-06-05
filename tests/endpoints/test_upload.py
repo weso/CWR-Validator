@@ -2,6 +2,7 @@
 
 import unittest
 from json import JSONEncoder
+import json
 
 from cwr_validator import create_app
 
@@ -43,6 +44,10 @@ class TestUpload(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
 
+        data = json.loads(response.data)
+
+        self.assertTrue('id' in data)
+
     def test_post_file_with_valid_data(self):
         json_data = JSONEncoder().encode(
             {
@@ -56,6 +61,10 @@ class TestUpload(unittest.TestCase):
                                          'content-type': 'application/json'})
 
         self.assertEqual(response.status_code, 200)
+
+        data = json.loads(response.data)
+
+        self.assertTrue('id' in data)
 
 
 def _file_contents_cwr():

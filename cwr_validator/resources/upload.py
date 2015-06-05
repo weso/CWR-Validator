@@ -56,4 +56,4 @@ class UploadFileResource(Resource):
 
         file_id = file_service.process_cwr(args)
 
-        return '', 200
+        return {'id':str(file_id)}, 200

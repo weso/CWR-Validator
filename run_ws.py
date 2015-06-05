@@ -12,7 +12,7 @@ __license__ = 'MIT'
 __version__ = '0.0.0'
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 33567))
+    port = int(os.environ.get('PORT', 33568))
     host = os.environ.get('HOST', '0.0.0.0')
 
     app = create_app()
