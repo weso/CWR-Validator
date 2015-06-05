@@ -44,7 +44,7 @@ class TestUpload(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
 
-        data = json.loads(response.data)
+        data = json.loads(str(response.data))
 
         self.assertTrue('id' in data)
 

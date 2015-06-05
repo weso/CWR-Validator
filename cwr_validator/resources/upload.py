@@ -1,5 +1,5 @@
 # -*- encoding: utf-8 -*-
-from flask import current_app
+from flask import current_app, jsonify
 from flask.ext.restful import Resource, reqparse
 
 """
@@ -56,4 +56,4 @@ class UploadFileResource(Resource):
 
         file_id = file_service.process_cwr(args)
 
-        return {'id':str(file_id)}, 200
+        return {'id':str(file_id)}
