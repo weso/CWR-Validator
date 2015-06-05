@@ -15,9 +15,7 @@ from flask.ext.restful import Api
 from cwr_validator.config import DevConfig
 from data_validator.accessor import CWRValidatorConfiguration
 from cwr_validator.resources import UploadFileResource
-from cwr_validator.service.cwr_parser import ThreadingCWRParserService
-from cwr_validator.service.identifier import UUIDIdentifierService
-from cwr_validator.service.data import MemoryDataStoreService
+from cwr_validator.service import ThreadingCWRParserService, UUIDIdentifierService
 
 __author__ = 'Bernardo Martínez Garrido'
 __license__ = 'MIT'
@@ -29,11 +27,9 @@ def _register_resources(api):
 
 
 def _load_services(app, config):
-    app.config['DATA_SERVICE'] = MemoryDataStoreService()
     app.config['ID_SERVICE'] = UUIDIdentifierService()
     app.config['FILE_SERVICE'] = ThreadingCWRParserService(
         config['upload.folder'],
-        app.config['DATA_SERVICE'],
         app.config['ID_SERVICE'])
 
 

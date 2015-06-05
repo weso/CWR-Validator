@@ -5,6 +5,8 @@ import os
 import codecs
 import logging
 import sys
+import json
+import requests
 
 from cwr.parser.decoder.file import default_file_decoder
 from cwr.parser.encoder.cwrjson import JSONEncoder
@@ -48,17 +50,6 @@ class CWRParserService(object):
         """
         raise NotImplementedError('The save_file method must be implemented')
 
-    @abstractmethod
-    def generate_json(self, data):
-        """
-        Generates a JSON from the CWR model graph.
-
-        :param data: CWR model graph to generate the JSON from
-        :return: a JSON generated from the CWR model graph
-        """
-        raise NotImplementedError(
-            'The generate_json method must be implemented')
-
 
 class ThreadingCWRParserService(CWRParserService):
     """
@@ -69,13 +60,12 @@ class ThreadingCWRParserService(CWRParserService):
 
     _logger = logging.getLogger(__name__)
 
-    def __init__(self, path, data_service, id_service):
+    def __init__(self, path, id_service):
         super(CWRParserService, self).__init__()
         self._path = path
         self._decoder = default_file_decoder()
         self._encoder_json = JSONEncoder()
 
-        self._data_service = data_service
         self._id_service = id_service
 
     def process_cwr(self, file):
@@ -97,9 +87,6 @@ class ThreadingCWRParserService(CWRParserService):
 
         return cwr_id
 
-    def generate_json(self, data):
-        return self._encoder_json.encode(data)
-
     @threaded
     def _parse_cwr_threaded(self, cwr_id, filename, file_path):
         self.parse_cwr(cwr_id, filename, file_path)
@@ -116,8 +103,19 @@ class ThreadingCWRParserService(CWRParserService):
             result = None
 
         if result:
-            self._data_service.store_cwr(cwr_id, result)
+            self._send_results(cwr_id, self._encoder_json.encode(result))
 
         os.remove(file_path)
 
-        return result
+    def _send_results(self, cwr_id, result):
+        # TODO: Do this in a cleaner way
+
+        headers = {'Content-Type': 'application/json'}
+
+        data = {
+            'id':str(cwr_id),
+            'data':result
+        }
+
+        requests.post('http://127.0.0.1:33567/files/', data=json.dumps(data), headers=headers)
+
