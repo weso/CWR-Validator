@@ -7,6 +7,7 @@ import logging
 import sys
 import json
 import requests
+from requests import ConnectionError
 
 from cwr.parser.decoder.file import default_file_decoder
 from cwr.parser.encoder.cwrjson import JSONEncoder
@@ -81,7 +82,7 @@ class ThreadingCWRParserService(CWRParserService):
                 # For Python 3
                 contents = str(contents)
 
-            f.write(contents)
+            f.write(contents.encode("UTF-8"))
 
         self._parse_cwr_threaded(cwr_id, file.filename, file_path)
 
@@ -117,5 +118,7 @@ class ThreadingCWRParserService(CWRParserService):
             'data':result
         }
 
-        requests.post('http://127.0.0.1:33567/files/', data=json.dumps(data), headers=headers)
-
+        try:
+            requests.post('http://127.0.0.1:33567/files/', data=json.dumps(data), headers=headers)
+        except ConnectionError:
+            self._logger.error('Failure when sending results')

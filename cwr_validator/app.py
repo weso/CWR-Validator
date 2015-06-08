@@ -16,6 +16,7 @@ from cwr_validator.config import DevConfig
 from data_validator.accessor import CWRValidatorConfiguration
 from cwr_validator.resources import UploadFileResource
 from cwr_validator.service import ThreadingCWRParserService, UUIDIdentifierService
+from cwr_validator.uploads.__uploads__ import path
 
 __author__ = 'Bernardo Martínez Garrido'
 __license__ = 'MIT'
@@ -27,9 +28,13 @@ def _register_resources(api):
 
 
 def _load_services(app, config):
+    path_upload = config['upload.folder']
+    if len(path_upload) == 0:
+        path_upload = path()
+
     app.config['ID_SERVICE'] = UUIDIdentifierService()
     app.config['FILE_SERVICE'] = ThreadingCWRParserService(
-        config['upload.folder'],
+        path_upload,
         app.config['ID_SERVICE'])
 
 

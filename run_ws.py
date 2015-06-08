@@ -13,7 +13,7 @@ __version__ = '0.0.0'
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 33568))
-    host = os.environ.get('HOST', '0.0.0.0')
+    host = os.environ.get('HOST', '127.0.0.1')
 
     app = create_app()
 
