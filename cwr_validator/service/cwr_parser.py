@@ -84,7 +84,7 @@ class ThreadingCWRParserService(CWRParserService):
 
             f.write(contents.encode("UTF-8"))
 
-        self._parse_cwr_threaded(cwr_id, file.filename, file_path)
+        self._parse_cwr_threaded(cwr_id, file['filename'], file_path)
 
         return cwr_id
 
