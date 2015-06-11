@@ -15,7 +15,7 @@ from flask.ext.restful import Api
 from cwr_validator.config import DevConfig
 from data_validator.accessor import CWRValidatorConfiguration
 from cwr_validator.resources import UploadFileResource
-from cwr_validator.service import ThreadingCWRParserService, UUIDIdentifierService
+from cwr_validator.service import ThreadingCWRParserService
 from cwr_validator.uploads.__uploads__ import path
 
 __author__ = 'Bernardo Martínez Garrido'
@@ -32,10 +32,8 @@ def _load_services(app, config):
     if len(path_upload) == 0:
         path_upload = path()
 
-    app.config['ID_SERVICE'] = UUIDIdentifierService()
     app.config['FILE_SERVICE'] = ThreadingCWRParserService(
-        path_upload,
-        app.config['ID_SERVICE'])
+        path_upload)
 
 
 def create_app(config_object=DevConfig):

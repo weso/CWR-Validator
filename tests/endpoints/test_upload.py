@@ -33,6 +33,7 @@ class TestUpload(unittest.TestCase):
     def test_post_file_with_invalid_data(self):
         json_data = JSONEncoder().encode(
             {
+                'file_id': '123',
                 'filename': 'hello_world.txt',
                 'contents': 'my file contents'
             }
@@ -51,6 +52,7 @@ class TestUpload(unittest.TestCase):
     def test_post_file_with_valid_data(self):
         json_data = JSONEncoder().encode(
             {
+                'file_id': '123',
                 'filename': 'hello_world.txt',
                 'contents': _file_contents_cwr()
             }

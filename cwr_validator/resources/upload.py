@@ -27,6 +27,9 @@ class UploadFileResource(Resource):
         super(UploadFileResource, self).__init__()
 
         self._reqparse = reqparse.RequestParser()
+        self._reqparse.add_argument('file_id', type=unicode, required=True,
+                                    help='No file ID provided',
+                                    location='json')
         self._reqparse.add_argument('filename', type=unicode, required=True,
                                     help='No file name provided',
                                     location='json')

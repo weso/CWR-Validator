@@ -61,16 +61,14 @@ class ThreadingCWRParserService(CWRParserService):
 
     _logger = logging.getLogger(__name__)
 
-    def __init__(self, path, id_service):
+    def __init__(self, path):
         super(CWRParserService, self).__init__()
         self._path = path
         self._decoder = default_file_decoder()
         self._encoder_json = JSONEncoder()
 
-        self._id_service = id_service
-
     def process_cwr(self, file):
-        cwr_id = self._id_service.generate_id()
+        cwr_id = file['file_id']
 
         file_path = os.path.join(self._path, str(cwr_id))
 
