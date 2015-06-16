@@ -1,7 +1,8 @@
 # -*- encoding: utf-8 -*-
+import logging
+
 from flask import current_app
 from flask.ext.restful import Resource, reqparse
-import logging
 
 """
 Flask RESTful resources for the file uploading endpoints.
@@ -27,7 +28,7 @@ class UploadFileResource(Resource):
         super(UploadFileResource, self).__init__()
 
         self._reqparse = reqparse.RequestParser()
-        self._reqparse.add_argument('file_id', type=unicode, required=True,
+        self._reqparse.add_argument('file_id', type=str, required=True,
                                     help='No file ID provided',
                                     location='json')
         self._reqparse.add_argument('filename', type=unicode, required=True,
@@ -63,6 +64,6 @@ class UploadFileResource(Resource):
 
         file_id = file_service.process_cwr(args)
 
-        _logger.info('Processed file with id %s' % file_id)
+        _logger.info('Sent to processing file with id %s' % file_id)
 
-        return {'id':str(file_id)}
+        return {'id': str(file_id)}

@@ -33,7 +33,7 @@ def _load_services(app, config):
         path_upload = path()
 
     app.config['FILE_SERVICE'] = ThreadingCWRParserService(
-        path_upload)
+        path_upload, 'http://127.0.0.1:33508/cwr/files/')
 
 
 def create_app(config_object=DevConfig):
