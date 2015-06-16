@@ -16,7 +16,7 @@ class TestUpload(unittest.TestCase):
     def setUp(self):
         self._path_test = __data_test__.path()
         path = __uploads__.path()
-        self._parser = ThreadingCWRParserService(path)
+        self._parser = ThreadingCWRParserService(path, 'http://127.0.0.1/')
 
     def test_parse_invalid(self):
         file_path = '%s/test_parse_invalid' % self._path_test

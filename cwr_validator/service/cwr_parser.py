@@ -102,7 +102,10 @@ class ThreadingCWRParserService(CWRParserService):
         data['filename'] = filename
         data['contents'] = codecs.open(file_path, 'r').read()
 
-        result = self._decoder.decode(data)
+        try:
+            result = self._decoder.decode(data)
+        except:
+            result = None
 
         if result:
             self._send_results(cwr_id, self._encoder_json.encode(result))
