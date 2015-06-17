@@ -3,7 +3,6 @@ import os
 
 from cwr_validator import create_app
 
-
 """
 Runs the CWR Validator web API.
 """
@@ -13,8 +12,8 @@ __license__ = 'MIT'
 __version__ = '0.0.0'
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 33567))
-    host = os.environ.get('HOST', '0.0.0.0')
+    port = int(os.environ.get('PORT', 33568))
+    host = os.environ.get('HOST', '127.0.0.1')
 
     app = create_app()
 
