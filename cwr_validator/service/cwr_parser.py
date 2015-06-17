@@ -77,40 +77,37 @@ class ThreadingCWRParserService(CWRParserService):
         file_path = os.path.join(self._path, cwr_id)
 
         # The file is temporarily saved
-        with open(file_path, 'w') as f:
-            contents = file['contents']
+        # with open(file_path, 'w') as f:
+        #     contents = file['contents']
+        #
+        #     if sys.version_info[0] > 2:
+        #         # For Python 3
+        #         contents = str(contents)
+        #
+        #     f.write(contents.encode('latin-1'))
 
-            if sys.version_info[0] > 2:
-                # For Python 3
-                contents = str(contents)
-
-            f.write(contents.encode('latin-1'))
-
-        self._parse_cwr_threaded(cwr_id, file['filename'], file_path)
+        self._parse_cwr_threaded(cwr_id, file)
 
         return cwr_id
 
     @threaded
-    def _parse_cwr_threaded(self, cwr_id, filename, file_path):
-        _logger.info('Begins processing CWR file %s' % filename)
-        self.parse_cwr(cwr_id, filename, file_path)
-        _logger.info('Finished processing CWR file %s' % filename)
+    def _parse_cwr_threaded(self, cwr_id, file_data):
+        _logger.info('Begins processing CWR file %s' % file_data['filename'])
+        self.parse_cwr(cwr_id, file_data)
+        _logger.info('Finished processing CWR file %s' % file_data['filename'])
 
-    def parse_cwr(self, cwr_id, filename, file_path):
+    def parse_cwr(self, cwr_id, file_data):
         data = {}
 
-        data['filename'] = filename
-        data['contents'] = codecs.open(file_path, 'r').read()
-
         try:
-            result = self._decoder.decode(data)
+            result = self._decoder.decode(file_data)
         except:
             result = None
 
         if result:
             self._send_results(cwr_id, self._encoder_json.encode(result))
 
-        os.remove(file_path)
+        # os.remove(file_path)
 
     def _send_results(self, cwr_id, result):
         # TODO: Do this in a cleaner way
