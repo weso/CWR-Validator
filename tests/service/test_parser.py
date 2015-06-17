@@ -25,6 +25,6 @@ class TestUpload(unittest.TestCase):
         file.write('')
         file.close()
 
-        result = self._parser.parse_cwr(0, 'empty.txt', file_path)
+        result = self._parser.parse_cwr(0, 'empty.txt')
 
         self.assertEqual(None, result)
