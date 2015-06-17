@@ -1,1 +1,1 @@
-__author__ = 'Bernardo'
+from cwr_validator.service.cwr_parser import ThreadingCWRParserService

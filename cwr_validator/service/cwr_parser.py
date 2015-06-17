@@ -5,12 +5,14 @@ import os
 import codecs
 import logging
 import sys
+import json
 
+import requests
+from requests import ConnectionError
 from cwr.parser.decoder.file import default_file_decoder
 from cwr.parser.encoder.cwrjson import JSONEncoder
 
 from cwr_validator.util.parallel import threaded
-
 
 """
 Services for parsing CWR files.
@@ -21,6 +23,8 @@ These allow creating the model graph from a CWR file, but also transforming it t
 __author__ = 'Bernardo Martínez Garrido'
 __license__ = 'MIT'
 __status__ = 'Development'
+
+_logger = logging.getLogger(__name__)
 
 
 class CWRParserService(object):
@@ -49,16 +53,6 @@ class CWRParserService(object):
         """
         raise NotImplementedError('The save_file method must be implemented')
 
-    @abstractmethod
-    def generate_json(self, data):
-        """
-        Generates a JSON from the CWR model graph.
-
-        :param data: CWR model graph to generate the JSON from
-        :return: a JSON generated from the CWR model graph
-        """
-        raise NotImplementedError('The generate_json method must be implemented')
-
 
 class ThreadingCWRParserService(CWRParserService):
     """
@@ -69,55 +63,65 @@ class ThreadingCWRParserService(CWRParserService):
 
     _logger = logging.getLogger(__name__)
 
-    def __init__(self, path, data_service, id_service):
+    def __init__(self, path, store_url):
         super(CWRParserService, self).__init__()
         self._path = path
         self._decoder = default_file_decoder()
         self._encoder_json = JSONEncoder()
 
-        self._data_service = data_service
-        self._id_service = id_service
+        self._store_url = store_url
 
     def process_cwr(self, file):
-        cwr_id = self._id_service.generate_id()
+        cwr_id = file['file_id']
 
-        file_path = os.path.join(self._path, str(cwr_id))
+        file_path = os.path.join(self._path, cwr_id)
 
         # The file is temporarily saved
-        with open(file_path, 'w') as f:
-            contents = file.read()
+        # with open(file_path, 'w') as f:
+        #     contents = file['contents']
+        #
+        #     if sys.version_info[0] > 2:
+        #         # For Python 3
+        #         contents = str(contents)
+        #
+        #     f.write(contents.encode('latin-1'))
 
-            if sys.version_info[0] > 2:
-                # For Python 3
-                contents = str(contents)
-
-            f.write(contents)
-
-        self._parse_cwr_threaded(cwr_id, file.filename, file_path)
+        self._parse_cwr_threaded(cwr_id, file)
 
         return cwr_id
 
-    def generate_json(self, data):
-        return self._encoder_json.encode(data)
-
     @threaded
-    def _parse_cwr_threaded(self, cwr_id, filename, file_path):
-        self.parse_cwr(cwr_id, filename, file_path)
+    def _parse_cwr_threaded(self, cwr_id, file_data):
+        _logger.info('Begins processing CWR file %s' % file_data['filename'])
+        self.parse_cwr(cwr_id, file_data)
+        _logger.info('Finished processing CWR file %s' % file_data['filename'])
 
-    def parse_cwr(self, cwr_id, filename, file_path):
+    def parse_cwr(self, cwr_id, file_data):
         data = {}
 
-        data['filename'] = filename
-        data['contents'] = codecs.open(file_path, 'r', 'latin-1').read()
-
         try:
-            result = self._decoder.decode(data)
+            result = self._decoder.decode(file_data)
         except:
             result = None
 
         if result:
-            self._data_service.store_cwr(cwr_id, result)
+            self._send_results(cwr_id, self._encoder_json.encode(result))
 
-        os.remove(file_path)
+        # os.remove(file_path)
 
-        return result
+    def _send_results(self, cwr_id, result):
+        # TODO: Do this in a cleaner way
+
+        headers = {'Content-Type': 'application/json'}
+
+        data = {
+            'id': cwr_id,
+            'data': result
+        }
+
+        try:
+            requests.post(self._store_url,
+                          data=json.dumps(data), headers=headers)
+            self._logger.info('Sent results')
+        except ConnectionError:
+            self._logger.error('Failure when sending results')
