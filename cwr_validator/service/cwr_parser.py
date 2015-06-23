@@ -88,20 +88,17 @@ class ThreadingCWRParserService(CWRParserService):
 
         self._parse_cwr_threaded(cwr_id, file)
 
-        return cwr_id
-
     @threaded
     def _parse_cwr_threaded(self, cwr_id, file_data):
-        _logger.info('Begins processing CWR file %s' % file_data['filename'])
+        _logger.info('Begins processing CWR file with id %s' % cwr_id)
         self.parse_cwr(cwr_id, file_data)
-        _logger.info('Finished processing CWR file %s' % file_data['filename'])
+        _logger.info('Finished processing CWR file with id %s' % cwr_id)
 
     def parse_cwr(self, cwr_id, file_data):
-        data = {}
-
         try:
             result = self._decoder.decode(file_data)
         except:
+            _logger.error('Error processing CWR file with id %s' % cwr_id)
             result = None
 
         if result:
@@ -122,6 +119,6 @@ class ThreadingCWRParserService(CWRParserService):
         try:
             requests.post(self._store_url,
                           data=json.dumps(data), headers=headers)
-            self._logger.info('Sent results')
+            self._logger.info('Sent parse results')
         except ConnectionError:
-            self._logger.error('Failure when sending results')
+            self._logger.error('Failure when sending parse results')

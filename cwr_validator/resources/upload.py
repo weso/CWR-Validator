@@ -58,12 +58,18 @@ class UploadFileResource(Resource):
         """
         _logger.info('Received CWR file')
 
-        args = self._reqparse.parse_args()
+        file_data = self._reqparse.parse_args()
+
+        _logger.info('Accepted CWR file')
 
         file_service = current_app.config['FILE_SERVICE']
 
-        file_id = file_service.process_cwr(args)
+        file_id = file_data['file_id']
 
-        _logger.info('Sent to processing file with id %s' % file_id)
+        _logger.info('Sending file with id %s to be processed' % file_id)
 
-        return {'id': str(file_id)}
+        file_service.process_cwr(file_data)
+
+        _logger.info('Sent file with id %s to be processed' % file_id)
+
+        return '', 200
