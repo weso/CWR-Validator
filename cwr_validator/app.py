@@ -7,6 +7,7 @@ Web app module.
 import logging
 from logging.handlers import RotatingFileHandler
 from logging import Formatter
+import os
 
 from flask import Flask
 from werkzeug.contrib.fixers import ProxyFix
@@ -17,8 +18,6 @@ from data_validator.accessor import CWRValidatorConfiguration
 from cwr_validator.resources import UploadFileResource
 from cwr_validator.service import ThreadingCWRParserService
 from cwr_validator.uploads.__uploads__ import path
-
-import os
 
 __author__ = 'Bernardo Martínez Garrido'
 __license__ = 'MIT'
@@ -31,7 +30,7 @@ def _register_resources(api):
 
 def _load_services(app, config):
     file_ws = os.environ.get('CWR_ADMIN_WS',
-                              'http://127.0.0.1:33508/cwr/')
+                             'http://127.0.0.1:33508/cwr/')
 
     path_upload = config['upload.folder']
     if len(path_upload) == 0:

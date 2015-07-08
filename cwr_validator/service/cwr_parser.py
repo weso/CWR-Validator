@@ -2,9 +2,7 @@
 
 from abc import ABCMeta, abstractmethod
 import os
-import codecs
 import logging
-import sys
 import json
 
 import requests
@@ -104,7 +102,7 @@ class ThreadingCWRParserService(CWRParserService):
         if result:
             self._send_results(cwr_id, self._encoder_json.encode(result))
 
-        # os.remove(file_path)
+            # os.remove(file_path)
 
     def _send_results(self, cwr_id, result):
         # TODO: Do this in a cleaner way
