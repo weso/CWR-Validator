@@ -7,6 +7,7 @@ Web app module.
 import logging
 from logging.handlers import RotatingFileHandler
 from logging import Formatter
+import os
 
 from flask import Flask
 from werkzeug.contrib.fixers import ProxyFix
@@ -28,12 +29,15 @@ def _register_resources(api):
 
 
 def _load_services(app, config):
+    file_ws = os.environ.get('CWR_ADMIN_WS',
+                             'http://127.0.0.1:33508/cwr/')
+
     path_upload = config['upload.folder']
     if len(path_upload) == 0:
         path_upload = path()
 
     app.config['FILE_SERVICE'] = ThreadingCWRParserService(
-        path_upload, 'http://127.0.0.1:33508/cwr/files/')
+        path_upload, file_ws + 'files/')
 
 
 def create_app(config_object=DevConfig):
