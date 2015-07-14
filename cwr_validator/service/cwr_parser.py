@@ -101,6 +101,8 @@ class ThreadingCWRParserService(CWRParserService):
 
         if result:
             self._send_results(cwr_id, self._encoder_json.encode(result))
+        else:
+            self._send_results(cwr_id, None)
 
             # os.remove(file_path)
 
@@ -110,9 +112,11 @@ class ThreadingCWRParserService(CWRParserService):
         headers = {'Content-Type': 'application/json'}
 
         data = {
-            'id': cwr_id,
-            'data': result
+            'id': cwr_id
         }
+
+        if result:
+            data['data'] = result
 
         try:
             requests.post(self._store_url,
