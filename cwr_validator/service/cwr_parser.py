@@ -10,8 +10,6 @@ from requests import ConnectionError
 from cwr.parser.decoder.file import default_file_decoder
 from cwr.parser.encoder.cwrjson import JSONEncoder
 
-from cwr_validator.util.parallel import threaded
-
 """
 Services for parsing CWR files.
 
@@ -86,7 +84,6 @@ class ThreadingCWRParserService(CWRParserService):
 
         self._parse_cwr_threaded(cwr_id, file)
 
-    @threaded
     def _parse_cwr_threaded(self, cwr_id, file_data):
         _logger.info('Begins processing CWR file with id %s' % cwr_id)
         self.parse_cwr(cwr_id, file_data)
@@ -100,6 +97,8 @@ class ThreadingCWRParserService(CWRParserService):
             result = None
 
         if result:
+            _logger.error(
+                'Sending processed results for file with id %s' % cwr_id)
             self._send_results(cwr_id, self._encoder_json.encode(result))
         else:
             self._send_results(cwr_id, None)
