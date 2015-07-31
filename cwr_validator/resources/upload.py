@@ -66,10 +66,10 @@ class UploadFileResource(Resource):
 
         file_id = file_data['file_id']
 
-        _logger.info('Sending file with id %s to be processed' % file_id)
+        _logger.info('Beginning to process file with id %s' % file_id)
 
         file_service.process_cwr(file_data)
 
-        _logger.info('Sent file with id %s to be processed' % file_id)
+        _logger.info('Finished processing file with id %s' % file_id)
 
         return '', 200
