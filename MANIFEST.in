@@ -1,4 +1,4 @@
 # Miscellany files
 include LICENSE
-include README.rst
+include README.md
 prune tests

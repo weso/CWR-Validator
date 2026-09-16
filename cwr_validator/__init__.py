@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
-
-from cwr_validator.app import create_app
-
 """
-    CWR Data API Validator WS
-    ~~~~~~~~~~~~~~~~~~~~~~~~~
-    Validator Web Service for Common Works Registrations.
-    :copyright: (c) 2015 by WESO
-    :license: MIT, see LICENSE for more details.
+CWR file validator CLI.
+
+Validates .V21 and .V22 files by parsing them through configurable local
+checkouts of the CWR DataApi library (v2.1 and v2.2).
 """
 
-__version__ = '0.0.1'
-__license__ = 'MIT'
+from cwr_validator.validator import ValidationResult, validate_file, validate_files
+
+__version__ = "1.0.0"
+__license__ = "MIT"
+
+__all__ = ["ValidationResult", "validate_file", "validate_files", "__version__"]

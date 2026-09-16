@@ -51,26 +51,21 @@ class _FileReader(object):
 
 class CWRValidatorConfiguration(object):
     """
-    Offers methods to access the CWR web application configuration data.
+    Offers methods to access the CWR validator configuration data.
     """
 
     def __init__(self):
-        # Reader for the files
         self._reader = _FileReader()
-
-        # Files containing the CWR info
         self._file_config = 'config.properties'
-
-        # Configuration
         self._config = None
 
     def get_config(self):
-        """
-        Loads the configuration file.
-
-        :return: the webapp configuration
-        """
+        """Load config.properties (cached after first read)."""
         if not self._config:
             self._config = self._reader.read_properties(self._file_config)
-
         return self._config
+
+    def get_library_path(self, version: str) -> str:
+        """Return the configured library path for 2.1 or 2.2 (may be empty)."""
+        key = "library.v21.path" if version == "2.1" else "library.v22.path"
+        return self.get_config().get(key, "").strip()
